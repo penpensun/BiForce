@@ -1,0 +1,887 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package biforce.graphs;
+
+import java.util.List;
+import java.io.IOException;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.util.*;
+import biforce.algorithms.Param;
+import biforce.constants.BiForceConstants;
+
+/**
+ * The 2nd version, MatrixBipartiteGraph2 extends Graph2. Incorporating the function
+ * computing distances is the main feature.
+ * @author Peng
+ */
+public class MatrixBipartiteGraph2 extends Graph2{
+    //This variable stores the cost of the cluster editing, with initial value of 0
+    double cost=0;
+    
+    /* These two variables store the sizes of the two vertex sets. */
+    int set0Size =0;
+    int set1Size =0;
+    /*This 2-dimensional array stores the adjacency matrix */
+    double[][] edgeWeights = null;
+    /* This matrix stores the distances. */
+    /* Distances, unlike edge weight, must be defined between two arbitrary vertices. It does not matter 
+    whether the two vertices come from the same set or not, since later single-linkage and kmeans clustering
+    use pairwise distances. */
+    /* Note that the distance matrix is a LOWER TRIANGULAR MATRIX. */
+    double[][] distances = null;
+    
+    /* Constructor */
+    /**
+     * This constructor initializes a MatrxiBipartiteGraph object.
+     * 
+     * @param filePath The input file path of graph.
+     * @param isHeader Is the input file with header.
+     */
+    public MatrixBipartiteGraph2(String filePath, boolean isHeader) {
+        if(isHeader)
+            try{
+                readGraphWithHeader(filePath);
+            }catch(IOException e){
+                System.out.println("(MatrixBipartiteGraph2.constructor)"
+                        + " MaxtrixBipartiteGraph readGraphWithHeader failed:"
+                        + " "+filePath);
+            }
+        else
+            try{
+                readGraph(filePath);
+            }catch(IOException e){
+                System.out.println("(MatrixBipartiteGraph2.constructor)"
+                        + " MatrixBipartiteGraph readGraph failed:"
+                        +" "+filePath);
+            }
+        /* Init the distance matrix. */
+        distances = new double[set0Size+set1Size][set0Size+set1Size];
+        for(int i=0;i<set0Size+set1Size;i++)
+            for(int j=0;j<set0Size+set1Size;j++)
+                distances[i][j] = -1;
+    }
+    
+    public MatrixBipartiteGraph2(String filePath, boolean isHeader,double thresh){
+        if(isHeader)
+            try{
+                readGraphWithHeader(filePath);
+            }catch(IOException e){
+                System.out.println("MaxtrixBipartiteGraph readGraphWithHeader failed.");
+            }
+        else
+            try{
+                readGraph(filePath);
+            }catch(IOException e){
+                System.out.println("MatrixBipartiteGraph readGraph failed.");
+            }
+        setThreshold(thresh);
+        detractThresh();
+        /* Init the distance matrix. */
+        distances = new double[set0Size+set1Size][set0Size+set1Size];
+        for(int i=0;i<set0Size+set1Size;i++)
+            for(int j=0;j<set0Size+set1Size;j++)
+                distances[i][j] = -1;
+    }
+    
+    
+    
+    @Override
+    public MatrixBipartiteSubgraph2 bfs(Vertex2 Vtx) {
+        LinkedList<Vertex2> queue = new LinkedList<>();
+        //create a marker
+        HashMap<String, Boolean> marker = new HashMap<>();
+        //init the haspmap
+
+        //create a new arrayList<Vertex> as result
+        ArrayList<Vertex2> result = new ArrayList<>();
+
+        for(Vertex2 vtx: getVertices()){
+            marker.put(vtx.toString(), Boolean.FALSE);
+        }
+
+        //enqueue source and mark source
+         queue.add(Vtx);
+         result.add(Vtx);
+         marker.put(Vtx.toString(),true);
+
+         //while queue is not empty
+         while(!queue.isEmpty()){
+             //dequeue an item from queue into CurrentVtx
+             Vertex2 CurrentVtx = queue.pollLast();
+             //get the nei of CurrentVtx
+             ArrayList<Vertex2> nei = neighbours(CurrentVtx);
+
+             /* If no neighbour is found, then we continue. */
+             if(nei == null)
+                 continue;
+             //for each neighbour
+             for(Vertex2 vtx: nei)
+             {
+                 if(!marker.get(vtx.toString()))
+                 {
+                     marker.put(vtx.toString(),true);
+                     queue.add(vtx);
+                     result.add(vtx);
+                 }
+             }
+
+         }
+         //create a new subkpartitegraph
+         MatrixBipartiteSubgraph2 sub = new MatrixBipartiteSubgraph2(result,this);
+         return sub;
+    }
+
+    /**
+     * This method returns the connected components in the form of 
+     * List<MatrixBipartiteSubgraphV2>.
+     * 
+     * @return 
+     */
+    @Override
+    public List<MatrixBipartiteSubgraph2> connectedComponents() {
+        ArrayList<MatrixBipartiteSubgraph2> connectecComps = new ArrayList<>();
+        //create a indicator LinkedList of vertices, when a vertex is included in one of the subgraphs, then it is 
+        //removed from the indicator LinkedList
+        LinkedList<Vertex2> indicatorList = new LinkedList<>();
+        //add all the vertex into the IndicatorArray
+        for(Vertex2 vtx: getVertices()){
+            indicatorList.add(vtx);
+        }
+        //While there is still unvisited vertex, we use it as the seed to search for subgraphs.
+        while(!indicatorList.isEmpty()){
+            Vertex2 Seed = indicatorList.pollFirst();
+            MatrixBipartiteSubgraph2 comp = bfs(Seed);
+            connectecComps.add(comp);
+            //remove all the vertex in the comp from indicatorList
+            for(Vertex2 vtx: comp.getSubvertices()){
+                indicatorList.remove(vtx);
+            }
+        }
+        connectecComps.trimToSize();
+        return connectecComps;
+    }
+
+   
+    
+    
+    /**
+     * This method computes the euclid distance between two vertices.
+     * @param vtx1
+     * @param vtx2
+     * @return 
+     */
+    private double euclidDist(Vertex2 vtx1, Vertex2 vtx2){
+        if(vtx1.getCoords() == null ||
+                vtx2.getCoords() == null)
+            throw new IllegalArgumentException ("(MatrixBipartiteGraph.euclidDist) Null coordinates:  "+
+                    "vtx1:  "+vtx1.getCoords().toString()+"  vtx2:  "+vtx2.getCoords().toString());
+        //check if they have the same dimension
+        if(vtx1.getCoords().length !=vtx2.getCoords().length )
+            throw new IllegalArgumentException("Point 1 and Point 2 have different dimension");
+        double Dist= 0;
+        for(int i=0;i<vtx1.getCoords().length;i++)
+        {
+            Dist+= (vtx1.getCoords()[i]-vtx2.getCoords()[i])*
+                    (vtx1.getCoords()[i]-vtx2.getCoords()[i]);
+        }
+        Dist = Math.sqrt(Dist);
+        return Dist;
+    }
+    
+    /**
+     * This method detracts all edge weights with threshold.
+     */
+    @Override
+    public final void detractThresh(){
+        /* First check if the thresh is detracted. */
+        if(threshDetracted)
+            throw new IllegalArgumentException("(MatrixBipartiteGraph2.detractThresh)"
+                    + "  The threshold is already detracted.");
+        /* Second check if the threshold has been set. */
+        if(thresh == Double.MAX_VALUE)
+            throw new IllegalArgumentException("(MatrixBipartiteGraph2.detractThresh)"
+                    + "  The threshold must be set at first.");
+        else{
+            for(int i=0;i<set0Size;i++)
+                for(int j=0;j<set1Size;j++)
+                    edgeWeights[i][j] -=thresh;
+        }
+        threshDetracted = true;
+    }
+    
+    /**
+     * This method implements detractThresh(double thresh)
+     * @param thresh 
+     */
+    @Override
+    public final void detractThresh(double thresh){
+        /* Check if the threshold has already detracted */
+        if(threshDetracted)
+            throw new IllegalArgumentException("(MatrixBipartiteGraph2.detractThresh)"
+                    + "  The threshold is already detracted.");
+        else
+            setThreshold(thresh);
+        detractThresh();
+    }
+    
+     /**
+     * This method returns the distance between two given vertices. 
+     * @param vtx1
+     * @param vtx2
+     * @return 
+     */
+    @Override
+    public double dist(Vertex2 vtx1, Vertex2 vtx2) {
+        /* First compute the indexes of vtx1 and vtx2 in the matrix. */
+        int distIdxVtx1 = vtx1.getVtxSet()*set0Size+vtx1.getVtxIdx();
+        int distIdxVtx2 = vtx2.getVtxSet()*set0Size+vtx2.getVtxIdx();
+        if(distIdxVtx1 <distIdxVtx2)
+            return distances[distIdxVtx1][distIdxVtx2];
+        else return distances[distIdxVtx2][distIdxVtx1];
+    }
+
+    @Override
+    public double edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
+        /* Check if two vertices are of same vertex set,then the edge is not defined. */
+        if(vtx1.getVtxSet() == vtx2.getVtxSet())
+            return BiForceConstants.NON_DEF_EDGE;
+        
+        /* Check the index bounds. */
+        /* If the vtx1 is in set0. */
+        if(vtx1.getVtxSet() == 0){
+            if(vtx1.getVtxIdx()<0|| vtx1.getVtxIdx()>=set0Size)
+                throw new IllegalArgumentException("(MatrixBipartiteGraph2.edgeWeight)"
+                        + " vtx1 index out of bound:  "+vtx1.getValue()
+                        +"  "+vtx1.getVtxSet()+"  "+vtx1.getVtxIdx());
+        }
+        /* If the vtx1 is in set1. */
+        else if(vtx1.getVtxSet() == 1){
+            if(vtx1.getVtxIdx() <0 || vtx1.getVtxIdx()>= set1Size)
+                throw new IllegalArgumentException("(MatrixBipartiteGraph2.edgeWeight)"
+                        +"  vtx1 index out of bound:  "+vtx1.getValue()+"  "
+                        +"  "+vtx1.getVtxSet()+"  "+vtx1.getVtxIdx());
+        }
+        
+        /*If the vtx2 is is in set0.*/
+        if(vtx2.getVtxSet() == 0){
+            if(vtx2.getVtxIdx()<0 || vtx2.getVtxIdx()>=set0Size)
+                throw new IllegalArgumentException("(MatrixBipartiteGraph2.edgeWeight)"
+                        + " vtx2 index out of bound:  "+vtx2.getValue()
+                        +"  "+vtx2.getVtxSet()+"  "+vtx2.getVtxIdx()); 
+        }
+        
+        else if(vtx2.getVtxSet() ==1){
+            if(vtx2.getVtxIdx() <0 || vtx2.getVtxIdx()>= set1Size)
+                throw new IllegalArgumentException("(MatrixBipartiteGraph2.edgeWeight)"
+                        +"  vtx1 index out of bound:  "+vtx2.getValue()+"  "
+                        +"  "+vtx2.getVtxSet()+"  "+vtx2.getVtxIdx());
+        }
+        
+        /* Extract the edge weight. */
+        if(vtx1.getVtxSet() == 0 && vtx2.getVtxSet() == 1)
+            return edgeWeights[vtx1.getVtxIdx()][vtx2.getVtxIdx()];
+        else
+            return edgeWeights[vtx2.getVtxIdx()][vtx1.getVtxIdx()];
+        
+    }
+    
+    /**
+     * Return the edge weight given two indexes.
+     * Note the vtxIdx1 must be an index in set0 and vtxIdx2 must be an index in set1.
+     * @param vtxIdx1
+     * @param vtxIdx2
+     * @return 
+     */
+    @Override
+    public double edgeWeight(int vtxIdx1, int vtxIdx2){
+        
+        /* Check the index bounds. */
+        if(vtxIdx1<0 || vtxIdx1 >= set0Size)
+            throw new IllegalArgumentException("VtxIdx1 out of bound:  "+vtxIdx1);
+        else if(vtxIdx2 <0 || vtxIdx2>=set1Size)
+            throw new IllegalArgumentException("VtxIdx2 out of bound:  "+vtxIdx2);
+        return edgeWeights[vtxIdx1][vtxIdx2];
+    }
+    
+    @Override
+    public final double getCost() {
+        return cost;
+    }
+
+    
+    /**
+     * This method returns if the current action has been taken.
+     * @param actIdx
+     * @return 
+     */
+    @Override
+    public boolean isActionTaken(int actIdx) {
+        Vertex2 vtx1 = actions.get(actIdx).getVtx1();
+        Vertex2 vtx2 = actions.get(actIdx).getVtx2();
+        if(edgeWeight(vtx1,vtx2) == actions.get(actIdx).getOriginalWeight())
+            return false;
+        else return true;
+    }
+    
+    
+    /**
+     * The method returns the nei of the given vertex.
+     * precondition: Threshold detracted.
+     * @param vtx
+     * @return 
+     */
+    @Override
+    public ArrayList<Vertex2> neighbours(Vertex2 currentVtx){
+        /* Here we add a pre-condition: Check if the threshold is detracted. */
+        if(!threshDetracted){
+            System.out.println
+                    ("(MatrixBipartiteGraph2.neighbours) Threshold must be detracted first.");
+            detractThresh();
+        }
+        ArrayList<Vertex2> neighbours = new ArrayList<>();
+        for(Vertex2 vtx: vertices){
+            /* If they are from the same set, then it's impossible there's an edge
+             * between them.*/
+            if(currentVtx.getVtxSet() ==
+                    vtx.getVtxSet())
+                continue;
+            else
+                if(edgeWeight(currentVtx,vtx)>0)
+                    neighbours.add(vtx);       
+        }
+        //neighbours.trimToSize();
+        /* If no neighbour is found, then return null. */
+        if(neighbours.isEmpty())
+            return null;
+        return neighbours;
+        
+    }
+    
+
+    /**
+     * 
+     * @param vtx1
+     * @param vtx2
+     * @param isEdgeInsertion
+     * @return 
+     */
+    @Override
+    public boolean pushAction(Vertex2 vtx1, Vertex2 vtx2) {
+        /* First check if thresh is already detracted, if not we have 
+         to first detract threshold. */
+        if(!threshDetracted)
+            detractThresh();
+        
+        double ew = edgeWeight(vtx1, vtx2);
+        if(ew == 0)
+            throw new IllegalArgumentException("There is a null-edge between vtx1 and vtx2");
+        Action2 act = null;
+        act = new Action2(vtx1,vtx2,ew);
+        actions.add(act);
+        if(act.getOriginalWeight() > 0){
+            cost += act.getOriginalWeight();
+        }
+        else{
+            cost -= act.getOriginalWeight();
+        }
+        return true;
+    }
+    
+    /**
+     * This method pushes one vertex into the graph. 
+     * Currently it's a private method, avoiding any insertion of vertices after
+     * the graph is initialized.
+     * @param vtx
+     * @return The index of the pushed vertex.
+     */
+    private int pushVertex(String vertexValue, int vertexSet ){
+        Vertex2 vtx = new Vertex2(vertexValue,vertexSet,-1);
+        //U. Note: we should add a new meothod, searching a vertex in a given
+        //vertex list (arrayList or Linkedlist). This method should be a static
+        //method
+        int Idx = ((ArrayList<Vertex2>)vertices).indexOf(vtx);
+        if(Idx == -1){
+            vertices.add(vtx);
+            //set the index of the new vertex according to its vertex set
+            if(vertexSet == 0){
+                vtx.setVtxIdx(set0Size);
+                set0Size++;
+                return set0Size-1;
+            }
+            else if(vertexSet ==1){
+                vtx.setVtxIdx(set1Size);
+                set1Size++;
+                return set1Size-1;
+            }
+            else
+                throw new IllegalArgumentException("Vertex lvel can only be 0 or 1");
+        }
+        else
+            return ((ArrayList<Vertex2>)vertices).get(Idx).getVtxIdx();
+    }
+  
+
+    /**
+    * This method reads file into MatrixBipartiteGraph.
+    * @param filePath
+    * @throws IOException 
+    */
+    @Override
+    public final void readGraph(String filePath) throws IOException {
+        //Init the vertices and the actions
+        vertices = new ArrayList<>();
+        actions = new ArrayList<>();
+        //Read the input file for the first time, to init the 
+        //EdgeWeight matrix
+        FileReader fr = new FileReader(filePath);
+        BufferedReader br= new BufferedReader(fr);
+        String line;
+        //no header in the file
+        //Size1, Size2 are two variables just to init EdgeWeight matrix.
+        //When the input file is read for the first time, we do not create any vertex or add any vertex into
+        //arraylist vertices.
+        int Size1 = 0;
+        int Size2 = 0;
+        // Here, we used 2 hashset to count how many vertices we have
+        HashSet<String> Set1 = new HashSet<>();
+        HashSet<String> Set2 = new HashSet<>();
+        
+        while((line = br.readLine())!= null)
+        {
+            String[] split  = line.split("\t");
+            //if there is only vertex, no other link
+            if(split.length ==2){
+                int setIdx = -1;
+                /* Catch the NumberFormatException. */
+                try{
+                    setIdx = Integer.parseInt(split[1]);
+                }catch(NumberFormatException e){
+                    System.out.println("(readGraph) Invalid number format for vertex set index: "+  split[1]);
+                    edgeWeights = null;
+                    return;
+                }
+                
+                if(setIdx == 0 )
+                    Set1.add(String.copyValueOf(split[0].toCharArray()));
+                else if(setIdx == 1)
+                    Set2.add(String.copyValueOf(split[0].toCharArray()));
+                else{
+                    System.out.println("(readGraph) Error: For bipartite graph, level number can only be 0 or 1");
+                    edgeWeights = null;
+                    return;
+                }
+                
+            }
+            else{
+                int set0Idx =-1,set1Idx = -1;
+                /* Catch the NumberFormatException. */
+                try{
+                    set0Idx = Integer.parseInt(split[1]);
+                }catch(NumberFormatException e){
+                    System.out.println("(readGraph) Invalid number format for vertex set index: "+split[1]);
+                    System.exit(0);
+                }
+                
+                try{
+                    set1Idx = Integer.parseInt(split[3]);
+                }catch(NumberFormatException e){
+                    System.out.println("(readGraph) Invalid number format for vertex set index:  "+split[3]);
+                    System.exit(0);
+                }
+                if(set0Idx == 0)
+                    Set1.add(String.copyValueOf(split[0].toCharArray()));
+                else if(Integer.parseInt(split[1]) == 1)
+                    Set2.add(String.copyValueOf(split[0].toCharArray()));
+                else{
+                    System.out.println("(readGraph) Error: For bipartite graph, level number can only be 0 or 1");
+                    System.exit(0);
+                }
+
+                if(Integer.parseInt(split[3]) == 0)
+                    Set1.add(String.copyValueOf(split[2].toCharArray()));
+                else if(Integer.parseInt(split[3]) == 1)
+                    Set2.add(String.copyValueOf(split[2].toCharArray()));
+                else{
+                    System.out.println("(readGraph) Error: For bipartite graph, level number can only be 0 or 1");
+                    System.exit(0);
+                }
+            }
+        }
+        br.close();
+        fr.close();
+        
+        Size1 = Set1.size();
+        Size2 = Set2.size();
+        Set1 = null;
+        Set2 = null;
+        //U. note: in the new version, we are to implement an npartitegraph based on matrix.
+        //Edges between two arbitrarily different vertex sets are permitted.
+        //Thus, if we have n vertex sets, we have n(n-1)/2 edge weight matrices
+        edgeWeights = new double[Size1][Size2];
+        /* Set the init values of edgeWeights to NaN. */
+        for(int i=0;i<Size1;i++)
+            for(int j=0;j<Size2;j++)
+                edgeWeights[i][j] = Double.NaN;
+        //Init the values;
+        
+        //re-read the file, create vertices and init edge weights.
+        fr = new FileReader(filePath);
+        br = new BufferedReader(fr);
+        while((line = br.readLine())!= null)
+        {
+            String[] split = line.split("\t");
+            //if there is only vertex, no other link
+            if(split.length ==2)
+            {
+                String vtxName = String.copyValueOf(split[0].toCharArray());
+                int vtxLvl = -1;
+                /* Catch the NumberFormatException. */
+                try{
+                    vtxLvl = Integer.parseInt(String.copyValueOf(split[1].toCharArray()));
+                }catch(NumberFormatException e){
+                    System.out.println("(readGraph) Invalid format for vertex set index:  "+split[1]);
+                    System.exit(0);
+                }
+                
+                //Push vertex
+                pushVertex(vtxName,vtxLvl);
+            }
+            else{
+                String Vtx1Name = String.copyValueOf(split[0].toCharArray());
+                //int Vtx1Lvl = Integer.parseInt(String.copyValueOf(splits2[1].toCharArray()));
+                int vtx1Lvl = -1;
+                /* Catch the NumberFormatException. */
+                try{
+                    vtx1Lvl = Integer.parseInt(String.copyValueOf(split[1].toCharArray()));
+                }catch(NumberFormatException e){
+                    System.out.println("(readGraph) Invalid format for vertex set index:  "+split[0]);
+                    System.exit(0);
+                }
+                
+                String Vtx2Name = String.copyValueOf(split[2].toCharArray());
+                //int Vtx2Lvl = Integer.parseInt(String.copyValueOf(splits2[3].toCharArray()));
+                int vtx2Lvl = -1;
+                /* Catch the NumberFormatException. */
+                try{
+                    vtx2Lvl = Integer.parseInt(String.copyValueOf(split[3].toCharArray()));
+                }catch(NumberFormatException e){
+                    System.out.println("(readGraph) Invalid format for vertex set index:  "+split[3]);
+                    System.exit(0);
+                }
+
+                //U. note: here it's not proper to use addVertex() just to search for an existing vertex.
+                //Thus, we should add a new method findVertex(). maybe a static method in Class Vertex, or a normal
+                //method in the new NpartiteGraph class
+                int Idx1 = pushVertex(Vtx1Name,vtx1Lvl);
+                int Idx2 = pushVertex(Vtx2Name,vtx2Lvl);
+                double ew = Double.parseDouble(String.copyValueOf(split[4].toCharArray()));
+                
+                //U. note: here we need a method to assign edgeweight.
+                if(vtx1Lvl == 0 && vtx2Lvl ==1)
+                    try{
+                        edgeWeights[Idx1][Idx2] = ew;
+                    }catch(ArrayIndexOutOfBoundsException e){
+                        System.out.println("(readGraph) Vertex index is out of bound: "+Idx1+"  "+Idx2);
+                        System.exit(0);
+                    }
+                else if(vtx1Lvl ==1 && vtx2Lvl ==0)
+                    try{
+                        edgeWeights[Idx2][Idx1] = ew;
+                    }catch(ArrayIndexOutOfBoundsException e){
+                        System.out.println("(readGraph) Vertex index is out of bound:  "+Idx1+"  "+Idx2);
+                    }
+                else throw new IllegalArgumentException("Vertex lvl can only be 0 or 1");
+            }
+        }
+        br.close();
+        fr.close();
+        //Init the clusters.
+        clusters = new ArrayList<>();
+    }
+    
+    /**
+     * This methdo reads a graph from an input file with header, i.e. the first row 
+     * of the row gives the number of vertices in the graph in each vertex set.
+     * @param filePath 
+     */
+    public final void readGraphWithHeader(String filePath) throws IOException{
+        /* These two variables store the number of vertices given by the graph header.*/
+        int size0,size1;
+        //Init the vertices and the actions
+        vertices = new ArrayList<>();
+        actions = new ArrayList<>();
+        /* Init the objects to read graphs. */
+        FileReader fr = new FileReader(filePath);
+        BufferedReader br= new BufferedReader(fr);
+        String line;
+        
+        /* Read the first line to obtain the numbers of vertices in two vertex sets. */
+        line = br.readLine();
+        /* Assign the set sizes. */
+        String[] splits1 = line.split("\\s+");
+        /* Check the length of splits1 array. If longer than 2, then gives error 
+         * and aborts the programme. */
+        if(splits1.length != 2){
+            System.out.println("(readGraphWithHeader) For a bipartite graph, header must only contain 2 numbers.");
+            System.exit(0);
+        }
+        try{
+            size0 = Integer.parseInt(splits1[0]);
+            size1 = Integer.parseInt(splits1[1]);
+            /* Init the double array for edge weights. */
+            edgeWeights = new double[size0][size1];
+        }catch(NumberFormatException e){
+            System.out.println("(readGraphWithHeader) The header of the input graph contains "
+                    +"invalid number formats.");
+            return;
+        }
+        
+        /* Set the init values of edge weight matrix to Double.NaN. */
+        for(int i=0;i<size0;i++)
+            for(int j=0;j<size1;j++)
+                edgeWeights[i][j] = Double.NaN;
+
+        /* Read the input file. */
+        while((line = br.readLine())!= null){
+            String[] splits2 = line.split("\t");
+            //if there is only vertex, no other link
+            if(splits2.length ==2)
+            {
+                String vtxName = String.copyValueOf(splits2[0].toCharArray());
+                int vtxLvl = -1;
+                /* Catch the NumberFormatException. */
+                try{
+                    vtxLvl = Integer.parseInt(String.copyValueOf(splits2[1].toCharArray()));
+                }catch(NumberFormatException e){
+                    System.out.println("(readGraphWithHeader) Invalid format for vertex set index:  "+splits2[1]);
+                    System.exit(0);
+                }
+                
+                //Push vertex
+                pushVertex(vtxName,vtxLvl);
+            }
+            else{
+                String vtx1Name = String.copyValueOf(splits2[0].toCharArray());
+                //int Vtx1Lvl = Integer.parseInt(String.copyValueOf(splits2[1].toCharArray()));
+                int vtx1Lvl = Integer.parseInt(String.copyValueOf(splits2[1].toCharArray()));
+                /* Check if vtx1Lvl is equal to 0 or 1.*/
+                if(vtx1Lvl != 0 && vtx1Lvl != 1){
+                    System.out.println("(readGraphWithHeader) Invalid vtx1Lv1. ");
+                    return;
+                }
+                    
+                String vtx2Name = String.copyValueOf(splits2[2].toCharArray());
+                //int Vtx2Lvl = Integer.parseInt(String.copyValueOf(splits2[3].toCharArray()));
+                int vtx2Lvl = Integer.parseInt(String.copyValueOf(splits2[3].toCharArray()));
+                if(vtx2Lvl != 0 && vtx2Lvl != 1){
+                    System.out.println("(readGraphWithHeader) Invalid vtx2Lvl.");
+                    return;
+                }
+                //U. note: here it's not proper to use addVertex() just to search for an existing vertex.
+                //Thus, we should add a new method findVertex(). maybe a static method in Class Vertex, or a normal
+                //method in the new NpartiteGraph class
+                int idx1 = pushVertex(vtx1Name,vtx1Lvl);
+                /* Here we must check the index, whether the index is out of the bound. */
+                if(vtx1Lvl == 0 && idx1 >= size0){
+                    System.out.println("(readGraphWithHeader) idx1 out of the bound of set0Size.");
+                    return;
+                }
+                else if(vtx1Lvl == 1 && idx1>=size1){
+                    System.out.println("(readGraphWithHeader) idx1 out of the bound of set1Size.");
+                    return;
+                }
+                    
+                int idx2 = pushVertex(vtx2Name,vtx2Lvl);
+                /* Here we must check the index, whether the index if out of the bound. */
+                 if(vtx2Lvl == 0 && idx2 >= size0){
+                    System.out.println("(readGraphWithHeader) idx2 out of the bound of set0Size.");
+                    return;
+                }
+                else if(vtx2Lvl == 1 && idx2 >= size1){
+                    System.out.println("(readGraphWithHeader) idx2 out of the bound of set1Size.");
+                    return;
+                }
+                 
+                double ew = Double.parseDouble(String.copyValueOf(splits2[4].toCharArray()));
+               
+                //U. note: here we need a method to assign edgeweight.
+                if(vtx1Lvl == 0 && vtx2Lvl ==1)
+                    edgeWeights[idx1][idx2] = ew;
+                else if(vtx1Lvl ==1 && vtx2Lvl ==0)
+                    edgeWeights[idx2][idx1] = ew;
+                else throw new IllegalArgumentException("(readGraphWithHeader) Vertex lvl can only be 0 or 1");
+            }
+        }
+        /* Check if the sizes given in the header match the real sizes obtained from the file. */
+        if(size0 != set0Size ||
+                size1 != set1Size){
+            System.out.println("(MatrixBipartiteGraph2.readWithHeader) Sizes in the header"
+                    + " do not match the real sizes: ");
+            System.out.println("Header sizes:  "+size0+"  "+size1);
+            System.out.println("Real sizes:  "+set0Size+"  "+set1Size);
+            System.exit(0);
+        }
+        br.close();
+        fr.close();
+        //Init the clusters.
+        clusters = new ArrayList<>();
+    }
+
+    /**
+     * This method restores the threshold from the edge weights.
+     */
+    @Override
+    public void restoreThresh(){
+        /* First check if the thresh is detracted, if not then throw an exception. */
+        if(!threshDetracted)
+            throw new IllegalArgumentException("(MatrixBipartiteGraph2.restoreThresh)"
+                    + "  The threshold is not yet detracted.");
+        /* Second check if the threshold has been set. */
+        if(thresh == Double.MAX_VALUE)
+            throw new IllegalArgumentException("(MatrixBipartiteGraph2.detractThresh)"
+                    + "  The threshold must be set at first.");
+        else{
+            for(int i=0;i<set0Size;i++)
+                for(int j=0;j<set1Size;j++)
+                    edgeWeights[i][j] +=thresh;
+        }
+        threshDetracted = false;
+    }
+    @Override
+    public boolean removeAction(int index) {
+        if(index<0 || index>= actions.size()){
+            System.out.println("(MatrixBipartiteGraph2.removeAction) Index out of bounds: "+index);
+            return false;
+        }
+        actions.remove(index);
+        return true;
+    }
+    
+    @Override
+    public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, double edgeWeight) {
+        if(vtx1.getVtxSet() == vtx2.getVtxSet()){
+            throw new IllegalArgumentException("(MatrixBipartiteGraph2) Vtx1 and vtx2"
+                    + "must not come from the same vertex set.");
+        }
+        /* If vtx1 comes from vertex 1, then we swap them. */
+        if(vtx1.getVtxSet() ==1){
+            Vertex2 swap = vtx1;
+            vtx1 = vtx2;
+            vtx2 = swap;
+        }
+        /* Check the index bound. */
+        if(vtx1.getVtxIdx() >= set0Size || vtx1.getVtxIdx()<0 ||
+                vtx2.getVtxIdx() >= set1Size || vtx2.getVtxIdx() <0)
+            throw new IllegalArgumentException("(MatrixBipartiteGraph.setEdgeWeight)"
+                    + " Index out of bound. vtxIdx1:  "+vtx1.getVtxIdx()+"  vtxIdx2:  "+vtx2.getVtxIdx());
+        if(threshDetracted){
+            edgeWeights[vtx1.getVtxIdx()][vtx2.getVtxIdx()] = edgeWeight-thresh;
+        }
+        else
+            edgeWeights[vtx1.getVtxIdx()][vtx2.getVtxIdx()] = edgeWeight;
+    }
+
+    /**
+     * This method takes the action. 
+     * @param idx
+     * @return 
+     */
+    @Override
+    public boolean takeAction(int idx) {
+        /* First the check the index. */
+        if(idx <0 || idx >= actions.size())
+            throw new IllegalArgumentException("(MatrixBipartitGraph2.takeAction) Wrong action index: "+
+                    idx);
+        Action2 act = actions.get(idx);
+        if(act.getOriginalWeight()>0)
+            setEdgeWeight(act.getVtx1(),act.getVtx2(),BiForceConstants.FORBIDDEN);
+        else
+            setEdgeWeight(act.getVtx1(),act.getVtx2(),BiForceConstants.PERMENANT);
+        return true;
+    }
+
+    /**
+     * Take all actions in the actions arrayList.
+     * @return 
+     */
+    @Override
+    public boolean takeActions() {
+        boolean flag = true;
+        for(int i=0;i<actions.size();i++){
+            if(!takeAction(i))
+                flag = false;
+        }
+        return flag;
+    }
+
+    
+
+    /**
+     * This method updates the distances.
+     */
+    @Override
+    public void updateDist() {
+        for(int i=0;i<vertices.size();i++)
+            for(int j=i+1;j<vertices.size();j++){
+                Vertex2 vtx1 = vertices.get(i);
+                Vertex2 vtx2 = vertices.get(j);
+                
+                /* Compute the index of the vertices in distance matrix. */
+                int distIdxVtx1 = set0Size*vtx1.getVtxSet()+vtx1.getVtxIdx();
+                int distIdxVtx2 = set0Size*vtx2.getVtxSet()+vtx2.getVtxIdx();
+                /* Keep distances as a lower triangular matrix. */
+                if(distIdxVtx1 <distIdxVtx2)
+                    distances[distIdxVtx1][distIdxVtx2] = euclidDist(vtx1,vtx2);
+                else 
+                    distances[distIdxVtx2][distIdxVtx1] = euclidDist(vtx1,vtx2);
+            }
+    }
+    
+    /**
+     * This method updates the positions.
+     * @param dispVector 
+     */
+    @Override
+    public void updatePos(double[][] dispVector){
+        /* For each vertex, update the position. */
+        for(int i=0;i<vertexCount();i++){
+            /* Compute the new coordinates. */
+            double[] coords = vertices.get(i).getCoords();
+            for(int j=0;j<coords.length;j++){
+                coords[j] += dispVector[i][j];
+            }
+            /* Set the coordinates. */
+            vertices.get(i).setCoords(coords);
+        }
+    }
+
+    @Override
+    public int vertexSetCount() {
+        return 2;
+    }
+
+    @Override
+    public void writeGraphTo(String FilePath) {
+        
+    }
+
+    /**
+     * This method writes the result clusters to a given file.
+     * @param FilePath 
+     */
+    @Override
+    public void writeClusterTo(String FilePath) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void writeResultInfoTo(String FilePath) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+}
