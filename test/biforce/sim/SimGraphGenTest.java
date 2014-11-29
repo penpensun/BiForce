@@ -164,7 +164,7 @@ public class SimGraphGenTest {
      */
     @Test
     public void testGeneratorHierGeneralGraph(){
-        System.out.println("(SimGraphGen.testGeneratorHierGeneralGraph) Test starts.");
+        System.out.println("(biforce.sim.SimGraphGenTest.testGeneratorHierGeneralGraph) Test starts.");
         int[] setSizes = new int[4];
         setSizes[0] = 10;
         setSizes[1] = 15;
@@ -176,7 +176,7 @@ public class SimGraphGenTest {
         double stdev = 0.0;
         double result = SimGraphGen.generatorHierGeneralGraph(setSizes, outputFile, mean, stdev);
         /* Read the graph. */
-        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(outputFile, false,0);
+        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(outputFile, false,false,0);
         
         double expRes = 0;
         /* First check the number of vertices. */
@@ -203,7 +203,51 @@ public class SimGraphGenTest {
             assertEquals(setSizes[i],weights.length);
         }
         
-        System.out.println("(SimGraphGen.testGeneratorHierGeneralGraph) Test ends.");
+        System.out.println("(biforce.sim.SimGraphGenTest.testGeneratorHierGeneralGraph) Test ends.");
+    }
+    
+    
+    @Test
+    public void testGeneratorHierGeneralGraphXml(){
+        System.out.println("(biforce.sim.SimGraphGenTest.testGeneratorHierGeneraGraphXml) Test starts.");
+        int[] setSizes = new int[4];
+        setSizes[0] = 10;
+        setSizes[1] = 15;
+        setSizes[2] = 20;
+        setSizes[3] = 18;
+        
+        String outputFile = "../../data/testdata/unit_test/SimGraphGen/outputfile_hiergeneralgraphxml.txt";
+        double mean = 20.0;
+        double stdev = 0.0;
+        double result = SimGraphGen.generatorHierGeneralGraphXml(setSizes, outputFile, mean, stdev);
+        
+        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(outputFile, false,true,0);
+        
+        double expRes = 0;
+        /* First check the number of vertices. */
+        //assertEquals(63, graph.vertexCount());
+        ArrayList<MatrixHierGeneralSubgraph> connComps = graph.connectedComponents();
+        
+        assertEquals(true, connComps.size()>0);
+        System.out.println("The number of connected components: "+connComps.size());
+        /* Check each connComp to see if they are bigger than 0 (not empty). */
+        for(int i=0;i<connComps.size();i++)
+            assertEquals(true,connComps.get(i).vertexCount()>0);
+        
+        /* Check if the setSizes match the matrix sizes. */
+        /* Check if the setSizes match the sizes of the inter edge weight matrices. */
+        for(int i=0;i<setSizes.length-1;i++){
+            double[][] weights = graph.interEdgeWeightMatrix(i);
+            assertEquals(setSizes[i],weights.length);
+            assertEquals(setSizes[i+1],weights[0].length);
+            
+        }
+        /* Check if the setSizes match the sizes of the intra edge weigt matrices. */
+        for(int i=0;i<setSizes.length;i++){
+            double[][] weights = graph.intraEdgeWeightMatrix(i);
+            assertEquals(setSizes[i],weights.length);
+        }
+        System.out.println("(biforce.sim.SimGraphGenTest.testGeneratorHierGeneraGraphXml) Test ends.");
     }
 
    

@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import org.jdom2.*;
+import org.jdom2.input.*;
+import java.io.File;
 
 /**
  * This graph is an upgraded version of MatrixHierNpartiteGraph, allowing edges within the 
@@ -40,15 +43,25 @@ public class MatrixHierGeneralGraph extends Graph2{
      * Constructor.
      * @param filePath 
      */
-    public MatrixHierGeneralGraph(String filePath, boolean isHeader){
+    public MatrixHierGeneralGraph(String filePath, boolean isHeader, boolean isXmlFile){
         /* Init the vertices arrayList. */
         vertices = new ArrayList<>();
         /* Init the distance arrayList. */
         //distances = new ArrayList<>();
         /* Init the action arrayList. */
         actions = new ArrayList<>();
+        /* If the input is in xml format. */
+        if(isXmlFile)
+            try{
+                readGraphInMatrixXML(filePath);
+            }catch(IOException e){
+                System.out.println("(biforce.graphs.MatrixHierGeneralGraph.constructor) "
+                        + " MatrixHierGeneralGraph readGraphWithHeader failed:"
+                        + " "+filePath);
+                return;
+            }
         /* If the input file is with header.*/
-        if(isHeader)
+        else if(isHeader)
             try{
                 readGraphWithHeader(filePath);
             }catch(IOException e){
@@ -73,20 +86,30 @@ public class MatrixHierGeneralGraph extends Graph2{
                 
     }
     
-    public MatrixHierGeneralGraph(String filePath, boolean isHeader,double thresh){
+    public MatrixHierGeneralGraph(String filePath, boolean isHeader, boolean isXmlFile,double thresh){
         /* Init the vertices arrayList. */
         vertices = new ArrayList<>();
         /* Init the distance arrayList. */
         //distances = new ArrayList<>();
         /* Init the action arrayList. */
         actions = new ArrayList<>();
+       /* If the input is in xml format. */
+        if(isXmlFile)
+            try{
+                readGraphInMatrixXML(filePath);
+            }catch(IOException e){
+                System.out.println("(biforce.graphs.MatrixHierGeneralGraph.constructor) "
+                        + " MatrixHierGeneralGraph readGraphWithHeader failed:"
+                        + " "+filePath);
+                return;
+            }
         /* If the input file is with header.*/
-        if(isHeader)
+        else if(isHeader)
             try{
                 readGraphWithHeader(filePath);
             }catch(IOException e){
-                System.out.println("(MatrixHierNpartiteGraph.constructor)"
-                        + " MatrixHierNpartiteGraph readGraphWithHeader failed:"
+                System.out.println("(MatrixHierGeneralGraph.constructor)"
+                        + " MatrixHierGeneralGraph readGraphWithHeader failed:"
                         + " "+filePath);
             }
         
@@ -94,8 +117,8 @@ public class MatrixHierGeneralGraph extends Graph2{
            try{
                 readGraph(filePath);
             }catch(IOException e){
-                System.out.println("(MatrixHierNpartiteGraph.constructor)"
-                        + " MatrixHierNpartiteGraph readGraphWithHeader failed:"
+                System.out.println("(MatrixHierGeneralGraph.constructor)"
+                        + " MatrixHierGeneralGraph readGraphWithHeader failed:"
                         + " "+filePath);
             } 
         setThreshold(thresh);
@@ -719,6 +742,197 @@ public class MatrixHierGeneralGraph extends Graph2{
         br.close();
         fr.close();
         /* Init the cluster object. */
+        clusters = new ArrayList<>();
+    }
+    
+    /**
+     * This method reads graph from the "entity-matrix" style input.
+     * @throws IOException 
+     * @param filePath The input file. 
+     */
+    public final void readGraphInMatrixXML(String filePath) throws IOException{
+        /* Read the input file. */
+        SAXBuilder builder = new SAXBuilder();
+        Document graphInput = null;
+        try{
+            graphInput = builder.build(new File(filePath));
+        }catch(JDOMException e){
+            System.out.println("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) Document init error:  "+filePath);
+            return;
+        }
+        /* Get the root element. */
+        Element docRoot = graphInput.getRootElement();
+        Element entity = docRoot.getChild("entity");
+        String levelStr = entity.getAttributeValue("levels"); /* Get how many sets are there in the graph. */
+        /* levelStr is required. */
+        if(levelStr == null){
+            /* If no "levels" attribute is defined, then an exception is thrown. */
+            throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) Attribute \"levels\" must be given.");
+        }
+        try{
+            setSizes = new int[Integer.parseInt(levelStr)];/* Init setSizes. */
+        }catch(NumberFormatException e){
+            throw new NumberFormatException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) Attribute \"levels\" number format error:  "+levelStr);
+        }
+        /* Get the content in entity. */
+        String entityContent = entity.getContent(0).getValue();
+        /* Split the content of the entity by lines. */
+        String[] contentSplits = entityContent.split("\n");
+        /* Create nodes and push into vertices. */
+        int setIdx = 0;
+        for(int i=0;i<contentSplits.length;i++){
+            /* Get the line. */
+            String line = contentSplits[i];
+            /* Jump the empty line. */
+            if(line.trim().isEmpty())
+                continue;
+            /* Split the line. */
+            String[] lineSplits = line.split("\\s+");
+            setSizes[setIdx] = lineSplits.length; /* The number of nodes in set i is the length of the splits on line i. */
+            for(int j=0;j<lineSplits.length;j++){
+                /* For each split, we create node. */
+                String value = String.copyValueOf(lineSplits[j].toCharArray());
+                Vertex2 vtx = new Vertex2(value,setIdx,j); /* The value of the node is the split. 
+                The level is i. The index is j.*/
+                vertices.add(vtx); /* Push the node into vertices. */
+            }
+            setIdx++;
+        }
+        /* Init all matrices. */
+        /* We have setSizes.length intraEdgeWeightMatrix. */
+        intraEdgeWeights = new ArrayList<> ();
+        for(int i=0;i<setSizes.length;i++){
+            double[][] intraMatrix = new double[setSizes[i]][setSizes[i]]; 
+            /* Give matrix the init values. */
+            for(int j=0;j<setSizes[i];j++)
+                for(int k=0;k<setSizes[i];k++)
+                    intraMatrix[j][k] = Double.NaN;
+            /* Push this intraMatrix to intraEdgeWeights. */
+            intraEdgeWeights.add(intraMatrix);
+        }
+        /* Init the inter matrices. */
+        interEdgeWeights = new ArrayList<>();
+        for(int i=0;i<setSizes.length-1;i++){
+            double[][] interMatrix = new double[setSizes[i]][setSizes[i+1]];
+            /* Give matrix the init values. */
+            for(int j=0;j<setSizes[i];j++)
+                for(int k=0;k<setSizes[i+1];k++)
+                    interMatrix[j][k] = Double.NaN;
+            /* Push this interMatrix into interEdgeWeights. */
+            interEdgeWeights.add(interMatrix);
+        }
+        /* Read the edge weights from the xml input file. */
+        ArrayList<Element> matrixElementList = new ArrayList<>(docRoot.getChildren("matrix"));
+        /* First check the number of elements in matrixElementList, if not equal to 2*setSizes.length-1. */
+        if(matrixElementList.size() != 2*setSizes.length-1)
+            throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) The number of matrices is wrong:  "+matrixElementList.size());
+        
+        /* Assign the edge weights. */
+        for(Element matrix: matrixElementList){
+            /* First where is this matrix. */
+            String matrixLevel = matrix.getAttributeValue("matrixLevel");
+            if(matrixLevel == null) /* The matrixLevel attribute is required. */
+                throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) The matrixLevel attribute is required.");
+            String[] matrixLevelSplits = matrixLevel.split("\\s+");
+            /* If string matrixLevel cannot be splitted into two splits, then it must be wrong. */
+            if(matrixLevelSplits.length !=2)
+                throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) The attribute matrixLevel error:  "+matrixLevel);
+            int matrixLevel1=-1,matrixLevel2=-1;
+            try{
+                matrixLevel1= Integer.parseInt(String.copyValueOf(matrixLevelSplits[0].toCharArray()));
+                matrixLevel2= Integer.parseInt(String.copyValueOf(matrixLevelSplits[1].toCharArray()));
+            }catch(NumberFormatException e){
+                throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) The attribute matrixLevel error:  "+matrixLevel);
+            }
+            /* Check if the matrix is a intra- or inter edge weight matrix. */
+            if(matrixLevel1 == matrixLevel2){ /* Intra matrix. */
+                /* Read the content. */
+                String matrixContent = matrix.getContent(0).getValue().trim();
+                /* Get the matrix in the graph. */
+                double[][] intraMatrix = intraEdgeWeights.get(matrixLevel1);
+                /* Split the matrixContent. */
+                String[] rowsStr = matrixContent.split("\n");
+                for(int i=0;i<rowsStr.length;i++){
+                    String row = rowsStr[i];
+                    /* Split the row into columns.*/
+                    String[] cols = row.split("\\s+");
+                    /* Here we check the size of the matrix, see if it matches setSizes. */
+                    if(rowsStr.length != setSizes[matrixLevel1] || cols.length != setSizes[matrixLevel1])
+                        throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) The size of the intra-matrix does not match setSizes, setSize:  "+
+                                setSizes[matrixLevel1]+", row:"+rowsStr.length+", cols:"+cols.length);
+                    for(int j=0;j<cols.length;j++){
+                        /* If this is a self-edge, then we just check if the value in the matrix is also NaN. */
+                        if(i==j && !Double.isNaN(intraMatrix[i][j]) )
+                            throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) Self-edge error, matrixLevel: "+
+                                    matrixLevel1+" ,row/col is:  "+i);
+                        else if(i==j)
+                            continue;
+                        else{/* If i!= j.*/
+                            /* First check the number format of the value in the matrix. */
+                            double value = Double.NaN;
+                            try{
+                                value = Double.parseDouble(String.copyValueOf(cols[j].toCharArray()));
+                            }catch(NumberFormatException e){
+                                e.printStackTrace();
+                                throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) Number format error:  "+cols[j]);
+                            }
+                            /* Here the value cannot be NaN, since it's not a self-edge.*/
+                            if(Double.isNaN(value))
+                                throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) Non-self edge weight cannot be NaN:  "+value+"  "+i+","+j);
+                            /* Check if the value in the matrix is already initialized. */
+                            if(!Double.isNaN(intraMatrix[i][j]))
+                                throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) Duplicated initialization,"+
+                                        " value in the matrix:  "+intraMatrix[i][j]+"  value in the xml file:  "+value);
+                            /* We then assign the value in the intraMatrix. */
+                            intraMatrix[i][j] = value;
+                            /* Here we have to check if the intraMatrix is symmetric. */
+                            if(i>j && intraMatrix[i][j] != intraMatrix[j][i])
+                                throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) Intra-matrix is not symmetric: "+
+                                        i+","+j+":  "+intraMatrix[i][j]+";  "+i+","+j+":  "+intraMatrix[j][i]);
+                        }
+                    }
+                }
+                intraEdgeWeights.set(matrixLevel1, intraMatrix); /* Re-set the intraMatrix.*/
+            }
+            else{ /* Inter matrix. */
+                String matrixContent = matrix.getContent(0).getValue().trim();
+                /* Get the inter matrix in the interEdgeWeights. The index of interMatrix is the min of matrixLevel1 and matrixLevel2. */
+                double[][] interMatrix = interEdgeWeights.get(Math.min(matrixLevel1, matrixLevel2));
+                /* Split the matrixContent. */
+                String[] rowsStr = matrixContent.split("\n");
+                for(int i=0;i<rowsStr.length;i++){
+                    String row = rowsStr[i];
+                    /* Split the row into columns. */
+                    String[] cols = row.split("\\s+");
+                    /* Here we check the size of the matrix, see if it matches setSizes. */
+                    if(rowsStr.length != setSizes[Math.min(matrixLevel1, matrixLevel2)] || 
+                            cols.length != setSizes[Math.max(matrixLevel1, matrixLevel2)])
+                        throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) The size of the inter-matrix does not match setSizes. Index of the set: "
+                                +matrixLevel1+","+matrixLevel2
+                                +" setSize of the row:  "+setSizes[Math.min(matrixLevel1, matrixLevel2)]+", row:"+rowsStr.length+
+                                ",setSize of the column:  "+setSizes[Math.max(matrixLevel1, matrixLevel2)]+" cols:"+cols.length);
+                    for(int j=0;j<cols.length;j++){
+                        /* First check the number format in the matrix. */
+                        double value = Double.NaN;
+                        try{
+                            value = Double.parseDouble(String.copyValueOf(cols[j].toCharArray()));
+                        }catch(NumberFormatException e){
+                            throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) Number format error:  "+cols[j]);
+                        }
+                        /* In the inter matrix, value cannot be NaN. */
+                        if(Double.isNaN(value))
+                            throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) NaN in the xml for inter matrix. ");
+                         /* Check the if the value in the interMatrix is duplicated initialized. */
+                        if(!Double.isNaN(interMatrix[i][j]))
+                            throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInMatrixXML) Duplicated initialization,"+
+                                        " value in the matrix:  "+interMatrix[i][j]+"  value in the xml file:  "+value);
+                        interMatrix[i][j] = value;
+                    }
+                }
+                /* Re-set the inter-matrix. */
+                interEdgeWeights.set(Math.min(matrixLevel1,matrixLevel2), interMatrix);
+            }
+        }
         clusters = new ArrayList<>();
     }
     

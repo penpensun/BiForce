@@ -41,7 +41,7 @@ public class MatrixHierGeneralSubgraphTest {
     public void testConstructor(){
         System.out.println("(MatrixHierGeneralSubgraphTest.constructor) Test starts.");
         MatrixHierGeneralGraph graphInstance =
-                new MatrixHierGeneralGraph(testConstructorSubgraph,true,0);
+                new MatrixHierGeneralGraph(testConstructorSubgraph,true,false,0);
         /* Create an arraylist of nodes for subgraph. */
         ArrayList<Vertex2> subgraphVertices = new ArrayList<Vertex2>();
         /* Get the vertices. */

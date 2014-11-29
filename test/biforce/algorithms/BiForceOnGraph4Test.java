@@ -172,7 +172,7 @@ public class BiForceOnGraph4Test {
                 int[] sizes = {20,20};
                 double stdCost = SimGraphGen.generatorHierGeneralGraph(sizes, 
                         testMatrixHierGeneralGraphInput, 20, 15);
-                MatrixHierGeneralGraph hierGeneralGraph = new MatrixHierGeneralGraph(testMatrixHierGeneralGraphInput,false,0);
+                MatrixHierGeneralGraph hierGeneralGraph = new MatrixHierGeneralGraph(testMatrixHierGeneralGraphInput,false,false,0);
                 
                 BiForceOnGraph4 biforce4 = new BiForceOnGraph4();
                 
