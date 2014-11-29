@@ -379,8 +379,8 @@ public class MatrixHierGeneralGraphTest {
     }
     
     @Test
-    public void testReadGraphInMatrixXML(){
-        System.out.println("(biforce.graph.MatrixHierGeneralGraphTest.testReadGraphInMatrixXML) Test starts. ");
+    public void testReadGraphInXML(){
+        System.out.println("(biforce.graph.MatrixHierGeneralGraphTest.testReadGraphInXML) Test starts. ");
         MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(testReadXmlMatrix,false, true,0);
         /* Check the nodes. */
         /* Init nodes. */
@@ -519,7 +519,7 @@ public class MatrixHierGeneralGraphTest {
            for(int j=0;j<row4.length;j++)
                assertEquals(interMatrix3[i][j], graph.edgeWeight(row3[i], row4[j]),0.0001);
             
-        System.out.println("(biforce.graph.MatrixHierGeneralGraphTest.testReadGraphInMatrixXML) Test ends");
+        System.out.println("(biforce.graph.MatrixHierGeneralGraphTest.testReadGraphInXML) Test ends");
     }
 
     /**

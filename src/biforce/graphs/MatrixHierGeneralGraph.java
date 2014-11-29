@@ -53,7 +53,7 @@ public class MatrixHierGeneralGraph extends Graph2{
         /* If the input is in xml format. */
         if(isXmlFile)
             try{
-                readGraphInMatrixXML(filePath);
+                readGraphInXML(filePath);
             }catch(IOException e){
                 System.out.println("(biforce.graphs.MatrixHierGeneralGraph.constructor) "
                         + " MatrixHierGeneralGraph readGraphWithHeader failed:"
@@ -96,7 +96,7 @@ public class MatrixHierGeneralGraph extends Graph2{
        /* If the input is in xml format. */
         if(isXmlFile)
             try{
-                readGraphInMatrixXML(filePath);
+                readGraphInXML(filePath);
             }catch(IOException e){
                 System.out.println("(biforce.graphs.MatrixHierGeneralGraph.constructor) "
                         + " MatrixHierGeneralGraph readGraphWithHeader failed:"
@@ -749,8 +749,9 @@ public class MatrixHierGeneralGraph extends Graph2{
      * This method reads graph from the "entity-matrix" style input.
      * @throws IOException 
      * @param filePath The input file. 
+     * untested.
      */
-    public final void readGraphInMatrixXML(String filePath) throws IOException{
+    public final void readGraphInXML(String filePath) throws IOException{
         /* Read the input file. */
         SAXBuilder builder = new SAXBuilder();
         Document graphInput = null;
