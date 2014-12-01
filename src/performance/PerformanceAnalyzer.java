@@ -49,7 +49,7 @@ public class PerformanceAnalyzer {
     public ArrayList<Double> graphGenerator(String type, 
             int size,int[] setSizes, int number, double mean, double dev, 
             String outputPrefix, String costsOutput){
-        
+        SimGraphGen gen = new SimGraphGen();
         /* The ArrayList<Double> contains the standard costs. */
         ArrayList<Double> stdCosts = new ArrayList<>(number);
         /* Generate graphs according to types. */
@@ -60,7 +60,7 @@ public class PerformanceAnalyzer {
             /* Generate n-partite graphs.*/
             for(int i=0;i<number;i++){
                 /* Generate the graph and add the cost into the stdCosts. */
-                stdCosts.add(SimGraphGen.generatorHierNpartiteGraph(setSizes, outputPrefix+"_"+i+".txt", mean, dev));
+                stdCosts.add(gen.generatorHierNpartiteGraph(setSizes, outputPrefix+"_"+i+".txt", mean, dev));
             }
         }
         else if(type.equals("hiergeneral")){
@@ -70,7 +70,7 @@ public class PerformanceAnalyzer {
             /* Generate hiergeneral graphs. */
             for(int i=0;i<number;i++){
                 /* Generate the graph and add the cost into the stdCosts. */
-                stdCosts.add(SimGraphGen.generatorHierGeneralGraph(setSizes, outputPrefix+"_"+i+".txt", mean, dev));
+                stdCosts.add(gen.generateHierGeneralGraph(setSizes, outputPrefix+"_"+i+".txt", mean, dev));
             }
         }
         else if(type.equals("bipartite")){
@@ -87,7 +87,7 @@ public class PerformanceAnalyzer {
             /* Generate general graphs. */
             for(int i=0;i<number;i++)
                 /* Generate the graph and add the cost into the stdCosts. */
-                stdCosts.add(SimGraphGen.generatorGeneralGraph1(size, outputPrefix+"_"+i+".txt", mean, dev));
+                stdCosts.add(gen.generatorGeneralGraph1(size, outputPrefix+"_"+i+".txt", mean, dev));
         }
         else if (type.equals("hiergeneralxml")){
              /* Check if the set sizes are null.*/
@@ -96,7 +96,7 @@ public class PerformanceAnalyzer {
             /* Generate hiergeneral graphs. */
             for(int i=0;i<number;i++){
                 /* Generate the graph and add the cost into the stdCosts. */
-                stdCosts.add(SimGraphGen.generatorHierGeneralGraphXml(setSizes, outputPrefix+"_"+i+".txt", mean, dev));
+                stdCosts.add(gen.generateHierGeneralGraphXml(setSizes, outputPrefix+"_"+i+".txt", mean, dev));
             }
         }
         else 
@@ -201,6 +201,7 @@ public class PerformanceAnalyzer {
         ArrayList<Double> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
                 inputPrefix,costsOutput);
     }
+    
     
     /**
      * 
@@ -352,18 +353,38 @@ public class PerformanceAnalyzer {
         runAlgorithm(inputPrefix, resultOutput,paramFile,true,stdCosts,repeat,true);
     }
     
+    public void generateExternIntraMatrix(String outputFile, int manyRows){
+        SimGraphGen gen = new SimGraphGen();
+        gen.writeRandomIntraMatrix(outputFile, manyRows, mean, dev);
+    }
+    
+    public void generateExternInterMatrix(String outputFile,int manyRows, int manyCols){
+        SimGraphGen gen = new SimGraphGen();
+        gen.writeRandomInterMatrix(outputFile, manyRows, manyCols, mean, dev);
+    }
+    
+    public void generateExternNodeNames(){
+        String outputFile = "../../data/testdata/performance_profile/inputs/25600nodes/xml_hier_general_25600nodes_names.txt";
+        int[] setSizes= {6400,6400,6400,6400};
+        SimGraphGen gen = new SimGraphGen();
+        gen.writeNodeNames(setSizes, outputFile);
+    }
+    
     public static void main(String[] args) throws IOException{
         PerformanceAnalyzer analyzer = new PerformanceAnalyzer();
         //performanceAnalysisOnHierGeneralGraph();
         //performanceAnalysisOnXmlHierGeneralGraph();
         //analyzer.generateSingleGraph();
-        long start = System.currentTimeMillis();
-        analyzer.runAlgorithmOnSingleFile("../../data/testdata/performance_profile/inputs/12800nodes/xml_hier_general_12800nodes_4.txt",
-                "../../data/testdata/performance_profile/outputs/12800nodes/xml_hier_general_12800nodes_4_output.txt",
+        //long start = System.currentTimeMillis();
+        
+        analyzer.runAlgorithmOnSingleFile(
+               "../../data/testdata/performance_profile/inputs/25600nodes/xml_hier_general_graph_25600nodes.txt",
+                "../../data/testdata/performance_profile/outputs/25600nodes/xml_hier_general_25600nodes_output.txt",
                 "./parameters.ini",
                 true);
-        long end = System.currentTimeMillis();
-        System.out.println("Running time:  "+(end-start)/1000.0);
+        
+        //long end = System.currentTimeMillis();
+        //System.out.println("Running time:  "+(end-start)/1000.0);
         /* Generate the sim graphs. */
         //analyzer.generateGraphs400Nodes();
         //analyzer.generateGraphs800Nodes();
@@ -372,5 +393,15 @@ public class PerformanceAnalyzer {
         //analyzer.generateGraphs6400Nodes();
         //analyzer.generateGraphs9600Nodes();
         //analyzer.generateGraphs12800Nodes();
+        //analyzer.generateExternNodeNames();
+        /*
+        analyzer.generateExternIntraMatrix("../../data/testdata/performance_profile/inputs/25600nodes/matrix_0_0.txt", 6400);
+        analyzer.generateExternIntraMatrix("../../data/testdata/performance_profile/inputs/25600nodes/matrix_1_1.txt", 6400);
+        analyzer.generateExternIntraMatrix("../../data/testdata/performance_profile/inputs/25600nodes/matrix_2_2.txt", 6400);
+        analyzer.generateExternIntraMatrix("../../data/testdata/performance_profile/inputs/25600nodes/matrix_3_3.txt", 6400);
+                */
+        //analyzer.generateExternInterMatrix("../../data/testdata/performance_profile/inputs/25600nodes/matrix_0_1.txt", 6400, 6400);
+        //analyzer.generateExternInterMatrix("../../data/testdata/performance_profile/inputs/25600nodes/matrix_1_2.txt", 6400, 6400);
+        //analyzer.generateExternInterMatrix("../../data/testdata/performance_profile/inputs/25600nodes/matrix_2_3.txt", 6400, 6400);
     }
 }

@@ -19,8 +19,9 @@ import biforce.graphs.MatrixHierGeneralSubgraph;
  * @author penpen926
  */
 public class SimGraphGenTest {
-    
+    SimGraphGen gen = null;
     public SimGraphGenTest() {
+        gen = new SimGraphGen();
     }
 
     @BeforeClass
@@ -51,7 +52,7 @@ public class SimGraphGenTest {
         double mean = 10.0;
         double stdev = 0.0;
         /* Create the graph. */
-        double cost = SimGraphGen.generatorGeneralGraph1(vtxNum, outputFile, mean, stdev);
+        double cost = gen.generatorGeneralGraph1(vtxNum, outputFile, mean, stdev);
         /* Read the graph. */
         MatrixGraph testGraph = new MatrixGraph(outputFile,true,0);
         /* Test the inputted graph. */
@@ -102,17 +103,17 @@ public class SimGraphGenTest {
         pivotIndexes.add(10);
         pivotIndexes.add(16);
         /* Test the cases for IN the same cluster. */
-        assertEquals(true,SimGraphGen.inSameClust(0,3,pivotIndexes));
-        assertEquals(true,SimGraphGen.inSameClust(4,5,pivotIndexes));
-        assertEquals(true,SimGraphGen.inSameClust(10,13, pivotIndexes));
-        assertEquals(true,SimGraphGen.inSameClust(17, 20, pivotIndexes));
+        assertEquals(true,gen.inSameClust(0,3,pivotIndexes));
+        assertEquals(true,gen.inSameClust(4,5,pivotIndexes));
+        assertEquals(true,gen.inSameClust(10,13, pivotIndexes));
+        assertEquals(true,gen.inSameClust(17, 20, pivotIndexes));
         
         /* Test the cases for NOT IN the same cluster. */
-        assertEquals(false,SimGraphGen.inSameClust(0, 4, pivotIndexes));
-        assertEquals(false,SimGraphGen.inSameClust(0, 12, pivotIndexes));
-        assertEquals(false,SimGraphGen.inSameClust(4, 15, pivotIndexes));
-        assertEquals(false,SimGraphGen.inSameClust(5, 18, pivotIndexes));
-        assertEquals(false,SimGraphGen.inSameClust(13, 19, pivotIndexes));
+        assertEquals(false,gen.inSameClust(0, 4, pivotIndexes));
+        assertEquals(false,gen.inSameClust(0, 12, pivotIndexes));
+        assertEquals(false,gen.inSameClust(4, 15, pivotIndexes));
+        assertEquals(false,gen.inSameClust(5, 18, pivotIndexes));
+        assertEquals(false,gen.inSameClust(13, 19, pivotIndexes));
         System.out.println("(SimGraphGen.inSameCluster) Test ends. ");
     }
 
@@ -131,7 +132,7 @@ public class SimGraphGenTest {
         String outputFile = "../../data/testdata/unit_test/SimGraphGen/outputfile_generatorHierNpartiteGraph.txt";
         double mean = 20.0;
         double stdev = 0.0;
-        double result = SimGraphGen.generatorHierNpartiteGraph(setSizes, outputFile, mean, stdev);
+        double result = gen.generatorHierNpartiteGraph(setSizes, outputFile, mean, stdev);
         /* Read the graph. */
         MatrixHierNpartiteGraph graph = new MatrixHierNpartiteGraph(outputFile, false,0);
         
@@ -174,7 +175,7 @@ public class SimGraphGenTest {
         String outputFile = "../../data/testdata/unit_test/SimGraphGen/outputfile_generatorHierGeneralGraph.txt";
         double mean = 20.0;
         double stdev = 0.0;
-        double result = SimGraphGen.generatorHierGeneralGraph(setSizes, outputFile, mean, stdev);
+        double result = gen.generateHierGeneralGraph(setSizes, outputFile, mean, stdev);
         /* Read the graph. */
         MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(outputFile, false,false,0);
         
@@ -219,10 +220,8 @@ public class SimGraphGenTest {
         String outputFile = "../../data/testdata/unit_test/SimGraphGen/outputfile_hiergeneralgraphxml.txt";
         double mean = 20.0;
         double stdev = 0.0;
-        double result = SimGraphGen.generatorHierGeneralGraphXml(setSizes, outputFile, mean, stdev);
-        
+        double result = gen.generateHierGeneralGraphXml(setSizes, outputFile, mean, stdev);
         MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(outputFile, false,true,0);
-        
         double expRes = 0;
         /* First check the number of vertices. */
         //assertEquals(63, graph.vertexCount());
@@ -249,8 +248,4 @@ public class SimGraphGenTest {
         }
         System.out.println("(biforce.sim.SimGraphGenTest.testGeneratorHierGeneraGraphXml) Test ends.");
     }
-
-   
-    
-    
 }

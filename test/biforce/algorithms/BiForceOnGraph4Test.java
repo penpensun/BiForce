@@ -24,7 +24,9 @@ public class BiForceOnGraph4Test {
     String testMatrixHierNpartiteGraphInput = "../../data/testdata/unit_test/MatrixHierNpartiteGraph/run_input.txt";
     String testMatrixHierGeneralGraphInput = "../../data/testdata/unit_test/MatrixHierGeneralGraph/run_input.txt";
     String paramFile = "./parameters.ini";
+    SimGraphGen gen = null;
     public BiForceOnGraph4Test() {
+        gen = new SimGraphGen();
     }
 
     @BeforeClass
@@ -77,7 +79,7 @@ public class BiForceOnGraph4Test {
             try{
                 Param p = Param.readParams(paramFile);
                 /* Generate a random npartiteInstance. */
-                double stdCost = SimGraphGen.generatorGeneralGraph1(50, testMatrixGraphInput, 20, 15);
+                double stdCost = gen.generatorGeneralGraph1(50, testMatrixGraphInput, 20, 15);
                 MatrixGraph graph = new MatrixGraph(testMatrixGraphInput,true,0);
                 BiForceOnGraph4 biforce4  =new BiForceOnGraph4();
                 biforce4.run(graph, p);
@@ -101,7 +103,7 @@ public class BiForceOnGraph4Test {
                 Param p = Param.readParams(paramFile);
                 //int[] sizes = {20,20,20,20};
                 int[] sizes = {20,20};
-                double stdCost = SimGraphGen.generatorHierNpartiteGraph(sizes, 
+                double stdCost = gen.generatorHierNpartiteGraph(sizes, 
                         testMatrixHierNpartiteGraphInput, 20, 15);
                 MatrixHierNpartiteGraph npartiteInstance = new MatrixHierNpartiteGraph(testMatrixHierNpartiteGraphInput,
                         false, 0);
@@ -133,7 +135,7 @@ public class BiForceOnGraph4Test {
         try{
             Param p = Param.readParams(paramFile);
             int[] sizes = {20,20};
-            double stdCost = SimGraphGen.generatorHierNpartiteGraph(sizes, 
+            double stdCost = gen.generatorHierNpartiteGraph(sizes, 
                         testMatrixHierNpartiteGraphInput, 20, 15);
             /* Create MatrixHierNpartiteGraph .*/
             MatrixHierNpartiteGraph npartiteInstance = new MatrixHierNpartiteGraph(testMatrixHierNpartiteGraphInput,
@@ -170,7 +172,7 @@ public class BiForceOnGraph4Test {
                 Param p = Param.readParams(paramFile);
                 //int[] sizes = {20,20,20,20};
                 int[] sizes = {20,20};
-                double stdCost = SimGraphGen.generatorHierGeneralGraph(sizes, 
+                double stdCost = gen.generateHierGeneralGraph(sizes, 
                         testMatrixHierGeneralGraphInput, 20, 15);
                 MatrixHierGeneralGraph hierGeneralGraph = new MatrixHierGeneralGraph(testMatrixHierGeneralGraphInput,false,false,0);
                 

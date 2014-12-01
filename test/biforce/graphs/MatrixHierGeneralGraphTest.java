@@ -16,7 +16,8 @@ public class MatrixHierGeneralGraphTest {
     String testReadGraphNoheaderInput = "../../data/testdata/unit_test/MatrixHierGeneralGraph/test_readgraph_noheader.txt";
     String testReadGraphHeaderInput = "../../data/testdata/unit_test/MatrixHierGeneralGraph/test_readgraph_header.txt";
     String testBfsInput = "../../data/testdata/unit_test/MatrixHierGeneralGraph/test_bfs_input.txt";
-    String testReadXmlMatrix = "../../data/testdata/unit_test/MatrixHierGeneralGraph/test_readxml.txt";
+    String testReadXml = "../../data/testdata/unit_test/MatrixHierGeneralGraph/test_readxml.txt";
+    String testReadXmlExternFile = "../../data/testdata/unit_test/XmlInputParser/test_readxml.txt";
     public MatrixHierGeneralGraphTest() {
     }
 
@@ -381,7 +382,7 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testReadGraphInXML(){
         System.out.println("(biforce.graph.MatrixHierGeneralGraphTest.testReadGraphInXML) Test starts. ");
-        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(testReadXmlMatrix,false, true,0);
+        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(testReadXml,false, true,0);
         /* Check the nodes. */
         /* Init nodes. */
         Vertex2 a1 = new Vertex2("a1",0,0);
@@ -522,6 +523,152 @@ public class MatrixHierGeneralGraphTest {
         System.out.println("(biforce.graph.MatrixHierGeneralGraphTest.testReadGraphInXML) Test ends");
     }
 
+    @Test
+    /**
+     * This tests to read from an xml file with external files.
+     */
+    public void testReadGraphInXmlExternFile(){
+        System.out.println("(biforce.graph.MatrixHierGeneralGraphTest.testReadGraphInXMLExternFile) Test starts. ");
+        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(testReadXmlExternFile,false, true,0);
+        /* Check the nodes. */
+        /* Init nodes. */
+        Vertex2 a1 = new Vertex2("a1",0,0);
+        Vertex2 a2 = new Vertex2("a2",0,1);
+        Vertex2 a3 = new Vertex2("a3",0,2);
+        Vertex2 a4 = new Vertex2("a4",0,3);
+        
+        Vertex2 b1 = new Vertex2("b1",1,0);
+        Vertex2 b2 = new Vertex2("b2",1,1);
+        Vertex2 b3 = new Vertex2("b3",1,2);
+        Vertex2 b4 = new Vertex2("b4",1,3);
+        Vertex2 b5 = new Vertex2("b5",1,4);
+        
+        Vertex2 c1 = new Vertex2("c1",2,0);
+        Vertex2 c2 = new Vertex2("c2",2,1);
+        Vertex2 c3 = new Vertex2("c3",2,2);
+        
+        Vertex2 d1 = new Vertex2("d1",3,0);
+        Vertex2 d2 = new Vertex2("d2",3,1);
+        /* Check the nodes. */
+        assertEquals(14,graph.vertexCount()); /* Check the number of the nodes in the graph. */
+        
+        assertTrue(graph.getVertices().contains(a1)); /* Check if the graph contains a1. */
+        assertEquals(0, graph.getVertex("a1").getVtxSet()); /* Check if the vtxSet of a1 is 0. */
+        
+        assertTrue(graph.getVertices().contains(a2)); /* Check if the graph contains a1. */
+        assertEquals(0, graph.getVertex("a2").getVtxSet()); /* Check if the vtxSet of a1 is 0. */
+        
+        assertTrue(graph.getVertices().contains(a3)); /* Check if the graph contains a1. */
+        assertEquals(0, graph.getVertex("a3").getVtxSet()); /* Check if the vtxSet of a1 is 0. */
+        
+        assertTrue(graph.getVertices().contains(a4)); /* Check if the graph contains a1. */
+        assertEquals(0, graph.getVertex("a4").getVtxSet()); /* Check if the vtxSet of a1 is 0. */
+        
+        assertTrue(graph.getVertices().contains(b1)); /* Check if the graph contains b1. */
+        assertEquals(1, graph.getVertex("b1").getVtxSet()); /* Check if the vtxSet of a1 is 1. */
+        
+        assertTrue(graph.getVertices().contains(b2)); /* Check if the graph contains b1. */
+        assertEquals(1, graph.getVertex("b2").getVtxSet()); /* Check if the vtxSet of a1 is 1. */
+        
+        assertTrue(graph.getVertices().contains(b3)); /* Check if the graph contains b1. */
+        assertEquals(1, graph.getVertex("b3").getVtxSet()); /* Check if the vtxSet of a1 is 1. */
+        
+        assertTrue(graph.getVertices().contains(b4)); /* Check if the graph contains b1. */
+        assertEquals(1, graph.getVertex("b4").getVtxSet()); /* Check if the vtxSet of a1 is 1. */
+        
+        assertTrue(graph.getVertices().contains(b5)); /* Check if the graph contains b1. */
+        assertEquals(1, graph.getVertex("b5").getVtxSet()); /* Check if the vtxSet of a1 is 1. */
+        
+        assertTrue(graph.getVertices().contains(c1)); /* Check if the graph contains c1. */
+        assertEquals(2, graph.getVertex("c1").getVtxSet()); /* Check if the vtxSet of c1 is 2. */
+        
+        assertTrue(graph.getVertices().contains(c2)); /* Check if the graph contains c2. */
+        assertEquals(2, graph.getVertex("c2").getVtxSet()); /* Check if the vtxSet of c2 is 2. */
+        
+        assertTrue(graph.getVertices().contains(c3)); /* Check if the graph contains c3. */
+        assertEquals(2, graph.getVertex("c3").getVtxSet()); /* Check if the vtxSet of c3 is 2. */
+        
+        assertTrue(graph.getVertices().contains(d1)); /* Check if the graph contains d1. */
+        assertEquals(3, graph.getVertex("d1").getVtxSet());  /* Check if the vtxSet of d1 is 3. */
+        
+        assertTrue(graph.getVertices().contains(d2)); /* Check if the graph contains d2. */
+        assertEquals(3, graph.getVertex("d2").getVtxSet());  /* Check if the vtxSet of d2 is 3. */
+        
+        /* Check the edge weights. */
+        /* Init the intra matrices. */
+        double[][] intraMatrix1 ={
+            {Double.NaN,1.2,1.3,1.4},
+            {1.2,Double.NaN,1.5,1.6},
+            {1.3,1.5,Double.NaN,1.7},
+            {1.4,1.6,1.7,Double.NaN}};
+        double[][] intraMatrix2 = {
+            {Double.NaN, 2.1, 2.2, 2.3, 2.4},
+            {2.1, Double.NaN, 2.5, 2.6, 2.7},
+            {2.2, 2.5, Double.NaN, 2.8, 2.9},
+            {2.3, 2.6, 2.8, Double.NaN, 3.0},
+            {2.4, 2.7, 2.9, 3.0, Double.NaN}};
+        double[][] intraMatrix3 = {
+            {Double.NaN, 3.1, 3.2},
+            {3.1, Double.NaN, 3.3},
+            {3.2, 3.3, Double.NaN}};
+        double[][] intraMatrix4 = {
+            {Double.NaN, 4.0},
+            {4.0, Double.NaN}};
+        /* Init the inter matrix. */
+        double[][] interMatrix1={
+            {1.1, 1.2, 1.3, 1.4, 1.5},
+            {2.1, 2.2, 2.3, 2.4, 2.5},
+            {3.1, 3.2, 3.3, 3.4, 3.5},
+            {4.1, 4.2, 4.3, 4.4, 4.5}};
+        double[][] interMatrix2={
+            {1.6, 1.7, 1.8},
+            {2.6, 2.7, 2.8},
+            {3.6, 3.7, 3.8},
+            {4.6, 4.7, 4.8},
+            {5.6, 5.7, 5.8}};
+        double[][] interMatrix3={
+            {6.1, 6.2},
+            {7.1, 7.2},
+            {8.1, 8.2}};
+        ArrayList<Vertex2[]> nodes = new ArrayList<>();
+        Vertex2[] row1 = {a1,a2,a3,a4};
+        nodes.add(row1);
+        Vertex2[] row2 = {b1,b2,b3,b4,b5};
+        nodes.add(row2);
+        Vertex2[] row3 = {c1,c2,c3};
+        nodes.add(row3);
+        Vertex2[] row4 = {d1,d2};
+        nodes.add(row4);
+        
+        /* Check the intra edge weights. */
+        for(int i=0;i<row1.length;i++)
+            for(int j=0;j<row1.length;j++)
+               assertEquals(intraMatrix1[i][j],graph.edgeWeight(row1[i], row1[j]),0.0001);
+       for(int i=0;i<row2.length;i++)
+            for(int j=0;j<row2.length;j++)
+               assertEquals(intraMatrix2[i][j],graph.edgeWeight(row2[i], row2[j]),0.0001);
+       for(int i=0;i<row3.length;i++)
+           for(int j=0;j<row3.length;j++)
+               assertEquals(intraMatrix3[i][j],graph.edgeWeight(row3[i], row3[j]),0.0001);
+       for(int i=0;i<row4.length;i++)
+           for(int j=0;j<row4.length;j++)
+               assertEquals(intraMatrix4[i][j],graph.edgeWeight(row4[i], row4[j]),0.0001);
+       
+       /* Check the inter-matrix. */
+       for(int i=0;i<row1.length;i++)
+           for(int j=0;j<row2.length;j++)
+               assertEquals(interMatrix1[i][j], graph.edgeWeight(row1[i], row2[j]),0.0001);
+       
+       for(int i=0;i<row2.length;i++)
+           for(int j=0;j<row3.length;j++)
+               assertEquals(interMatrix2[i][j], graph.edgeWeight(row2[i], row3[j]),0.0001);
+       
+       for(int i=0;i<row3.length;i++)
+           for(int j=0;j<row4.length;j++)
+               assertEquals(interMatrix3[i][j], graph.edgeWeight(row3[i], row4[j]),0.0001);
+            
+        System.out.println("(biforce.graph.MatrixHierGeneralGraphTest.testReadGraphInXMLExternFile) Test ends");
+    }
     /**
      * Test of restoreThresh method, of class MatrixHierGeneralGraph.
      */

@@ -26,7 +26,7 @@ public class SimGraphGen {
      * @param vtxNum 
      * @return The ideal editing cost.
      */
-    public static double generatorGeneralGraph1(int vtxNum, String outputFile, 
+    public double generatorGeneralGraph1(int vtxNum, String outputFile, 
             double mean, double stdev){
         
         /* The pivots pivotIndexes stands tell the division of the pre-defined clusters.
@@ -103,7 +103,7 @@ public class SimGraphGen {
      * @param stdev
      * @return 
      */
-    public static double generatorHierNpartiteGraph(int[] setSizes,
+    public double generatorHierNpartiteGraph(int[] setSizes,
             String outputFile, double mean, double stdev){
         double cost = 0; /* The cost */
         /* Get the vertex count. */
@@ -192,7 +192,7 @@ public class SimGraphGen {
      * @param stdev
      * @return 
      */
-    public static double generatorHierGeneralGraph(int[] setSizes,
+    public double generateHierGeneralGraph(int[] setSizes,
             String outputFile, double mean, double stdev){
         double cost = 0; /* The cost */
         /* Get the vertex count. */
@@ -323,7 +323,7 @@ public class SimGraphGen {
      * @param stdev
      * @return 
      */
-    public static double generatorHierGeneralGraphXml(int[] setSizes,
+    public double generateHierGeneralGraphXml(int[] setSizes,
             String outputFile, double mean, double stdev){
         /* First and foremost, check the legality of all parameters. */
         /* setSizes cannot be null.*/
@@ -337,8 +337,6 @@ public class SimGraphGen {
         /* The String outputFile cannot be null.*/
         if(outputFile == null)
             throw new IllegalArgumentException("(biforce.sim.SimGraphGen.generatorHierGeneralGraphXml) The parameter outputFile is null.");
-        
-        
         /* outputFile must be a legal file path. */
         /* Generate xml file. */
         FileWriter fw =null; 
@@ -381,9 +379,7 @@ public class SimGraphGen {
             /* Randomly get an integer from 1 to vtxNum-assignedElements. */
             assignedElements += (int)( Math.random()*(vertexCount- assignedElements)+1);
             pivotIndexes.add(assignedElements);
-            
         }while(vertexCount-assignedElements != 0);
-        
         /* Assign the intra-set edge weights. */
         ArrayList<double[][]> intraEdgeWeights = new ArrayList<>();
         for(int i=0;i<setSizes.length;i++){
@@ -490,6 +486,102 @@ public class SimGraphGen {
         
         return cost;
     }
+    
+    /**
+     * This method generates a random matrix and writes into the given outputfile.
+     * @param outputFile
+     * @param manyRows
+     * @param manyCols 
+     * @param mean 
+     * @param dev 
+     */
+    public void writeRandomInterMatrix(String outputFile, int manyRows, int manyCols,
+            double mean, double dev){
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try{
+            fw = new FileWriter(outputFile);
+            bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        Random r = new Random();
+        try{
+        for(int i=0;i<manyRows;i++){
+            for(int j=0;j<manyCols-1;j++){
+                double ew = r.nextGaussian()*dev+mean;
+                bw.write(ew+"\t");
+            }
+            double ew = r.nextGaussian()*dev+mean;
+            bw.write(ew+"\n");
+        }
+        bw.flush();
+        bw.close();
+        fw.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+    
+    public void writeRandomIntraMatrix(String outputFile, int manyRows,
+            double mean, double dev){
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try{
+            fw = new FileWriter(outputFile);
+            bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        Random r = new Random();
+        /* Generate the matrix.*/
+        double[][] ew = new double[manyRows][manyRows];
+        for(int i=0;i<ew.length;i++)
+            for(int j=0;j<ew[0].length;j++)
+                ew[i][j] = Double.NaN;
+        
+        for(int i=0;i<manyRows;i++)
+            for(int j=i+1;j<manyRows;j++){
+                ew[i][j]=r.nextGaussian()*dev+mean;
+                ew[j][i]=ew[i][j];
+            }
+        try{
+        for(int i=0;i<manyRows;i++){
+            for(int j=0;j<manyRows-1;j++){ 
+                bw.write(ew[i][j]+"\t");
+            }
+            bw.write(ew[i][manyRows-1]+"\n");
+        }
+        bw.flush();
+        bw.close();
+        fw.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * This method 
+     * @param setSizes 
+     */
+    public void writeNodeNames(int[] setSizes, String outputFile){
+        try{
+        FileWriter fw = new FileWriter(outputFile);
+        BufferedWriter bw = new BufferedWriter(fw);
+        for(int i=0;i<setSizes.length;i++){
+            for(int j=0;j<setSizes[i]-1;j++){
+                bw.write(i+"_"+j+"\t");
+            }
+            bw.write(i+"_"+(setSizes[i]-1)+"\n");
+        }
+        bw.flush();
+        bw.close();
+        fw.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+    
     /**
      * This method works for generatorGeneralGraph1(), to check whether two given indexes 
      * in the same pre-defined clusters.
@@ -497,7 +589,7 @@ public class SimGraphGen {
      * @param j
      * @return 
      */
-    public static boolean inSameClust(int i, int j, ArrayList<Integer> pivotIndexes){
+    public boolean inSameClust(int i, int j, ArrayList<Integer> pivotIndexes){
         int maxPivotI=0,maxPivotJ=0;
         for(int k=0;k<pivotIndexes.size();k++){
             if(pivotIndexes.get(k)<=i)
@@ -505,7 +597,6 @@ public class SimGraphGen {
             if(pivotIndexes.get(k)<=j)
                 maxPivotJ = pivotIndexes.get(k);
         }
-        
         return maxPivotI == maxPivotJ;
     }
 }
