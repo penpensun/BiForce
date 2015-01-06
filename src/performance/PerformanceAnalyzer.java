@@ -300,7 +300,9 @@ public class PerformanceAnalyzer {
             }
             /* Output the result into the resultOutput file. */
             try{
-            bw.write(inputPrefix+"\t"+stdCosts.get(i)+"\t"+hierGeneralInput.getCost()+"\r\n");
+                if(stdCosts == null)
+                    bw.write(inputPrefix+"\t"+null+"\t"+hierGeneralInput.getCost()+"\r\n");
+                else bw.write(inputPrefix+"\t"+stdCosts.get(i)+"\t"+hierGeneralInput.getCost()+"\r\n");
             bw.flush();
             }catch(IOException e){
                 System.out.println("(PerformanceAnalyzer.runAlgorithm) biforce result outputting error.");
@@ -338,19 +340,29 @@ public class PerformanceAnalyzer {
     
     public void performanceAnalysisOnXmlHierGeneralGraph(){
         String resultOutput = "../../data/testdata/performance_profile/costs_comparison.txt";
-        String inputFolder = "../../data/testdata/performance_profile/inputs/";
+        String inputFolder = "../../data/testdata/performance_profile/inputs/200nodes/";
         String costsOutput = "../../data/testdata/performance_profile/standard_costs.txt";
         String paramFile="./parameters.ini"; /* This is the parameter file for biforce. */
-        String inputPrefix="../../data/testdata/performance_profile/inputs/xml_hier_general_1600nodes";
+        String inputPrefix="../../data/testdata/performance_profile/inputs/hier_general_200nodes";
         int repeat = 1;
         double mean = 20;
         double dev=10;
         /* Each graph is with four levels. The verices are evenly distributed. */
-        int setSizes[] = {1600,1600,1600,1600};
+        int setSizes[] = {50,50,50,50};
         ArrayList<Double> stdCosts = graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
                 inputPrefix,costsOutput);
         /* Run BiforceGraph4 on the graphs with 1600 nodes.*/
         runAlgorithm(inputPrefix, resultOutput,paramFile,true,stdCosts,repeat,true);
+    }
+    
+    
+    public void run(){
+        String resultOutput = "../../data/testdata/performance_profile/profile.txt";
+        String inputFolder = "../../data/testdata/performance_profile/inputs/400nodes/";
+        String costsOutput = "../../data/testdata/performance_profile/standard_costs.txt";
+        String paramFile="./parameters.ini"; /* This is the parameter file for biforce. */
+        String inputPrefix="../../data/testdata/performance_profile/inputs/3200nodes/xml_hier_general_3200nodes";
+        runAlgorithm(inputPrefix, resultOutput,paramFile,true,null,repeat,true);
     }
     
     public void generateExternIntraMatrix(String outputFile, int manyRows){
@@ -372,16 +384,17 @@ public class PerformanceAnalyzer {
     
     public static void main(String[] args) throws IOException{
         PerformanceAnalyzer analyzer = new PerformanceAnalyzer();
+        analyzer.run();
         //performanceAnalysisOnHierGeneralGraph();
         //performanceAnalysisOnXmlHierGeneralGraph();
         //analyzer.generateSingleGraph();
         //long start = System.currentTimeMillis();
         
-        analyzer.runAlgorithmOnSingleFile(
-               "../../data/testdata/performance_profile/inputs/25600nodes/xml_hier_general_graph_25600nodes.txt",
-                "../../data/testdata/performance_profile/outputs/25600nodes/xml_hier_general_25600nodes_output.txt",
-                "./parameters.ini",
-                true);
+       // analyzer.runAlgorithmOnSingleFile(
+         //      "../../data/testdata/performance_profile/inputs/25600nodes/xml_hier_general_graph_25600nodes.txt",
+           //     "../../data/testdata/performance_profile/outputs/25600nodes/xml_hier_general_25600nodes_output.txt",
+             //   "./parameters.ini",
+               // true);
         
         //long end = System.currentTimeMillis();
         //System.out.println("Running time:  "+(end-start)/1000.0);

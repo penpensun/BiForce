@@ -8,7 +8,6 @@ import biforce.graphs.Graph2;
 import biforce.graphs.Action2;
 import biforce.graphs.Vertex2;
 import biforce.graphs.Cluster2;
-import biforce.graphs.Subgraph2;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Iterator;
