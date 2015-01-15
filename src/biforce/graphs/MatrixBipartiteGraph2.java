@@ -329,6 +329,35 @@ public class MatrixBipartiteGraph2 extends Graph2{
     }
     
     
+    @Override
+    public boolean isSame(Graph2 graph){
+        if(!(graph instanceof MatrixBipartiteGraph2))
+            return false;
+        MatrixBipartiteGraph2 converted = (MatrixBipartiteGraph2)graph;
+        /* Check set0Size, set1Size. */
+        if(this.set0Size != converted.set0Size)
+            return false;
+        if(this.set1Size != converted.set1Size)
+            return false;
+        /* Check edgeWeights. */
+        if(this.edgeWeights.length != converted.edgeWeights.length)
+            return false;
+        if(this.edgeWeights[0].length != converted.edgeWeights[0].length)
+            return false;
+        for(int i=0;i<edgeWeights.length;i++)
+            for(int j=0;j<edgeWeights[0].length;j++)
+                if(this.edgeWeights[i][j] != converted.edgeWeights[i][j])
+                    return false;
+        
+        /* Check the vertices. */
+        if(this.vertices.size() != converted.vertices.size())
+            return false;
+        for(int i=0;i<vertices.size();i++)
+            if( !vertices.get(i).equals(converted.vertices.get(i)))
+                return false;
+        return true;
+    }
+    
     /**
      * The method returns the nei of the given vertex.
      * precondition: Threshold detracted.
@@ -453,6 +482,9 @@ public class MatrixBipartiteGraph2 extends Graph2{
         
         while((line = br.readLine())!= null)
         {
+            line = line.trim();
+            if(line.isEmpty())
+                continue;
             String[] split  = line.split("\t");
             //if there is only vertex, no other link
             if(split.length ==2){
@@ -534,6 +566,9 @@ public class MatrixBipartiteGraph2 extends Graph2{
         br = new BufferedReader(fr);
         while((line = br.readLine())!= null)
         {
+            line = line.trim();
+            if(line.isEmpty())
+                continue;
             String[] split = line.split("\t");
             //if there is only vertex, no other link
             if(split.length ==2)
@@ -648,6 +683,9 @@ public class MatrixBipartiteGraph2 extends Graph2{
 
         /* Read the input file. */
         while((line = br.readLine())!= null){
+            line = line.trim();
+            if(line.isEmpty())
+                continue;
             String[] splits2 = line.split("\t");
             //if there is only vertex, no other link
             if(splits2.length ==2)
@@ -866,22 +904,157 @@ public class MatrixBipartiteGraph2 extends Graph2{
     }
 
     @Override
-    public void writeGraphTo(String FilePath) {
-        
+    public void writeGraphTo(String filePath, boolean outFmt) {
+        /* Check the out put file. */
+        if(filePath == null)
+            throw new IllegalArgumentException("(MatrixBipartiteGraph2.writeGraphTo) The output path cannot be null.");
+        if(!outFmt)
+            writePlainGraphTo(filePath);
+        else writeXmlGraphTo(filePath);
+    }
+    
+    /**
+     * This method writes the graph as xml format.
+     * @param filePath 
+     */
+    public void writeXmlGraphTo(String filePath){
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try{
+            fw = new FileWriter(filePath);
+            bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeXmlGraphTo) Xml output error.");
+            return;
+        }
+        try{
+            bw.write("<document>\n");
+            /* Output the entity element. */
+            bw.write("<entity levels=\"2\">\n");
+            for(int i=0;i<vertices.size();i++){
+                if(vertices.get(i).getVtxSet() == 0)
+                    bw.write(vertices.get(i).getValue()+"\t");
+            }
+            bw.write("\n");
+            for(int i=0;i<vertices.size();i++){
+                if(vertices.get(i).getVtxSet() ==1)
+                    bw.write(vertices.get(i).getValue()+"\t");
+            }
+            bw.write("\n");
+            bw.write("</entity>\n");
+            /* Output the matrix. */
+            bw.write("<matrix matrixLevel=\"0  1\">\n");
+            for(int i=0;i<edgeWeights.length;i++){
+                for(int j=0;j<edgeWeights[0].length-1;j++)
+                    bw.write(edgeWeights[i][j]+"\t");
+                bw.write(edgeWeights[i][edgeWeights[0].length-1]+"\n");
+            }
+            bw.write("</matrix>\n");
+            bw.write("</document>\n");
+            bw.flush();
+            bw.close();
+            fw.close();
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeXmlGraphTo) Xml writing error.");
+            return;
+        }
+    }
+    
+    /**
+     * This method writes to the given filePath the graph in plain format with header.
+     * @param filePath 
+     */
+    public void writePlainGraphTo(String filePath){
+        FileWriter fw = null;
+        BufferedWriter bw= null;
+        try{
+        fw = new FileWriter(filePath);
+        bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writePlainGraphTo) File writing error.");
+            return;
+        }
+        try{
+            /* First output the header. */
+            bw.write(set0Size+"\t"+set1Size+"\n");
+            /* Then output the matrix. */
+            for(int i=0;i<vertices.size();i++)
+                for(int j=i+1;j<vertices.size();j++){
+                    if(vertices.get(i).getVtxSet() == 
+                            vertices.get(j).getVtxSet())
+                        continue;
+                    else{
+                        bw.write(vertices.get(i).getValue()+"\t"+vertices.get(i).getVtxSet()+"\t"+
+                                vertices.get(j).getValue()+"\t"+vertices.get(j).getVtxSet()+
+                                        "\t"+edgeWeight(vertices.get(i),vertices.get(j))+"\n");
+                    }
+                }
+            bw.flush();
+            bw.close();
+            fw.close();
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writePlainGraphTo) Writing error.");
+            return;
+        }
     }
 
     /**
      * This method writes the result clusters to a given file.
-     * @param FilePath 
+     * @param filePath 
      */
     @Override
-    public void writeClusterTo(String FilePath) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeClusterTo(String filePath) {
+        FileWriter fw =null;
+        BufferedWriter bw = null;
+        try{
+            fw = new FileWriter(filePath);
+            bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeClusterTo) Clusters writing error.");
+            return;
+        }
+        try{
+        for(int i=0;i<clusters.size();i++){
+            for(int j=0;j<clusters.get(i).getVertices().size()-1;j++){
+                bw.write(clusters.get(i).getVertices().get(j).getValue()+"\t");
+            }
+            bw.write(clusters.get(i).getVertices()
+                    .get(clusters.get(i).getVertices().size()-1).getValue()+"\n");
+        }
+        bw.flush();
+        bw.close();
+        fw.close();
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeClusterTo) Clusters writing error.");
+            return;
+        }
     }
 
+    /**
+     * This method writes the actions stored in the graph.
+     * @param filePath 
+     */
     @Override
-    public void writeResultInfoTo(String FilePath) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeResultInfoTo(String filePath) {
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try{
+        fw = new FileWriter(filePath);
+        bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeResultInfoTo) Result file opening error. ");
+            return;
+        }
+        try{
+        for(int i=0;i<actions.size();i++){
+            bw.write(actions.get(i).getVtx1().getValue()+"\t"+actions.get(i).getVtx1().getVtxSet()+"\t"+
+                    actions.get(i).getVtx2().getValue()+"\t"+actions.get(i).getVtx2().getVtxSet()+"\t"+
+                    actions.get(i).getOriginalWeight()+"\n");
+        }
+        }catch(IOException e){
+            System.err.println("(MatrixBiPartiteGraph2.writeResultInfoTo) Writing error.");
+            return;
+        }
     }
     
 }

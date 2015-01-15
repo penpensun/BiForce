@@ -37,8 +37,9 @@ public class XmlInputParser {
         for(int i=0;i<contentSplits.length;i++){
             /* Get the line. */
             String line = contentSplits[i];
+            line = line.trim();
             /* Jump the empty line. */
-            if(line.trim().isEmpty())
+            if(line.isEmpty())
                 continue;
             /* Split the line. */
             String[] lineSplits = line.split("\\s+");
@@ -82,7 +83,8 @@ public class XmlInputParser {
         int setIdx = 0;
         try{
         while((line = br.readLine())!= null){
-            if(line.trim().isEmpty())
+            line = line.trim();
+            if(line.isEmpty())
                 continue;
             /* Split the line. */
             String[] lineSplits = line.split("\\s+");
@@ -122,6 +124,7 @@ public class XmlInputParser {
         String[] rowsStr = matrixContent.split("\n");
         for(int i=0;i<rowsStr.length;i++){
             String row = rowsStr[i];
+            row = row.trim();
             /* Split the row into columns. */
             String[] cols = row.split("\\s+");
             /* Here we check the size of the matrix, see if it matches setSizes. */

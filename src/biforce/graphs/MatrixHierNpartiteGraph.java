@@ -329,6 +329,53 @@ public final class MatrixHierNpartiteGraph extends Graph2{
             return false;
         else return true;
     }
+    
+    @Override
+    public boolean isSame(Graph2 graph){
+        /* Check if it is a MatrixHierNpartiteGraph. */
+        if(!(graph instanceof MatrixHierNpartiteGraph))
+            return false;
+        MatrixHierNpartiteGraph converted = (MatrixHierNpartiteGraph)graph;
+        /* Check the vertices. */
+        if(this.vertices.size()!= converted.vertices.size())
+            return false;
+        for(int i=0;i<vertices.size();i++)
+            if(!vertices.get(i).equals(converted.vertices.get(i)))
+                return false;
+        /* Check the setSizes. */
+        if(setSizes.length != converted.setSizes.length)
+            return false;
+        for(int i=0;i<setSizes.length;i++)
+            if(setSizes[i]!= converted.setSizes[i])
+                return false;
+        
+        /* Check the edgeWeights. */
+        if(edgeWeights.size() != converted.edgeWeights.size())
+            return false;
+        for(int i=0;i<edgeWeights.size();i++)
+            if(!isMatrixEqual(edgeWeights.get(i),converted.edgeWeights.get(i)))
+                return false;
+        
+        return true;
+    }
+    
+    /**
+     * This method returns if the two matrices are same.
+     * @param matrix1
+     * @param matrix2
+     * @return 
+     */
+    public boolean isMatrixEqual(double[][] matrix1, double[][] matrix2){
+        if(matrix1.length != matrix2.length)
+            return false;
+        if(matrix1[0].length != matrix2[0].length)
+            return false;
+        for(int i=0;i<matrix1.length;i++)
+            for(int j=0;j<matrix2.length;j++)
+                if(matrix1[i][j]!= matrix2[i][j]) 
+                    return false;
+        return true;
+    }
 
     @Override
     public ArrayList<Vertex2> neighbours(Vertex2 currentVtx) {
@@ -820,19 +867,160 @@ public final class MatrixHierNpartiteGraph extends Graph2{
         return setSizes.length;
     }
 
+    /**
+     * This method writes to the given filePath, according to the different format.
+     * @param filePath
+     * @param outFmt 
+     */
     @Override
-    public void writeGraphTo(String FilePath) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeGraphTo(String filePath,boolean outFmt) {
+        if(filePath == null)
+            throw new IllegalArgumentException("(MatrixHierNpartiteGraph.writeGraphTo) The given file path is null. ");
+        if(!outFmt) /* The plain format. */
+            writePlainGraphTo(filePath);
+        else
+            writeXmlGraphTo(filePath);
+    }
+    
+    /**
+     * This method writes to the given filepath the xml graph format. 
+     * @param filePath 
+     */
+    public void writeXmlGraphTo(String filePath){
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try{
+            fw = new FileWriter(filePath);
+            bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeXmlGraphTo) Xml output error.");
+            return;
+        }
+        try{
+            bw.write("<document>\n");
+            /* Output the entity element. */
+            bw.write("<entity levels=\""+setSizes.length+"\">\n");
+            /* Output the vertices. */
+            for(int k=0;k<setSizes.length;k++){
+                for(int i=0;i<vertices.size();i++){
+                    if(vertices.get(i).getVtxSet() == k)
+                        bw.write(vertices.get(i).getValue()+"\t");
+                }
+                bw.write("\n");
+            }
+            bw.write("</entity>\n");
+            /* Output the matrix. */
+            for(int l=0;l<setSizes.length-1;l++){
+                bw.write("<matrix matrixLevel=\""+l+"  "+(l+1)+"\">\n");
+                double[][] matrix = edgeWeights.get(l);
+                for(int j=0;j<matrix.length;j++){
+                    for(int k=0;k<matrix[0].length-1;k++)
+                        bw.write(matrix[j][k]+"\t");
+                    bw.write(matrix[j][matrix[0].length-1]+"\n");
+                }
+                bw.write("</matrix>\n");
+            }
+            bw.write("</document>\n");
+            bw.flush();
+            bw.close();
+            fw.close();
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeXmlGraphTo) Xml writing error.");
+            return;
+        }
+    }
+   
+    
+    /**
+     * This method writes to the given filepath the plain graph format. 
+     * @param filePath 
+     */
+    public void writePlainGraphTo(String filePath){
+        
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try{
+        fw = new FileWriter(filePath);
+        bw = new BufferedWriter(fw);
+        bw.write(setSizes.length+"\t");
+        for(int i=0;i<setSizes.length-1;i++)
+            bw.write(setSizes[i]+"\t");
+        bw.write(setSizes[setSizes.length-1]+"\n");
+        for(int i=0;i<vertices.size();i++)
+            for(int j=i+1;j<vertices.size();j++){
+                double ew = edgeWeight(vertices.get(i), vertices.get(j));
+                if(Double.isNaN(ew))
+                    continue;
+                bw.write(vertices.get(i).getValue()+"\t"+vertices.get(i).getVtxSet()+"\t"+
+                        vertices.get(j).getValue()+"\t"+vertices.get(j).getVtxSet()+"\t"+
+                        ew+"\n");
+            }
+        bw.flush();
+        bw.close();
+        fw.close();
+        }catch(IOException e){
+            System.err.println("(MatrixHierNpartiteGraph.writePlainGraphTo) Write error.");
+            return;
+        }
     }
 
+    /**
+     * This method outputs the cluster result to the given path.
+     * @param filePath 
+     */
     @Override
-    public void writeClusterTo(String FilePath) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeClusterTo(String filePath) {
+        FileWriter fw =null;
+        BufferedWriter bw = null;
+        try{
+            fw = new FileWriter(filePath);
+            bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeClusterTo) Clusters writing error.");
+            return;
+        }
+        try{
+        for(int i=0;i<clusters.size();i++){
+            for(int j=0;j<clusters.get(i).getVertices().size()-1;j++){
+                bw.write(clusters.get(i).getVertices().get(j).getValue()+"\t");
+            }
+            bw.write(clusters.get(i).getVertices()
+                    .get(clusters.get(i).getVertices().size()-1).getValue()+"\n");
+        }
+        bw.flush();
+        bw.close();
+        fw.close();
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeClusterTo) Clusters writing error.");
+            return;
+        }
     }
 
+    /**
+     * 
+     * @param filePath 
+     */
     @Override
-    public void writeResultInfoTo(String FilePath) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeResultInfoTo(String filePath) {
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try{
+        fw = new FileWriter(filePath);
+        bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeResultInfoTo) Result file opening error. ");
+            return;
+        }
+        try{
+        for(int i=0;i<actions.size();i++){
+            bw.write(actions.get(i).getVtx1().getValue()+"\t"+actions.get(i).getVtx1().getVtxSet()+"\t"+
+                    actions.get(i).getVtx2().getValue()+"\t"+actions.get(i).getVtx2().getVtxSet()+"\t"+
+                    actions.get(i).getOriginalWeight()+"\n");
+        }
+        }catch(IOException e){
+            System.err.println("(MatrixBiPartiteGraph2.writeResultInfoTo) Writing error.");
+            return;
+        }
     }
     
 }

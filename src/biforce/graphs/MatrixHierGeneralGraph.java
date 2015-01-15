@@ -6,15 +6,18 @@ package biforce.graphs;
 
 import biforce.constants.BiForceConstants;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Arrays;
 import org.jdom2.*;
 import org.jdom2.input.*;
 import java.io.File;
+import java.io.FileWriter;
 
 /**
  * This graph is an upgraded version of MatrixHierNpartiteGraph, allowing edges within the 
@@ -53,7 +56,7 @@ public class MatrixHierGeneralGraph extends Graph2{
         /* If the input is in xml format. */
         if(isXmlFile)
             try{
-                readGraphInXml(filePath);
+                readXmlGraph(filePath);
             }catch(IOException e){
                 System.out.println("(biforce.graphs.MatrixHierGeneralGraph.constructor) "
                         + " MatrixHierGeneralGraph readGraphWithHeader failed:"
@@ -96,7 +99,7 @@ public class MatrixHierGeneralGraph extends Graph2{
        /* If the input is in xml format. */
         if(isXmlFile)
             try{
-                readGraphInXml(filePath);
+                readXmlGraph(filePath);
             }catch(IOException e){
                 System.out.println("(biforce.graphs.MatrixHierGeneralGraph.constructor) "
                         + " MatrixHierGeneralGraph readGraphWithHeader failed:"
@@ -129,6 +132,27 @@ public class MatrixHierGeneralGraph extends Graph2{
         for(int i=0;i<distMatrix.length;i++)
             for(int j=0;j<distMatrix[0].length;j++)
                 distMatrix[i][j] = Double.NaN;
+    }
+    
+    /**
+     * This constructor assigns the variables with given parameters.
+     * @param vertices
+     * @param actions
+     * @param clusters
+     * @param setSizes
+     * @param intraEdgeWeights
+     * @param interEdgeWeights 
+     */
+    public MatrixHierGeneralGraph(ArrayList<Vertex2> vertices, ArrayList<Action2> actions, 
+            ArrayList<Cluster2> clusters, 
+            int[] setSizes,
+            ArrayList<double[][]> intraEdgeWeights, 
+            ArrayList<double[][]> interEdgeWeights){
+        this.vertices = vertices;
+        this.actions = actions;
+        this.setSizes = setSizes;
+        this.intraEdgeWeights=  intraEdgeWeights;
+        this.interEdgeWeights = interEdgeWeights;
     }
     
     /**
@@ -351,6 +375,61 @@ public class MatrixHierGeneralGraph extends Graph2{
         else return true;
     }
 
+    @Override
+    public boolean isSame(Graph2 graph){
+        if(!(graph instanceof MatrixHierGeneralGraph))
+            return false;
+        MatrixHierGeneralGraph converted = (MatrixHierGeneralGraph)(graph);
+        
+        /* Check the vertices. */
+        if(this.vertices.size() != converted.vertices.size())
+            return false;
+        for(int i=0;i<vertices.size();i++)
+            if(!this.vertices.get(i).equals(converted.vertices.get(i)))
+                return false;
+        /* Check the setsizes. */
+        if(this.setSizes.length != converted.setSizes.length)
+            return false;
+        for(int i=0;i<setSizes.length;i++)
+            if(this.setSizes[i] != converted.setSizes[i])
+                return false;
+        
+        /* Check the edge weights. */
+        /* InterEdgeWeights. */
+        if(interEdgeWeights.size() != converted.interEdgeWeights.size())
+            return false;
+        /* Check every matrix in interEdgeWeights. */
+        for(int i=0;i<interEdgeWeights.size();i++)
+            if( !isMatrixEqual(interEdgeWeights.get(i),converted.interEdgeWeights.get(i)))
+                return false;
+        /* IntraEdgeWeights. */
+        if(intraEdgeWeights.size()!= converted.intraEdgeWeights.size())
+            return false;
+        /* Check very matri xin the intraEdgeWeights. */
+        for(int j=0;j<intraEdgeWeights.size();j++)
+            if(!isMatrixEqual(intraEdgeWeights.get(j),converted.intraEdgeWeights.get(j)))
+                return false;
+        return true;
+    }
+    
+    /**
+     * This method returns if the two matrices are same.
+     * @param matrix1
+     * @param matrix2
+     * @return 
+     */
+    public boolean isMatrixEqual(double[][] matrix1, double[][] matrix2){
+        if(matrix1.length != matrix2.length)
+            return false;
+        if(matrix1[0].length != matrix2[0].length)
+            return false;
+        for(int i=0;i<matrix1.length;i++)
+            for(int j=0;j<matrix2.length;j++)
+                if(matrix1[i][j]!= matrix2[i][j]) 
+                    return false;
+        return true;
+    }
+    
     @Override
     public ArrayList<Vertex2> neighbours(Vertex2 currentVtx) {
         /* Here we add a pre-condition: Check if the threshold is detracted. */
@@ -751,7 +830,7 @@ public class MatrixHierGeneralGraph extends Graph2{
      * @param filePath The input file. 
      * untested.
      */
-    public final void readGraphInXml(String filePath) throws IOException{
+    public final void readXmlGraph(String filePath) throws IOException{
         /* Read the input file. */
         SAXBuilder builder = new SAXBuilder();
         Document graphInput = null;
@@ -1038,18 +1117,123 @@ public class MatrixHierGeneralGraph extends Graph2{
     }
 
     @Override
-    public void writeGraphTo(String FilePath) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeGraphTo(String filePath, boolean outFmt) {
+        if(!outFmt) /* If plain graph is to be outputted. */
+            writePlainGraphTo(filePath);
+        else
+            writeXmlGraphTo(filePath);
+    }
+    
+    public void writeXmlGraphTo(String filePath){
+        /* Write the xml. */
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try{
+            fw = new FileWriter(filePath);
+            bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeXmlGraphTo) Xml output error.");
+            return;
+        }
+        try{
+            bw.write("<document>\n");
+            /* Output the entity element. */
+            bw.write("<entity levels=\""+setSizes.length+"\">\n");
+            /* Output the vertices. */
+            for(int k=0;k<setSizes.length;k++){
+                for(int i=0;i<vertices.size();i++){
+                    if(vertices.get(i).getVtxSet() == k)
+                        bw.write(vertices.get(i).getValue()+"\t");
+                }
+                bw.write("\n");
+            }
+           
+            bw.write("</entity>\n");
+            /* Output the interEdgeWeight matrix. */
+            for(int l=0;l<setSizes.length-1;l++){
+                bw.write("<matrix matrixLevel=\""+l+"  "+(l+1)+"\">\n");
+                double[][] matrix = interEdgeWeights.get(l);
+                for(int j=0;j<matrix.length;j++){
+                    for(int k=0;k<matrix[0].length-1;k++)
+                        bw.write(matrix[j][k]+"\t");
+                    bw.write(matrix[j][matrix[0].length-1]+"\n");
+                }
+                bw.write("</matrix>\n");
+            }
+            /* Output the intraEdgeWeight matrix. */
+            for(int l=0;l<intraEdgeWeights.size();l++){
+                bw.write("<matrix matrixLevel=\""+l+"  "+l+"\">\n");
+                double[][] matrix = intraEdgeWeights.get(l);
+                for(int j=0;j<matrix.length;j++){
+                    for(int k=0;k<matrix[0].length-1;k++)
+                        bw.write(matrix[j][k]+"\t");
+                    bw.write(matrix[j][matrix[0].length-1]+"\n");
+                }
+                bw.write("</matrix>\n");
+            }
+            bw.write("</document>\n");
+            bw.flush();
+            bw.close();
+            fw.close();
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeXmlGraphTo) Xml writing error.");
+            return;
+        }
+    }
+    
+    public void writePlainGraphTo(String filePath){
+        
     }
 
     @Override
-    public void writeClusterTo(String FilePath) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeClusterTo(String filePath) {
+        FileWriter fw =null;
+        BufferedWriter bw = null;
+        try{
+            fw = new FileWriter(filePath);
+            bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeClusterTo) Clusters writing error.");
+            return;
+        }
+        try{
+        for(int i=0;i<clusters.size();i++){
+            for(int j=0;j<clusters.get(i).getVertices().size()-1;j++){
+                bw.write(clusters.get(i).getVertices().get(j).getValue()+"\t");
+            }
+            bw.write(clusters.get(i).getVertices()
+                    .get(clusters.get(i).getVertices().size()-1).getValue()+"\n");
+        }
+        bw.flush();
+        bw.close();
+        fw.close();
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeClusterTo) Clusters writing error.");
+            return;
+        }
     }
 
     @Override
-    public void writeResultInfoTo(String FilePath) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void writeResultInfoTo(String filePath) {
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try{
+        fw = new FileWriter(filePath);
+        bw = new BufferedWriter(fw);
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeResultInfoTo) Result file opening error. ");
+            return;
+        }
+        try{
+        for(int i=0;i<actions.size();i++){
+            bw.write(actions.get(i).getVtx1().getValue()+"\t"+actions.get(i).getVtx1().getVtxSet()+"\t"+
+                    actions.get(i).getVtx2().getValue()+"\t"+actions.get(i).getVtx2().getVtxSet()+"\t"+
+                    actions.get(i).getOriginalWeight()+"\n");
+        }
+        }catch(IOException e){
+            System.err.println("(MatrixBiPartiteGraph2.writeResultInfoTo) Writing error.");
+            return;
+        }
     }
     
 

@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.*;
 import static org.junit.Assert.*;
+import biforce.algorithms.*;
+import java.io.IOException;
 
 /**
  *
@@ -18,6 +20,8 @@ public class MatrixHierNpartiteGraphTest {
     String testReadGraphWithHeaderInput = "../../data/testdata/unit_test/MatrixHierNpartiteGraph/test_input_header.txt";
     String testEdgeWeightInput = "../../data/testdata/unit_test/MatrixHierNpartiteGraph/test_edgeweight_input.txt";
     String testNeighboursInput = "../../data/testdata/unit_test/MatrixHierNpartiteGraph/test_neighbours_input.txt";
+    String testOutputPlain = "../../data/testdata/unit_test/MatrixHierNpartiteGraph/test_write_graph_output.txt";
+    String testClusterOutput = "../../data/testdata/unit_test/MatrixHierNpartiteGraph/test_cluster_output.txt";
     public MatrixHierNpartiteGraphTest() {
     }
 
@@ -503,12 +507,14 @@ public class MatrixHierNpartiteGraphTest {
      */
     @Test
     public void testWriteGraphTo() {
-        System.out.println("writeGraphTo");
-        String FilePath = "";
-        MatrixHierNpartiteGraph instance = null;
-        instance.writeGraphTo(FilePath);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("(MatrixHierNpartiteGraphTest.testWriteGraphTo) Test starts.");
+        MatrixHierNpartiteGraph graph = new
+                MatrixHierNpartiteGraph(testReadGraphWithHeaderInput,true);
+        graph.writeGraphTo(testOutputPlain,false);
+        MatrixHierNpartiteGraph out = new 
+                MatrixHierNpartiteGraph(testOutputPlain,true);
+        
+        System.out.println("(MatrixHierNpartiteGraphTest.testWriteGraphTO) Test ends.");
     }
 
     /**
@@ -516,12 +522,18 @@ public class MatrixHierNpartiteGraphTest {
      */
     @Test
     public void testWriteClusterTo() {
-        System.out.println("writeClusterTo");
-        String FilePath = "";
-        MatrixHierNpartiteGraph instance = null;
-        instance.writeClusterTo(FilePath);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("(MatrixNpartiteGraphTest.testWriteClusterTo) Test starts.");
+        MatrixHierNpartiteGraph graph = new 
+                MatrixHierNpartiteGraph(testReadGraphWithHeaderInput, true);
+        BiForceOnGraph4 algorithm = new BiForceOnGraph4();
+        Param p = new Param("./parameters.ini");
+        try{
+            algorithm.run(graph, p);
+        }catch(IOException e){
+            System.err.println("(MatrixNpartiteGraphTest.testWriteClusterTo) Algorithm throws IOException.");
+        }
+        graph.writeClusterTo(testClusterOutput);
+        System.out.println("(MatrixNpartiteGraphTest.testWriteClusterTo) Test ends.");
     }
 
     /**

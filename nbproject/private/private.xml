@@ -3,16 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/graphs/MatrixHierNpartiteGraph.java</file>
-            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/io/ResultWriter.java</file>
-            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/graphs/MatrixHierNpartiteSubgraph.java</file>
-            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/io/Main2.java</file>
             <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/graphs/Subgraph2.java</file>
             <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/graphs/MatrixHierGeneralGraph.java</file>
-            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/graphs/Cluster2.java</file>
-            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/io/Main3.java</file>
-            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/algorithms/BiForceOnGraph3.java</file>
-            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/graphs/Graph2.java</file>
+            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/algorithms/BiForceOnGraph4.java</file>
+            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/graphs/MatrixHierGeneralSubgraph.java</file>
+            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/test/biforce/algorithms/BiForceOnGraph4Test.java</file>
         </group>
     </open-files>
 </project-private>

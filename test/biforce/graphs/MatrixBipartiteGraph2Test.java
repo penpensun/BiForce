@@ -24,6 +24,8 @@ public class MatrixBipartiteGraph2Test {
     String testDistInput = "../../data/testdata/unit_test/MatrixBipartiteGraph/distance_input";
     String testBfsInput = "../../data/testdata/unit_test/MatrixBipartiteGraph/bfs_input";
     String testConnectedComponents="../../data/testdata/unit_test/MatrixBipartiteGraph/connected_component.txt";
+    String testWriteXmlGraphOutput ="../../data/testdata/unit_test/MatrixBipartiteGraph/write_xml_graph_output.txt";
+    String testWritePlainGraphOutput="../../data/testdata/unit_test/MatrixBipartiteGraph/write_plain_graph_output.txt";
     public MatrixBipartiteGraph2Test() {
     }
 
@@ -656,6 +658,21 @@ public class MatrixBipartiteGraph2Test {
         assertEquals(instance.vertexSetCount(),2);
         
         System.out.println("### testVertexSetCount ends.");
+    }
+    
+    @Test
+    public void testWriteGraphTo(){
+        System.out.println("(MatrixBipartiteGraph2Test.testWriteGraphTo) Test starts.");
+        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testHeaderInput, true);
+        graph.writeGraphTo(testWriteXmlGraphOutput, true);
+        graph.writeGraphTo(testWritePlainGraphOutput, false);
+        /* Check if the the outputted graph is the same with the input graph. */
+        /* Check the xml output. */
+        /* Check the plain output. */
+        MatrixBipartiteGraph2 writtenGraphPlain = new MatrixBipartiteGraph2(testWritePlainGraphOutput,
+            true);
+        assertTrue(graph.isSame(writtenGraphPlain));
+        System.out.println("(MatrixBipartiteGraph2Test.testWriteGraphTo) Test ends.");
     }
 
     

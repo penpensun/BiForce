@@ -7,6 +7,8 @@ package biforce.graphs;
 import java.util.ArrayList;
 import org.junit.*;
 import static org.junit.Assert.*;
+import biforce.algorithms.*;
+import java.io.*;
 
 /**
  *
@@ -18,6 +20,10 @@ public class MatrixHierGeneralGraphTest {
     String testBfsInput = "../../data/testdata/unit_test/MatrixHierGeneralGraph/test_bfs_input.txt";
     String testReadXml = "../../data/testdata/unit_test/MatrixHierGeneralGraph/test_readxml.txt";
     String testReadXmlExternFile = "../../data/testdata/unit_test/XmlInputParser/test_readxml.txt";
+    String testWriteXml = "../../data/testdata/unit_test/MatrixHierGeneralGraph/test_writexml.txt";
+    String testWriteCluster = "../../data/testdata/unit_test/MatrixHierGeneralGraph/test_writecluster.txt";
+    String testWritePlain ="../../data/testdata/unit_test/MatrixHierGeneralGraph/test_writeplain.txt";
+    
     public MatrixHierGeneralGraphTest() {
     }
 
@@ -793,12 +799,15 @@ public class MatrixHierGeneralGraphTest {
      */
     @Test
     public void testWriteGraphTo() {
-        System.out.println("writeGraphTo");
-        String FilePath = "";
-        MatrixHierGeneralGraph instance = null;
-        instance.writeGraphTo(FilePath);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("(MatrixHierGeneralGraphTest.testWriteGraphTo) Test starts.");
+        /* Test writig the graph in xml format. */
+        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(testReadXml,false,true);
+        graph.writeGraphTo(testWriteXml, true); /* Output the graph.*/
+        MatrixHierGeneralGraph test = new MatrixHierGeneralGraph(testWriteXml,false, true);
+        //assertTrue(graph.isSame(test));
+        /* Test writing the graph in plain format. */
+        graph.writeGraphTo(testWritePlain, false);
+        System.out.println("(MatrixHierGeneralGraphTest.testWriteGraphTo) Test ends.");
     }
 
     /**
@@ -806,12 +815,19 @@ public class MatrixHierGeneralGraphTest {
      */
     @Test
     public void testWriteClusterTo() {
-        System.out.println("writeClusterTo");
-        String FilePath = "";
-        MatrixHierGeneralGraph instance = null;
-        instance.writeClusterTo(FilePath);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("(MatrixHierGeneralGraphTest.testWriteClusterTo) Test starts. ");
+        MatrixHierGeneralGraph graph = new
+                MatrixHierGeneralGraph(testReadXml,false,true);
+        Param p =new Param("./parameters.ini");
+        BiForceOnGraph4 algorithm = new BiForceOnGraph4();
+        try{
+            graph = (MatrixHierGeneralGraph)algorithm.run(graph, p);
+        }catch(IOException e){
+            System.err.println("(MatrixHierGeneralGraphTest.testWriteClusterTo) Algorithm error.");
+            return;
+        }
+        graph.writeClusterTo(testWriteCluster);
+        System.out.println("(MatrixHierGeneralGraphTest.testWriteClusterTo) Test ends.");
     }
 
     /**

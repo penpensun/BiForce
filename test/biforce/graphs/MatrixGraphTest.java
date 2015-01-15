@@ -423,7 +423,7 @@ public class MatrixGraphTest {
         System.out.println("writeGraphTo");
         String FilePath = "";
         MatrixGraph instance = null;
-        instance.writeGraphTo(FilePath);
+        instance.writeGraphTo(FilePath,false);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
