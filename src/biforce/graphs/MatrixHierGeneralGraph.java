@@ -365,6 +365,10 @@ public class MatrixHierGeneralGraph extends Graph2{
     public double getCost() {
         return cost;
     }
+    
+    public int[] getSetSizes(){
+        return setSizes;
+    }
 
     @Override
     public boolean isActionTaken(int actIdx) {
