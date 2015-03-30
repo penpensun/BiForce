@@ -87,7 +87,7 @@ public class XmlInputParser {
             if(line.isEmpty())
                 continue;
             /* Split the line. */
-            String[] lineSplits = line.split("\\s+");
+            String[] lineSplits = line.split("\t");
             inputGraph.setSizes[setIdx] = lineSplits.length; /* The number of nodes in set i is the length of the splits on line i. */
             for(int j=0;j<lineSplits.length;j++){
                 /* For each split, we create node. */
@@ -298,7 +298,8 @@ public class XmlInputParser {
         int i = 0; /* This is the row index.*/
         try{
         while((row = br.readLine())!= null){
-            if(row.trim().isEmpty())
+            row = row.trim();
+            if(row.isEmpty())
                 continue;
             /* Split the row into columns.*/
             String[] cols = row.split("\\s+");
@@ -318,9 +319,10 @@ public class XmlInputParser {
                         e.printStackTrace();
                         throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Number format error:  "+cols[j]);
                     }
-                    /* Here the value cannot be NaN, since it's not a self-edge.*/
-                    if(Double.isNaN(value))
-                        throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Non-self edge weight cannot be NaN:  "+value+"  "+i+","+j);
+                    /* Here the value cannot be NaN, since it's not a self-edge. 
+                    Rule changed, because pathway-pathway sims are all NaNs. 2015.03.08*/
+                    //if(Double.isNaN(value))
+                      //  throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Non-self edge weight cannot be NaN:  "+matrixFile+"\n"+value+"  "+i+","+j);
                     /* Check if the value in the matrix is already initialized. */
                     if(!Double.isNaN(intraMatrix[i][j]))
                         throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Duplicated initialization,"+
@@ -328,8 +330,11 @@ public class XmlInputParser {
                     /* We then assign the value in the intraMatrix. */
                     intraMatrix[i][j] = value;
                     /* Here we have to check if the intraMatrix is symmetric. */
+                    /* This if is added because pathway-pathway sims are all NaNs. 2015.03.08 */
+                    if(i >j && Double.isNaN(intraMatrix[i][j]) && Double.isNaN(intraMatrix[j][i]))
+                        continue;
                     if(i>j && intraMatrix[i][j] != intraMatrix[j][i])
-                        throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Intra-matrix is not symmetric: "+
+                        throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Intra-matrix is not symmetric: "+matrixFile+"\n"+
                                 i+","+j+":  "+intraMatrix[i][j]+";  "+i+","+j+":  "+intraMatrix[j][i]);
                 }
             }

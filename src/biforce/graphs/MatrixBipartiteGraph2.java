@@ -1003,7 +1003,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
      * @param filePath 
      */
     @Override
-    public void writeClusterTo(String filePath) {
+    public void writeClusterTo(String filePath, boolean isXmlFile) {
         FileWriter fw =null;
         BufferedWriter bw = null;
         try{

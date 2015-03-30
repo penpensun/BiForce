@@ -179,10 +179,10 @@ public abstract class Graph2 {
     public abstract boolean isSame(Graph2 graph);
     
     /* This method writes the graph into a given file path. */
-    public abstract void writeGraphTo(String FilePath, boolean outFmt);
+    public abstract void writeGraphTo(String FilePath, boolean isXmlFile);
     
     /* This method writes the cluster result into a given file path. */
-    public abstract void writeClusterTo(String FilePath);
+    public abstract void writeClusterTo(String FilePath, boolean isXmlFile);
     
     /* This method writes the info of result into a given file path. */
     public abstract void writeResultInfoTo(String FilePath);

@@ -821,12 +821,12 @@ public class MatrixHierGeneralGraphTest {
         Param p =new Param("./parameters.ini");
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
         try{
-            graph = (MatrixHierGeneralGraph)algorithm.run(graph, p);
+            graph = (MatrixHierGeneralGraph)algorithm.run(graph, p,1);
         }catch(IOException e){
             System.err.println("(MatrixHierGeneralGraphTest.testWriteClusterTo) Algorithm error.");
             return;
         }
-        graph.writeClusterTo(testWriteCluster);
+        graph.writeClusterTo(testWriteCluster,true);
         System.out.println("(MatrixHierGeneralGraphTest.testWriteClusterTo) Test ends.");
     }
 

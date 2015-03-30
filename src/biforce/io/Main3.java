@@ -31,17 +31,32 @@ public class Main3 {
             String clusterOut,
             String editingOut,
             boolean isHeader,
-            boolean inFmt,
-            boolean outFmt,
-            String paramFile
+            boolean isInXmlFile,
+            boolean isOutXmlFile,
+            String paramFile,
+            int slType
             )throws IOException{
         /* Read the parameters. */
         Param p  =new Param(paramFile);
+        p.setThresh(thresh);
         runGraph(graphType, thresh, graphIn, graphOut, clusterOut, editingOut,
-                isHeader, inFmt, outFmt, p);
+                isHeader, isInXmlFile, isOutXmlFile, p, slType);
         
     }
     
+    /**
+     * This method runs nforce on different types of graphs.
+     * @param graphType
+     * @param thresh
+     * @param graphIn
+     * @param graphOut
+     * @param clusterOut
+     * @param editingOut
+     * @param isHeader
+     * @param isInXmlFile
+     * @param isOutXmlFile
+     * @param p 
+     */
     public static void runGraph(int graphType,
             double thresh,
             String graphIn,
@@ -49,13 +64,15 @@ public class Main3 {
             String clusterOut,
             String editingOut,
             boolean isHeader,
-            boolean inFmt,
-            boolean outFmt,
-            Param p){
+            boolean isInXmlFile,
+            boolean isOutXmlFile,
+            Param p,
+            int slType){
+        p.setThresh(thresh);
         /* Check the parameters. */
         if(graphType <=0 || graphType >=5)
             throw new IllegalArgumentException ("(runGraph) The graph type can only be [1-4]. ");
-        if(p.getMaxIter() <=0)
+        if(p.getThresh() <=0)
             throw new IllegalArgumentException("(runGraph) The threshold cannot be equal to smaller than 0.");
         if(p.getLowerth()<0)
             throw new IllegalArgumentException("(runGraph) The lower-bound of the threshold cannot be smaller than 0.");
@@ -73,6 +90,8 @@ public class Main3 {
         if(editingOut==null)
             throw new IllegalArgumentException("(runGraph) The editing cost output cannot be null.");
         
+        if(slType != 1 && slType != 2)
+            throw new IllegalArgumentException("(runGraph) The type of single linkage clustering error:  "+slType);
         /* Check if the file can be openend. */
         FileReader fr = null;
         FileWriter fw = null;
@@ -114,7 +133,7 @@ public class Main3 {
                 inputGraph = new MatrixHierNpartiteGraph(graphIn, isHeader);
                 break;
             case 3: /* hierarchy general graph. */
-                inputGraph = new MatrixHierGeneralGraph(graphIn,isHeader,inFmt);
+                inputGraph = new MatrixHierGeneralGraph(graphIn,isHeader,isInXmlFile);
                 break;
             case 4: /* General graph. */
                 inputGraph = new MatrixGraph(graphIn,isHeader);
@@ -126,17 +145,21 @@ public class Main3 {
         /* Run the algorithm. */
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
         try{
-        inputGraph = algorithm.run(inputGraph, p);
+            inputGraph = algorithm.run(inputGraph, p, slType); /* The main entrace. */
         }catch(IOException e){
             System.err.println("(runGraph) The algorithm error.");
             return;
         }
         /* Output the graph. */
-        inputGraph.writeGraphTo(graphOut, outFmt);
+        System.out.println("Start writing the results.");
+        inputGraph.writeGraphTo(graphOut, isOutXmlFile);
+        System.out.println("The resulted graph is written to:  "+graphOut);
         /* Output the cluster. */
-        inputGraph.writeClusterTo(clusterOut);
+        inputGraph.writeClusterTo(clusterOut,isOutXmlFile);
+        System.out.println("The resulted cluster is written to:  "+clusterOut);
         /* Output the editing details. */
         inputGraph.writeResultInfoTo(editingOut);
+        System.out.println("The editing information is written to:  "+editingOut);
     }
     
     /**
@@ -161,8 +184,8 @@ public class Main3 {
      * @param upperth The upper-bound for the single linkage search.
      * @param clusterOut The path to output the cluster result.
      * @param editingOut The path to output the details of the editing cost.
-     * @param inFmt  This is the input format: false, plain format; true, xml format.
-     * @param outFmt This is the output format: false, plain foramt; true, xml format.
+     * @param isInXmlFile  This is the input format: false, plain format; true, xml format.
+     * @param isOutXmlFile This is the output format: false, plain foramt; true, xml format.
      */
     public static void runGraph(int graphType,
             double thresh,
@@ -173,18 +196,19 @@ public class Main3 {
             double lowerth,
             double step,
             boolean isHeader,
-            boolean inFmt,
-            boolean outFmt,
+            boolean isInXmlFile,
+            boolean isOutXmlFile,
             String graphIn,
             String graphOut,
             String clusterOut,
-            String editingOut
+            String editingOut,
+            int slType
             ){
         
         /* Create the parameter object. */
         Param p = new Param(maxIter,
                 fatt, frep,M0,dim,radius,thresh, upperth,lowerth,step);
-        runGraph(graphType, thresh,graphIn,graphOut,clusterOut,editingOut, isHeader, inFmt, outFmt, p);
+        runGraph(graphType, thresh,graphIn,graphOut,clusterOut,editingOut, isHeader, isInXmlFile, isOutXmlFile, p,slType);
     }
     
     

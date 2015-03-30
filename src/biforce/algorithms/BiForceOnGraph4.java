@@ -78,8 +78,11 @@ public class BiForceOnGraph4 {
         
         ArrayList<Cluster2> clusters = new ArrayList();
         try{
-        for(int i=0;i<=maxClusterIdx;i++)
-            clusters.add(new Cluster2(clusterArray[i]));
+        for(int i=0;i<=maxClusterIdx;i++){
+            //29.03.2015. Add only the non-empty clusters
+            if(!clusterArray[i].isEmpty())
+                clusters.add(new Cluster2(clusterArray[i]));
+        }
                 }catch(IllegalArgumentException e){
             System.out.print("catch");
         }
@@ -487,48 +490,76 @@ public class BiForceOnGraph4 {
      * MatrixBipartiteGraph object.
      * @param graph
      * @param p
+     * @param slType The type of single-linkage clustering: 1, normal sl. 2, chain sl.
      * @return
      * @throws IOException 
      */
-    public Graph2 run(Graph2 graph, Param p) throws IOException{
+    public Graph2 run(Graph2 graph, Param p, int slType) throws IOException{
         /* First we have to detract the threshold. */
+        System.out.println("Detract the threshold.");
         if(!graph.isThreshDetracted())
             graph.detractThresh(p.getThresh());
+        System.out.println("Threshold detracted.");
         /* Compute the intial layout. */
+        System.out.println("Compute the initial layout.");
         initLayout(graph, p);
+        System.out.println("Compute the displacement and update the nodes position.");
         graph.updateDist();
         /* For a certain number of iterations, we compute the displacement 
          * vector and update the vertex positions. */       
         for(int i=0;i< p.getMaxIter();i++){
             graph.updatePos(displace(graph,p,i));
             graph.updateDist();
+            if(i % 5==0)
+                System.out.println("Iteration: "+i);
         }
+        System.out.println("Displacement completed.");
         
         /*Starting from the lower bound of the threshold, 
          *until the upper bound of the threshold.We try to find the dist 
          *threhold resulting in the smallest editing cost for test, 
          *we record the best DistThr. */
         
+        System.out.println("Partition the nodes. ");
         double minCostSL = Double.MAX_VALUE;
         double costAti;
         double minCostThresh=0;
+        System.out.println("Start single-linkage partitioning.");
         int[] slClusters = new int[graph.getVertices().size()];
-        for(double i = p.getLowerth(); i<= p.getUpperth();i+= p.getStep()){
-            singleLinkageClust(graph,i);
-            costAti = computeCost(graph);
-            if(costAti< minCostSL){
-                minCostSL = costAti;
-                minCostThresh = i;
-                //record the cluster assignment
-                for(int j=0;j<graph.getVertices().size();j++)
-                    slClusters[j] = graph.getVertices().get(j).getClustNum(); 
+        // Normal sl clustering
+        if(slType == 1){
+                for(double i = p.getLowerth(); i<= p.getUpperth();i+= p.getStep()){
+                singleLinkageClust(graph,i);
+                costAti = computeCost(graph);
+                if(costAti< minCostSL){
+                    minCostSL = costAti;
+                    minCostThresh = i;
+                    //record the cluster assignment
+                    for(int j=0;j<graph.getVertices().size();j++)
+                        slClusters[j] = graph.getVertices().get(j).getClustNum(); 
+                }
             }
         }
+        // Chain sl clustering
+        else if(slType ==2){
+                for(double i = p.getLowerth(); i<= p.getUpperth();i+= p.getStep()){
+                singleLinkageClustChain(graph,i);
+                costAti = computeCost(graph);
+                if(costAti< minCostSL){
+                    minCostSL = costAti;
+                    minCostThresh = i;
+                    //record the cluster assignment
+                    for(int j=0;j<graph.getVertices().size();j++)
+                        slClusters[j] = graph.getVertices().get(j).getClustNum(); 
+                }
+            }
+        }
+        
         double minCostKmeans = Double.MAX_VALUE;
         int minK = 0;
         double costAtk;
         int[] kmeansClusters = new int[graph.getVertices().size()];
-        
+        System.out.println("Start k-mean partitioning.");
         //in case the initial k=2 is larger than or equal to VertexList.size()/3
         if(graph.getVertices().size() < 9){
             for(int k=2;k<=4;k++){
@@ -583,6 +614,8 @@ public class BiForceOnGraph4 {
             for(int i=0;i<graph.getVertices().size();i++)
                 graph.getVertices().get(i).setClustNum(slClusters[i]);
         }
+        System.out.println("Partitioning completed");
+        System.out.println("Assigning clusters and generating the results.");
         //assing the clusters
         assignClusters(graph);
         
@@ -641,6 +674,88 @@ public class BiForceOnGraph4 {
         return graph;
     }
     
+    
+    /**
+     * This method performs single-linkage clustering with certain constraint.
+     * Every time we perform single-linkage cluster, we start with a "chain" that
+     * contains one node from each level, if any unassigned node left.
+     * @param graph
+     * @param distThresh 
+     */
+    private void singleLinkageClustChain(Graph2 graph, double distThresh){
+        //init all the clust num to be -1
+        for(Vertex2 vtx:graph.getVertices())
+            vtx.setClustNum(-1);
+        int currentClustIdx = 0;
+        Vertex2 noClustVtx;
+        
+        while((noClustVtx = getFirstUnassignedChain(graph,currentClustIdx))!= null){
+            currentClustIdx++;
+            //check if all the vertex are assigned with some cluster number
+            Stack<Vertex2> verticesToVisit = new Stack<>();
+            verticesToVisit.add(noClustVtx);
+            while(!verticesToVisit.isEmpty()){
+                Vertex2 seed = verticesToVisit.pop();
+                /* For all the other unassigned vertices in the VertexList. */
+                for(Vertex2 vtx: graph.getVertices()){
+                    if(vtx.getClustNum() != -1)
+                        continue;
+
+                    if( graph.dist(vtx,seed) < distThresh){
+                        vtx.setClustNum(currentClustIdx);
+                        verticesToVisit.add(vtx);
+                    }
+                }
+            }
+            /* Increase the cluster number by 1. */
+            currentClustIdx++;
+        }
+    }
+    
+    /**
+     * This method assign a chain of vertex with the currentClustIdx, and return the first
+     * unassigned vertex.
+     * @param vertices
+     * @return 
+     */
+    private Vertex2 getFirstUnassignedChain(Graph2 graph, int currentClustIdx){
+        Vertex2 firstUnassigned = null;
+        // Get the first unassigned vertex in the smallest level.
+        for(int lvl = 0; lvl<graph.vertexSetCount();lvl++){
+            for(Vertex2 vtx: graph.getVertices()){
+                if(vtx.getVtxSet() == lvl && vtx.getClustNum() == -1){
+                    firstUnassigned = vtx;
+                    break;
+                }
+                else{}
+            }
+            if(firstUnassigned != null)
+                break;
+        }
+        if(firstUnassigned == null)
+            return null;
+        firstUnassigned.setClustNum(currentClustIdx);
+        Vertex2 chainSeed = firstUnassigned;
+        // Get the chain
+        for(int i= firstUnassigned.getVtxSet()+1;i<graph.vertexSetCount();i++){
+            Vertex2 minDistVtx = null;
+            double minDist = Double.MAX_VALUE;
+            for(Vertex2 vtx: graph.getVertices()){
+                double dist = graph.dist(chainSeed, vtx); // Compute the dist.
+                if(vtx.getVtxSet() == i && dist<minDist){ // Get the vertex with minimum distance.
+                    minDistVtx = vtx;
+                    minDist = dist;
+                }   
+            }
+            if(minDistVtx == null){
+                System.err.println("(BiForceOnGraph4.getFirstUnassignedChain) minDistVtx is null:  "+chainSeed.getValue());
+                return null;
+            }
+            minDistVtx.setClustNum(currentClustIdx);
+            chainSeed = minDistVtx;   
+        }
+        return firstUnassigned;
+    }
     
     /**
      * This method performs single-linkage cluster.

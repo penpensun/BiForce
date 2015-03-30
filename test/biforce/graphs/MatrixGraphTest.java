@@ -436,7 +436,7 @@ public class MatrixGraphTest {
         System.out.println("writeClusterTo");
         String FilePath = "";
         MatrixGraph instance = null;
-        instance.writeClusterTo(FilePath);
+        instance.writeClusterTo(FilePath,true);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

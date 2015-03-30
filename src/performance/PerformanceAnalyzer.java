@@ -240,7 +240,7 @@ public class PerformanceAnalyzer {
         BiForceOnGraph4 biforce = new BiForceOnGraph4();
         Param p = Param.readParams(paramFile);
         try{
-            biforce.run(hierGeneralInput,p);
+            biforce.run(hierGeneralInput,p,1);
         }catch(IOException e){
             System.out.println("(PerformanceAnalyzer.runAlgorithm) biforce running error.");
         }
@@ -294,7 +294,7 @@ public class PerformanceAnalyzer {
             BiForceOnGraph4 biforce = new BiForceOnGraph4();
             Param p = Param.readParams(paramFile);
             try{
-            biforce.run(hierGeneralInput,p);
+            biforce.run(hierGeneralInput,p,1);
             }catch(IOException e){
                 System.out.println("(PerformanceAnalyzer.runAlgorithm) biforce running error.");
             }

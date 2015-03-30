@@ -662,7 +662,7 @@ public class MatrixGraph extends Graph2 {
     }
 
     @Override
-    public void writeClusterTo(String filePath) {
+    public void writeClusterTo(String filePath, boolean isXmlFile) {
         FileWriter fw =null;
         BufferedWriter bw = null;
         try{

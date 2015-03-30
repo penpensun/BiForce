@@ -966,10 +966,23 @@ public final class MatrixHierNpartiteGraph extends Graph2{
 
     /**
      * This method outputs the cluster result to the given path.
-     * @param filePath 
+     * @param filePath  The file path to output.
+     * @param isXmlFile  If the file is outputted as xml format.
      */
     @Override
-    public void writeClusterTo(String filePath) {
+    public void writeClusterTo(String filePath, boolean isXmlFile) {
+        if(isXmlFile)
+            writeXmlClusterTo(filePath);
+        else
+            writePlainClusterTo(filePath);
+    }
+    
+    
+    /**
+     * This method writes the cluster in plain format into filePath.
+     * @param filePath 
+     */
+    public void writePlainClusterTo(String filePath){
         FileWriter fw =null;
         BufferedWriter bw = null;
         try{
@@ -995,7 +1008,52 @@ public final class MatrixHierNpartiteGraph extends Graph2{
             return;
         }
     }
+    
+    /**
+     * This method writes the resulted clusters into the filePath.
+     * @param filePath 
+     */
+    public void writeXmlClusterTo(String filePath){
+        try{
+            FileWriter fw = new FileWriter(filePath);
+            BufferedWriter bw = new BufferedWriter(fw);
+            
+            for(int i=0;i<clusters.size();i++){
+                writeSingleCluster(bw, clusters.get(i));
+            }
+            bw.flush();
+            bw.close();
+            fw.close();
+            
+        }catch(IOException e){
+            System.err.println("(MatrixHierNpartiteGraph.writeXmlClusterTo) Cluster writing error.");
+            e.printStackTrace();
+            return;
+        }
+    }
 
+    /**
+     * This method writes a single cluster using the given BufferedWriter
+     * @param bw 
+     * @param cluster 
+     */
+    public void writeSingleCluster(BufferedWriter bw, Cluster2 cluster){
+        ArrayList<Vertex2> clusterVertices = cluster.getVertices();
+        try{
+        /* We output the cluster in separated sets. */
+        for(int i=0;i<setSizes.length;i++){
+            for(int j=0;j<clusterVertices.size();j++)
+                if(clusterVertices.get(j).getVtxSet() == i)
+                    bw.write(clusterVertices.get(j).getValue()+"\t");
+            bw.write("\n");
+        }
+        bw.flush();
+        }catch(IOException e){
+            System.err.println("(MatrixHierNpartiteGraph.writeSingleCluster) Single cluster output error.");
+            e.printStackTrace();
+            return;
+        }
+    }
     /**
      * 
      * @param filePath 

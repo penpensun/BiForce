@@ -528,11 +528,11 @@ public class MatrixHierNpartiteGraphTest {
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
         Param p = new Param("./parameters.ini");
         try{
-            algorithm.run(graph, p);
+            algorithm.run(graph, p,1);
         }catch(IOException e){
             System.err.println("(MatrixNpartiteGraphTest.testWriteClusterTo) Algorithm throws IOException.");
         }
-        graph.writeClusterTo(testClusterOutput);
+        graph.writeClusterTo(testClusterOutput,true);
         System.out.println("(MatrixNpartiteGraphTest.testWriteClusterTo) Test ends.");
     }
 

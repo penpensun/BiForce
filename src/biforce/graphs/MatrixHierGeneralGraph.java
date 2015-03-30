@@ -89,6 +89,13 @@ public class MatrixHierGeneralGraph extends Graph2{
                 
     }
     
+    /**
+     * Constructor.
+     * @param filePath
+     * @param isHeader
+     * @param isXmlFile
+     * @param thresh 
+     */
     public MatrixHierGeneralGraph(String filePath, boolean isHeader, boolean isXmlFile,double thresh){
         /* Init the vertices arrayList. */
         vertices = new ArrayList<>();
@@ -1035,8 +1042,9 @@ public class MatrixHierGeneralGraph extends Graph2{
      */
     public void setDist(Vertex2 vtx1, Vertex2 vtx2){
         /* For the 2nd version of distance, the first version of MatixHierGeneralGraph. */
-        distMatrix[vtx1.getDistIdx()][vtx2.getDistIdx()] = euclidDist(vtx1,vtx2);
-        distMatrix[vtx2.getDistIdx()][vtx2.getDistIdx()] = euclidDist(vtx2,vtx1);
+        double dist = euclidDist(vtx1,vtx2);
+        distMatrix[vtx1.getDistIdx()][vtx2.getDistIdx()] = dist;
+        distMatrix[vtx2.getDistIdx()][vtx1.getDistIdx()] = dist;
     }
 
     @Override
@@ -1087,7 +1095,7 @@ public class MatrixHierGeneralGraph extends Graph2{
     @Override
     public void updateDist() {
         for(int i=0;i<vertices.size();i++)
-            for(int j=0;j<vertices.size();j++)
+            for(int j=i+1;j<vertices.size();j++)
                 setDist(vertices.get(i),vertices.get(j));
                 
     }
@@ -1120,14 +1128,36 @@ public class MatrixHierGeneralGraph extends Graph2{
         return setSizes.length;
     }
 
+    /**
+     * This method outputs the cluster result to the given path.
+     * @param filePath  The file path to output.
+     * @param isXmlFile  If the file is outputted as xml format.
+     */
     @Override
-    public void writeGraphTo(String filePath, boolean outFmt) {
-        if(!outFmt) /* If plain graph is to be outputted. */
+    public void writeClusterTo(String filePath, boolean isXmlFile) {
+        if(isXmlFile)
+            writeXmlClusterTo(filePath);
+        else
+            writePlainClusterTo(filePath);
+    }
+    
+    /**
+     * This method writes the graph in the given format into the given filePath.
+     * @param filePath
+     * @param isXmlFile 
+     */
+    @Override
+    public void writeGraphTo(String filePath, boolean isXmlFile) {
+        if(!isXmlFile) /* If plain graph is to be outputted. */
             writePlainGraphTo(filePath);
         else
             writeXmlGraphTo(filePath);
     }
     
+    /**
+     * This method outputs the resulted graph in xml format into the given filePath.
+     * @param filePath 
+     */
     public void writeXmlGraphTo(String filePath){
         /* Write the xml. */
         FileWriter fw = null;
@@ -1136,7 +1166,7 @@ public class MatrixHierGeneralGraph extends Graph2{
             fw = new FileWriter(filePath);
             bw = new BufferedWriter(fw);
         }catch(IOException e){
-            System.err.println("(MatrixBipartiteGraph2.writeXmlGraphTo) Xml output error.");
+            System.err.println("(MatrixHierGeneralGraph.writeXmlGraphTo) Xml output error.");
             return;
         }
         try{
@@ -1180,7 +1210,7 @@ public class MatrixHierGeneralGraph extends Graph2{
             bw.close();
             fw.close();
         }catch(IOException e){
-            System.err.println("(MatrixBipartiteGraph2.writeXmlGraphTo) Xml writing error.");
+            System.err.println("(MatrixHierGeneralGraph.writeXmlGraphTo) Xml writing error.");
             return;
         }
     }
@@ -1188,16 +1218,20 @@ public class MatrixHierGeneralGraph extends Graph2{
     public void writePlainGraphTo(String filePath){
         
     }
-
-    @Override
-    public void writeClusterTo(String filePath) {
+    
+    
+     /**
+     * This method writes the cluster in plain format into filePath.
+     * @param filePath 
+     */
+    public void writePlainClusterTo(String filePath){
         FileWriter fw =null;
         BufferedWriter bw = null;
         try{
             fw = new FileWriter(filePath);
             bw = new BufferedWriter(fw);
         }catch(IOException e){
-            System.err.println("(MatrixBipartiteGraph2.writeClusterTo) Clusters writing error.");
+            System.err.println("(MatrixHierGeneralGraph.writeClusterTo) Clusters writing error.");
             return;
         }
         try{
@@ -1212,11 +1246,63 @@ public class MatrixHierGeneralGraph extends Graph2{
         bw.close();
         fw.close();
         }catch(IOException e){
-            System.err.println("(MatrixBipartiteGraph2.writeClusterTo) Clusters writing error.");
+            System.err.println("(MatrixHierGeneralGraph.writeClusterTo) Clusters writing error.");
+            return;
+        }
+    }
+    
+    /**
+     * This method writes the resulted clusters into the filePath.
+     * @param filePath 
+     */
+    public void writeXmlClusterTo(String filePath){
+        try{
+            FileWriter fw = new FileWriter(filePath);
+            BufferedWriter bw = new BufferedWriter(fw);
+            
+            for(int i=0;i<clusters.size();i++){
+                writeSingleCluster(bw, clusters.get(i));
+            }
+            bw.flush();
+            bw.close();
+            fw.close();
+            
+        }catch(IOException e){
+            System.err.println("(MatrixHierGeneralGraph.writeXmlClusterTo) Cluster writing error.");
+            e.printStackTrace();
             return;
         }
     }
 
+    /**
+     * This method writes a single cluster using the given BufferedWriter
+     * @param bw 
+     * @param cluster 
+     */
+    public void writeSingleCluster(BufferedWriter bw, Cluster2 cluster){
+        ArrayList<Vertex2> clusterVertices = cluster.getVertices();
+        try{
+        bw.write("<cluster>\n");
+        /* We output the cluster in separated sets. */
+        for(int i=0;i<setSizes.length;i++){
+            for(int j=0;j<clusterVertices.size();j++)
+                if(clusterVertices.get(j).getVtxSet() == i)
+                    bw.write(clusterVertices.get(j).getValue()+"\t");
+            bw.write("\n");
+        }
+        bw.flush();
+        bw.write("</cluster>\n");
+        }catch(IOException e){
+            System.err.println("(MatrixHierGeneralGraph.writeSingleCluster) Single cluster output error.");
+            e.printStackTrace();
+            return;
+        }
+    }
+
+    /**
+     * This method writes the information of the result into the given filePath.
+     * @param filePath 
+     */
     @Override
     public void writeResultInfoTo(String filePath) {
         FileWriter fw = null;
@@ -1235,7 +1321,7 @@ public class MatrixHierGeneralGraph extends Graph2{
                     actions.get(i).getOriginalWeight()+"\n");
         }
         }catch(IOException e){
-            System.err.println("(MatrixBiPartiteGraph2.writeResultInfoTo) Writing error.");
+            System.err.println("(MatrixHierGeneralGraph.writeResultInfoTo) Writing error.");
             return;
         }
     }

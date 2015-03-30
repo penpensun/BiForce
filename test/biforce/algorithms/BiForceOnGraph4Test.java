@@ -61,7 +61,7 @@ public class BiForceOnGraph4Test {
             
             MatrixBipartiteGraph2 graph2 = new MatrixBipartiteGraph2(testMatrixBipartiteGraph2Input,false,0);
             BiForceOnGraph4 biforce4  =new BiForceOnGraph4();
-            biforce4.run(graph2, p);
+            biforce4.run(graph2, p,1);
             System.out.println(graph.getCost());
             assertEquals(graph.getCost(),graph2.getCost(),0.01);
         }catch(IOException e){
@@ -82,7 +82,7 @@ public class BiForceOnGraph4Test {
                 double stdCost = gen.generatorGeneralGraph1(50, testMatrixGraphInput, 20, 15);
                 MatrixGraph graph = new MatrixGraph(testMatrixGraphInput,true,0);
                 BiForceOnGraph4 biforce4  =new BiForceOnGraph4();
-                biforce4.run(graph, p);
+                biforce4.run(graph, p,1);
                 System.out.println(graph.getCost());
                 assertEquals(stdCost,graph.getCost(), stdCost*0.05);
             }catch(IOException e){
@@ -108,14 +108,14 @@ public class BiForceOnGraph4Test {
                 MatrixHierNpartiteGraph npartiteInstance = new MatrixHierNpartiteGraph(testMatrixHierNpartiteGraphInput,
                         false, 0);
                 BiForceOnGraph4 biforce4  =new BiForceOnGraph4();
-                biforce4.run(npartiteInstance, p);
+                biforce4.run(npartiteInstance, p,1);
                 System.out.print("NpartiteGraph: "+ npartiteInstance.getCost());
                 //assertEquals(stdCost,npartiteInstance.getCost(), stdCost*0.05);
                 
                 
                 MatrixBipartiteGraph2 bipartiteInstance = new MatrixBipartiteGraph2(
                         testMatrixHierNpartiteGraphInput,false,0);
-                biforce4.run(bipartiteInstance,p);
+                biforce4.run(bipartiteInstance,p,1);
                 System.out.println(" BipartiteGraph:  "+bipartiteInstance.getCost());
                 assertEquals(bipartiteInstance.getCost(),npartiteInstance.getCost(),0.5);
             }catch(IOException e){
@@ -142,7 +142,7 @@ public class BiForceOnGraph4Test {
                     false, 0);
             /* Run on MatrixHierNpartiteGraph .*/
             BiForceOnGraph4 biforce4  =new BiForceOnGraph4();
-            biforce4.run(npartiteInstance, p);
+            biforce4.run(npartiteInstance, p,1);
             System.out.print("NpartiteGraph: "+ npartiteInstance.getCost());
             //assertEquals(stdCost,npartiteInstance.getCost(), stdCost*0.05);
 
@@ -150,7 +150,7 @@ public class BiForceOnGraph4Test {
             MatrixBipartiteGraph2 bipartiteInstance = new MatrixBipartiteGraph2(
                     testMatrixHierNpartiteGraphInput,false,0);
             /* Run on MatrixBipartiteGraph2. */
-            biforce4.run(bipartiteInstance,p);
+            biforce4.run(bipartiteInstance,p,1);
             
             /* Comparison between the results .*/
             System.out.println("The editing cost: npartite  "+npartiteInstance.getCost()+"  bipartite  "+bipartiteInstance.getCost()+"\r\n");
@@ -178,7 +178,7 @@ public class BiForceOnGraph4Test {
                 
                 BiForceOnGraph4 biforce4 = new BiForceOnGraph4();
                 
-                biforce4.run(hierGeneralGraph,p);
+                biforce4.run(hierGeneralGraph,p,1);
                 System.out.println(" hierGeneralGraph cost:  "+hierGeneralGraph.getCost());
                 System.out.println(" Standard cost:  "+stdCost);
                 assertEquals(stdCost,hierGeneralGraph.getCost(),5);
