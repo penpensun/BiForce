@@ -17,7 +17,10 @@ public class Setting {
     private static String tempGraphFile = "./temp/tempGraph.txt";
     private static String ParameterFile = "./parameters/parameters.txt";
     
-    private static String LogFile = "./log/BiForce.log";
+    public static String VERTEX_LOG = "./vertex_log";
+    public static String DIST_LOG = "./dist_log";
+    public static String INTRA_EW_LOG = "./intra_log_";
+    public static String INTER_EW_LOG = "./inter_log_";
     
     public static String getTempMatrixFile()
     {
@@ -34,10 +37,6 @@ public class Setting {
         return tempGraphFile;
     }
     
-    public static String getLogFile()
-    {
-        return LogFile;
-    }
     
     public static String getParameterFile()
     {

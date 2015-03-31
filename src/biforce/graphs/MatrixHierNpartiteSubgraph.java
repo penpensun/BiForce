@@ -106,7 +106,7 @@ public class MatrixHierNpartiteSubgraph extends Subgraph2 implements
      * @return 
      */
     @Override
-    public double edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
+    public float edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
         return supergraph.edgeWeight(vtx1,vtx2);
     }
 
@@ -131,7 +131,7 @@ public class MatrixHierNpartiteSubgraph extends Subgraph2 implements
     }
 
     @Override
-    public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, double edgeWeight) {
+    public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, float edgeWeight) {
         supergraph.setEdgeWeight(vtx1, vtx2, edgeWeight);
     }
 

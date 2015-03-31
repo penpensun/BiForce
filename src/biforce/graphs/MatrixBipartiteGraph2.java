@@ -21,19 +21,19 @@ import biforce.constants.BiForceConstants;
  */
 public class MatrixBipartiteGraph2 extends Graph2{
     //This variable stores the cost of the cluster editing, with initial value of 0
-    double cost=0;
+    float cost=0;
     
     /* These two variables store the sizes of the two vertex sets. */
     int set0Size =0;
     int set1Size =0;
     /*This 2-dimensional array stores the adjacency matrix */
-    double[][] edgeWeights = null;
+    float[][] edgeWeights = null;
     /* This matrix stores the distances. */
     /* Distances, unlike edge weight, must be defined between two arbitrary vertices. It does not matter 
     whether the two vertices come from the same set or not, since later single-linkage and kmeans clustering
     use pairwise distances. */
     /* Note that the distance matrix is a LOWER TRIANGULAR MATRIX. */
-    double[][] distances = null;
+    float[][] distances = null;
     
     /* Constructor */
     /**
@@ -60,13 +60,13 @@ public class MatrixBipartiteGraph2 extends Graph2{
                         +" "+filePath);
             }
         /* Init the distance matrix. */
-        distances = new double[set0Size+set1Size][set0Size+set1Size];
+        distances = new float[set0Size+set1Size][set0Size+set1Size];
         for(int i=0;i<set0Size+set1Size;i++)
             for(int j=0;j<set0Size+set1Size;j++)
                 distances[i][j] = -1;
     }
     
-    public MatrixBipartiteGraph2(String filePath, boolean isHeader,double thresh){
+    public MatrixBipartiteGraph2(String filePath, boolean isHeader,float thresh){
         if(isHeader)
             try{
                 readGraphWithHeader(filePath);
@@ -82,7 +82,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
         setThreshold(thresh);
         detractThresh();
         /* Init the distance matrix. */
-        distances = new double[set0Size+set1Size][set0Size+set1Size];
+        distances = new float[set0Size+set1Size][set0Size+set1Size];
         for(int i=0;i<set0Size+set1Size;i++)
             for(int j=0;j<set0Size+set1Size;j++)
                 distances[i][j] = -1;
@@ -175,7 +175,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
      * @param vtx2
      * @return 
      */
-    private double euclidDist(Vertex2 vtx1, Vertex2 vtx2){
+    private float euclidDist(Vertex2 vtx1, Vertex2 vtx2){
         if(vtx1.getCoords() == null ||
                 vtx2.getCoords() == null)
             throw new IllegalArgumentException ("(MatrixBipartiteGraph.euclidDist) Null coordinates:  "+
@@ -183,13 +183,13 @@ public class MatrixBipartiteGraph2 extends Graph2{
         //check if they have the same dimension
         if(vtx1.getCoords().length !=vtx2.getCoords().length )
             throw new IllegalArgumentException("Point 1 and Point 2 have different dimension");
-        double Dist= 0;
+        float Dist= 0;
         for(int i=0;i<vtx1.getCoords().length;i++)
         {
             Dist+= (vtx1.getCoords()[i]-vtx2.getCoords()[i])*
                     (vtx1.getCoords()[i]-vtx2.getCoords()[i]);
         }
-        Dist = Math.sqrt(Dist);
+        Dist = (float)Math.sqrt(Dist);
         return Dist;
     }
     
@@ -215,11 +215,11 @@ public class MatrixBipartiteGraph2 extends Graph2{
     }
     
     /**
-     * This method implements detractThresh(double thresh)
+     * This method implements detractThresh(float thresh)
      * @param thresh 
      */
     @Override
-    public final void detractThresh(double thresh){
+    public final void detractThresh(float thresh){
         /* Check if the threshold has already detracted */
         if(threshDetracted)
             throw new IllegalArgumentException("(MatrixBipartiteGraph2.detractThresh)"
@@ -236,7 +236,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
      * @return 
      */
     @Override
-    public double dist(Vertex2 vtx1, Vertex2 vtx2) {
+    public float dist(Vertex2 vtx1, Vertex2 vtx2) {
         /* First compute the indexes of vtx1 and vtx2 in the matrix. */
         int distIdxVtx1 = vtx1.getVtxSet()*set0Size+vtx1.getVtxIdx();
         int distIdxVtx2 = vtx2.getVtxSet()*set0Size+vtx2.getVtxIdx();
@@ -246,7 +246,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
     }
 
     @Override
-    public double edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
+    public float edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
         /* Check if two vertices are of same vertex set,then the edge is not defined. */
         if(vtx1.getVtxSet() == vtx2.getVtxSet())
             return BiForceConstants.NON_DEF_EDGE;
@@ -298,7 +298,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
      * @return 
      */
     @Override
-    public double edgeWeight(int vtxIdx1, int vtxIdx2){
+    public float edgeWeight(int vtxIdx1, int vtxIdx2){
         
         /* Check the index bounds. */
         if(vtxIdx1<0 || vtxIdx1 >= set0Size)
@@ -309,7 +309,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
     }
     
     @Override
-    public final double getCost() {
+    public final float getCost() {
         return cost;
     }
 
@@ -406,7 +406,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
         if(!threshDetracted)
             detractThresh();
         
-        double ew = edgeWeight(vtx1, vtx2);
+        float ew = edgeWeight(vtx1, vtx2);
         if(ew == 0)
             throw new IllegalArgumentException("There is a null-edge between vtx1 and vtx2");
         Action2 act = null;
@@ -554,11 +554,11 @@ public class MatrixBipartiteGraph2 extends Graph2{
         //U. note: in the new version, we are to implement an npartitegraph based on matrix.
         //Edges between two arbitrarily different vertex sets are permitted.
         //Thus, if we have n vertex sets, we have n(n-1)/2 edge weight matrices
-        edgeWeights = new double[Size1][Size2];
+        edgeWeights = new float[Size1][Size2];
         /* Set the init values of edgeWeights to NaN. */
         for(int i=0;i<Size1;i++)
             for(int j=0;j<Size2;j++)
-                edgeWeights[i][j] = Double.NaN;
+                edgeWeights[i][j] = Float.NaN;
         //Init the values;
         
         //re-read the file, create vertices and init edge weights.
@@ -614,7 +614,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
                 //method in the new NpartiteGraph class
                 int Idx1 = pushVertex(Vtx1Name,vtx1Lvl);
                 int Idx2 = pushVertex(Vtx2Name,vtx2Lvl);
-                double ew = Double.parseDouble(String.copyValueOf(split[4].toCharArray()));
+                float ew = Float.parseFloat(String.copyValueOf(split[4].toCharArray()));
                 
                 //U. note: here we need a method to assign edgeweight.
                 if(vtx1Lvl == 0 && vtx2Lvl ==1)
@@ -668,8 +668,8 @@ public class MatrixBipartiteGraph2 extends Graph2{
         try{
             size0 = Integer.parseInt(splits1[0]);
             size1 = Integer.parseInt(splits1[1]);
-            /* Init the double array for edge weights. */
-            edgeWeights = new double[size0][size1];
+            /* Init the float array for edge weights. */
+            edgeWeights = new float[size0][size1];
         }catch(NumberFormatException e){
             System.out.println("(readGraphWithHeader) The header of the input graph contains "
                     +"invalid number formats.");
@@ -679,7 +679,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
         /* Set the init values of edge weight matrix to Double.NaN. */
         for(int i=0;i<size0;i++)
             for(int j=0;j<size1;j++)
-                edgeWeights[i][j] = Double.NaN;
+                edgeWeights[i][j] = Float.NaN;
 
         /* Read the input file. */
         while((line = br.readLine())!= null){
@@ -745,7 +745,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
                     return;
                 }
                  
-                double ew = Double.parseDouble(String.copyValueOf(splits2[4].toCharArray()));
+                float ew = Float.parseFloat(String.copyValueOf(splits2[4].toCharArray()));
                
                 //U. note: here we need a method to assign edgeweight.
                 if(vtx1Lvl == 0 && vtx2Lvl ==1)
@@ -801,7 +801,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
     }
     
     @Override
-    public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, double edgeWeight) {
+    public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, float edgeWeight) {
         if(vtx1.getVtxSet() == vtx2.getVtxSet()){
             throw new IllegalArgumentException("(MatrixBipartiteGraph2) Vtx1 and vtx2"
                     + "must not come from the same vertex set.");
@@ -885,11 +885,11 @@ public class MatrixBipartiteGraph2 extends Graph2{
      * @param dispVector 
      */
     @Override
-    public void updatePos(double[][] dispVector){
+    public void updatePos(float[][] dispVector){
         /* For each vertex, update the position. */
         for(int i=0;i<vertexCount();i++){
             /* Compute the new coordinates. */
-            double[] coords = vertices.get(i).getCoords();
+            float[] coords = vertices.get(i).getCoords();
             for(int j=0;j<coords.length;j++){
                 coords[j] += dispVector[i][j];
             }
@@ -1055,6 +1055,16 @@ public class MatrixBipartiteGraph2 extends Graph2{
             System.err.println("(MatrixBiPartiteGraph2.writeResultInfoTo) Writing error.");
             return;
         }
+    }
+    
+    public void writerInterEwMatrix(String outFile, int idx){
+        
+    }
+    public void writeIntraEwMatrix(String outFile, int idx){
+        
+    }
+    public void writeDistanceMatrix(String file){
+        
     }
     
 }

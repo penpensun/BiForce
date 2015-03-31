@@ -16,11 +16,6 @@ public class LogFile {
     static BufferedWriter logbw = null;
     static
     {
-        try{
-            logfw = new FileWriter(Setting.getLogFile(),true);
-            logbw = new BufferedWriter(logfw);
-        }catch(IOException e){System.out.println("Log File init error");
-        }
         
     }
     

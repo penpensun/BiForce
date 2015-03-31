@@ -22,7 +22,7 @@ public class Training {
     
     
     public static Param singleTrain (String input, TrainingParam initset, 
-            double thresh, int dim, double upperth, double lowerth, double step, 
+            float thresh, int dim, float upperth, float lowerth, float step, 
             int trainingiter) throws IOException
     {
         TrainingParam[] parasetarray = new TrainingParam[2];
@@ -31,10 +31,10 @@ public class Training {
         {
             //for a parameter x, we randomly generate a parameter y within the range of (0,2x);
             int maxIter = (int)(Math.random()*10*initset.getMaxIter());
-            double fatt = Math.random()*10*initset.getFatt();
-            double frep = Math.random()*10*initset.getFrep();
-            double M0 = Math.random()*10*initset.getM0();
-            double radius = Math.random()*10*initset.getRadius();
+            float fatt = (float)(Math.random()*10*initset.getFatt());
+            float frep = (float)(Math.random()*10*initset.getFrep());
+            float M0 = (float)(Math.random()*10*initset.getM0());
+            float radius = (float)(Math.random()*10*initset.getRadius());
             parasetarray[i] = new TrainingParam(maxIter,fatt,frep,M0,dim,radius,thresh,upperth,lowerth,step);
         }
             /*
@@ -47,7 +47,7 @@ public class Training {
             //for all the parameter sets
             for(TrainingParam paraset: parasetarray)
             {
-                double Cost = BiForceOnGraph2.run(new BipartiteGraph(input), paraset).getCost();            
+                float Cost = (float)BiForceOnGraph2.run(new BipartiteGraph(input), paraset).getCost();            
                 paraset.setCost(Cost);
             }
             System.out.println("Iteration:  "+i);
@@ -79,7 +79,7 @@ public class Training {
         //the third set in the new array is the mean of the first 3 sets in the old one
         // This part needs test
         int maxiter;
-        double fatt,frep,M0,radius;
+        float fatt,frep,M0,radius;
         maxiter = (int)((inputparam[0].getMaxIter()+inputparam[1].getMaxIter()+inputparam[2].getMaxIter())/3);
         fatt = (inputparam[0].getFatt()+inputparam[1].getFatt()+inputparam[2].getFatt())/3;
         frep = (inputparam[0].getFrep()+inputparam[1].getFrep()+inputparam[2].getFrep())/3;
@@ -104,10 +104,10 @@ public class Training {
         for(int i=6;i<=8;i++)
         {
             maxiter = (int)(inputparam[0].getMaxIter()*(Math.random()/5+0.9));
-            fatt = inputparam[0].getFatt()*(Math.random()/5+0.9);
-            frep = inputparam[0].getFrep()*(Math.random()/5+0.9);
-            M0 = inputparam[0].getM0()*(Math.random()/5+0.9);
-            radius = inputparam[0].getRadius()*(Math.random()/5+0.9);
+            fatt = (float)(inputparam[0].getFatt()*(Math.random()/5+0.9));
+            frep = (float)(inputparam[0].getFrep()*(Math.random()/5+0.9));
+            M0 = (float)(inputparam[0].getM0()*(Math.random()/5+0.9));
+            radius = (float)(inputparam[0].getRadius()*(Math.random()/5+0.9));
             NewTrainingSets[i] = new TrainingParam(maxiter,fatt,frep,M0,3, radius,
                     inputparam[0].getThresh(),
                 inputparam[0].getUpperth(),inputparam[0].getLowerth(),inputparam[0].getStep());  
@@ -116,10 +116,10 @@ public class Training {
         for(int i=9;i<=11;i++)
         {
             maxiter = (int)(inputparam[0].getMaxIter()*(Math.random()*2));
-            fatt = inputparam[0].getFatt()*(Math.random()*2);
-            frep = inputparam[0].getFrep()*(Math.random()*2);
-            M0 = inputparam[0].getM0()*(Math.random()*2);
-            radius = inputparam[0].getRadius()*(Math.random()*2);
+            fatt = (float)(inputparam[0].getFatt()*(Math.random()*2));
+            frep = (float)(inputparam[0].getFrep()*(Math.random()*2));
+            M0 = (float)(inputparam[0].getM0()*(Math.random()*2));
+            radius = (float)(inputparam[0].getRadius()*(Math.random()*2));
             NewTrainingSets[i] = new TrainingParam(maxiter,fatt,frep,M0,3, radius,
                     inputparam[0].getThresh(),
                 inputparam[0].getUpperth(),inputparam[0].getLowerth(),inputparam[0].getStep());  
@@ -151,23 +151,23 @@ public class Training {
      * @throws java.io.IOException 
      */
     public TrainingParam GeneralTraining(String inputfolder, TrainingParam initset, 
-            double thresh, int dim, double upperth, double lowerth, double step,
+            float thresh, int dim, float upperth, float lowerth, float step,
             int trainingiter, String logfile) throws IOException
     {
         //init the log file
         FileWriter fw = new FileWriter(logfile);
         BufferedWriter bw = new BufferedWriter(fw);
         TrainingParam[] paramarray = new TrainingParam[12];
-        paramarray[0] = new TrainingParam(186,1.245,1.687,633.0, dim, 200.0,
+        paramarray[0] = new TrainingParam(186,1.245f,1.687f,633.0f, dim, 200.0f,
             thresh, lowerth, upperth,step);
         for(int i=1;i<paramarray.length;i++)
         {
             //for a parameter x, we randomly generate a parameter y within the range of (0,2x);
             int maxIter = (int)(Math.random()*10*paramarray[0].getMaxIter());
-            double fatt = Math.random()*10*paramarray[0].getFatt();
-            double frep = Math.random()*10*paramarray[0].getFrep();
-            double M0 = Math.random()*10*paramarray[0].getM0();
-            double radius = Math.random()*10*paramarray[0].getRadius();
+            float fatt = (float)(Math.random()*10*paramarray[0].getFatt());
+            float frep = (float)(Math.random()*10*paramarray[0].getFrep());
+            float M0 = (float)(Math.random()*10*paramarray[0].getM0());
+            float radius = (float)(Math.random()*10*paramarray[0].getRadius());
             paramarray[i] = new TrainingParam(maxIter,fatt,frep,M0,dim, radius,
             thresh, lowerth, upperth,step);
             
@@ -190,7 +190,7 @@ public class Training {
             //for all the parameter sets
             for(TrainingParam param: paramarray)
             {
-                double Cost = 0;
+                float Cost = 0;
                 String[] FileList = new File(inputfolder).list();
                 //for each file
                 for(String InputFile: FileList)

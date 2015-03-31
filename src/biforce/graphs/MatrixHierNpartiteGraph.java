@@ -21,11 +21,11 @@ import java.util.LinkedList;
  * @author penpen926
  */
 public final class MatrixHierNpartiteGraph extends Graph2{
-    double cost = 0; /* Stores the cost for the editing. */
+    float cost = 0; /* Stores the cost for the editing. */
     int[] setSizes = null;
     /* Here since we have different sets of edges between different vertex sets,
      * we got to have more than one edge weights matrices.*/
-    ArrayList<double[][]> edgeWeights = null;
+    ArrayList<float[][]> edgeWeights = null;
     /* This matrix stores the distances. */
     /* Distances, unlike edge weight, must be defined between two arbitrary vertices. It does not matter 
     whether the two vertices come from the same set or not, since later single-linkage and kmeans clustering
@@ -33,9 +33,9 @@ public final class MatrixHierNpartiteGraph extends Graph2{
     /* Note that the distance matrix is a LOWER TRIANGULAR MATRIX. */
     /* In MatrixHierNpartiteGraph, since we have distances between different vertices, we have 
     more than one distances.*/
-    //ArrayList<double[][]> distances = null;
+    //ArrayList<float[][]> distances = null;
     /* 2nd version of distances, for test. */
-    double[][] distMatrix = null;
+    float[][] distMatrix = null;
     /**
      * Constructor.
      * @param filePath 
@@ -70,7 +70,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
         /*
         for(int i=0;i<setSizes.length;i++){
             /* Create the dist matrix between two sets. */
-            //double[][] dist = new double [setSizes[i]][setSizes[i+1]];
+            //float[][] dist = new float [setSizes[i]][setSizes[i+1]];
             /* Init the values in the dist matrix. */
         /*
             for(int j=0;j<dist.length;j++)
@@ -80,14 +80,14 @@ public final class MatrixHierNpartiteGraph extends Graph2{
         }
         */
         /* 2nd version of the distance matrix. */
-        distMatrix = new double[vertices.size()][vertices.size()];
+        distMatrix = new float[vertices.size()][vertices.size()];
         for(int i=0;i<distMatrix.length;i++)
             for(int j=0;j<distMatrix[0].length;j++)
-                distMatrix[i][j] = Double.NaN;
+                distMatrix[i][j] = Float.NaN;
                 
     }
     
-    public MatrixHierNpartiteGraph(String filePath, boolean isHeader,double thresh){
+    public MatrixHierNpartiteGraph(String filePath, boolean isHeader,float thresh){
         /* Init the vertices arrayList. */
         vertices = new ArrayList<>();
         /* Init the distance arrayList. */
@@ -116,7 +116,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
         /* Init the distance matrix. */
        // for(int i=0;i<setSizes.length-1;i++){
             /* Create the dist matrix between two sets. */
-           // double[][] dist = new double [setSizes[i]][setSizes[i+1]];
+           // float[][] dist = new float [setSizes[i]][setSizes[i+1]];
             /* Init the values in the dist matrix. */
           //  for(int j=0;j<dist.length;j++)
            //     for(int k=0;k<dist[0].length;k++)
@@ -127,10 +127,10 @@ public final class MatrixHierNpartiteGraph extends Graph2{
         detractThresh();
         
         /* 2nd version of the distance matrix. */
-        distMatrix = new double[vertices.size()][vertices.size()];
+        distMatrix = new float[vertices.size()][vertices.size()];
         for(int i=0;i<distMatrix.length;i++)
             for(int j=0;j<distMatrix[0].length;j++)
-                distMatrix[i][j] = Double.NaN;
+                distMatrix[i][j] = Float.NaN;
     }
     
     /**
@@ -215,7 +215,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
     @Override
     public final void detractThresh() {
         for(int i=0;i<edgeWeights.size();i++){
-            double[][] weights = edgeWeights.get(i);
+            float[][] weights = edgeWeights.get(i);
             for(int j=0;j<weights.length;j++)
                 for(int k=0;k<weights[0].length;k++)
                     weights[j][k] -=thresh;
@@ -224,7 +224,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
     }
 
     @Override
-    public final void detractThresh(double thresh) {
+    public final void detractThresh(float thresh) {
         /* Check if the threshold has already detracted */
         if(threshDetracted)
             throw new IllegalArgumentException("(MatrixHierNpartiteGraph.detractThresh)"
@@ -241,7 +241,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
      * @return 
      */
     @Override
-    public double dist(Vertex2 vtx1, Vertex2 vtx2) {
+    public float dist(Vertex2 vtx1, Vertex2 vtx2) {
         /* First check if the distances between the two vertices are defined. */
         /*
         if( vtx1.getVtxSet() - vtx2.getVtxSet() != 1 &&
@@ -259,11 +259,11 @@ public final class MatrixHierNpartiteGraph extends Graph2{
     }
 
     @Override
-    public double edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
+    public float edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
         /* Return Double.NaN for all undefined. */
         if(vtx1.getVtxSet() - vtx2.getVtxSet() != 1 &&
                 vtx1.getVtxSet() - vtx2.getVtxSet() != -1)
-            return Double.NaN;
+            return Float.NaN;
         
         int minVtxLvl = Math.min(vtx1.getVtxSet(),vtx2.getVtxSet());
         if(minVtxLvl == vtx1.getVtxSet())
@@ -273,7 +273,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
     }
 
     @Override
-    public double edgeWeight(int vtxIdx1, int vtxIdx2) {
+    public float edgeWeight(int vtxIdx1, int vtxIdx2) {
         throw new UnsupportedOperationException("This edgeWeight(int, int) is not supported in MatrixHierNpartiteGraph.");
     }
     
@@ -284,7 +284,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
      * @param i
      * @return 
      */
-    public double[][] edgeWeightMatrix(int i){
+    public float[][] edgeWeightMatrix(int i){
         /* First check the index. */
         if( i<0 || i>= edgeWeights.size()){
             throw new IllegalArgumentException("(MatrixHierNpartiteGraph.edgeWeighMatrix) Index out of bound:  "+
@@ -299,7 +299,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
      * @param vtx2
      * @return 
      */
-    private double euclidDist(Vertex2 vtx1,Vertex2 vtx2){
+    private float euclidDist(Vertex2 vtx1,Vertex2 vtx2){
         if(vtx1.getCoords() == null ||
                 vtx2.getCoords() == null)
             throw new IllegalArgumentException ("(MatrixHierNpartiteGraph.euclidDist) Null coordinates:  "+
@@ -307,17 +307,17 @@ public final class MatrixHierNpartiteGraph extends Graph2{
         //check if they have the same dimension
         if(vtx1.getCoords().length !=vtx2.getCoords().length )
             throw new IllegalArgumentException("Point 1 and Point 2 have different dimension");
-        double Dist= 0;
+        float Dist= 0;
         for(int i=0;i<vtx1.getCoords().length;i++){
             Dist+= (vtx1.getCoords()[i]-vtx2.getCoords()[i])*
                     (vtx1.getCoords()[i]-vtx2.getCoords()[i]);
         }
-        Dist = Math.sqrt(Dist);
+        Dist = (float)Math.sqrt(Dist);
         return Dist;
     }
 
     @Override
-    public double getCost() {
+    public float getCost() {
         return cost;
     }
 
@@ -365,7 +365,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
      * @param matrix2
      * @return 
      */
-    public boolean isMatrixEqual(double[][] matrix1, double[][] matrix2){
+    public boolean isMatrixEqual(float[][] matrix1, float[][] matrix2){
         if(matrix1.length != matrix2.length)
             return false;
         if(matrix1[0].length != matrix2[0].length)
@@ -389,7 +389,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
         for(Vertex2 vtx: vertices){
             /* If they are from the same set, then it's impossible there's an edge
              * between them.*/
-            double ew  = edgeWeight(currentVtx, vtx);
+            float ew  = edgeWeight(currentVtx, vtx);
             if(!Double.isNaN(ew) && ew>0)
                 neighbours.add(vtx);       
         }
@@ -407,7 +407,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
         if(!threshDetracted)
             detractThresh();
         
-        double ew = edgeWeight(vtx1, vtx2);
+        float ew = edgeWeight(vtx1, vtx2);
         if(ew == 0)
             throw new IllegalArgumentException("There is a null-edge between vtx1 and vtx2");
         Action2 act = null;
@@ -542,11 +542,11 @@ public final class MatrixHierNpartiteGraph extends Graph2{
         /* Init thte edgeWeights matrix. */
         edgeWeights = new ArrayList<>();
         for(int i=0;i<maxSetIdx;i++){
-            double[][] weights = new double[sizes[i]][sizes[i+1]];
+            float[][] weights = new float[sizes[i]][sizes[i+1]];
             /* Init the values. */
             for(int j=0;j<weights.length;j++)
                 for(int k=0;k<weights[0].length;k++)
-                    weights[j][k] = Double.NaN;
+                    weights[j][k] = Float.NaN;
             
             edgeWeights.add(weights);
         }
@@ -602,7 +602,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
                 //method in the new NpartiteGraph class
                 int idx1 = pushVertex(vtx1Name,vtx1Lvl);
                 int idx2 = pushVertex(vtx2Name,vtx2Lvl);
-                double ew = Double.parseDouble(String.copyValueOf(splits[4].toCharArray()));
+                float ew = Float.parseFloat(String.copyValueOf(splits[4].toCharArray()));
                 
                 //U. note: here we need a method to assign edgeweight.
                 int minVtxLvl = Math.min(vtx1Lvl, vtx2Lvl);
@@ -653,11 +653,11 @@ public final class MatrixHierNpartiteGraph extends Graph2{
         /* Init the edgeWeight matrix. */
         edgeWeights = new ArrayList<>();
         for(int i=0;i<setSizes.length-1;i++){
-            double[][] weights = new double[sizes[i]][sizes[i+1]];
+            float[][] weights = new float[sizes[i]][sizes[i+1]];
             /* Init the values. */
             for(int j=0;j<weights.length;j++)
                 for(int k=0;k<weights[0].length;k++)
-                    weights[j][k] = Double.NaN;
+                    weights[j][k] = Float.NaN;
             edgeWeights.add(weights);
         }
         
@@ -708,7 +708,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
                 //method in the new NpartiteGraph class
                 int idx1 = pushVertex(vtx1Name,vtx1Lvl);
                 int idx2 = pushVertex(vtx2Name,vtx2Lvl);
-                double ew = Double.parseDouble(String.copyValueOf(splits[4].toCharArray()));
+                float ew = Float.parseFloat(String.copyValueOf(splits[4].toCharArray()));
                 
                 //U. note: here we need a method to assign edgeweight.
                 int minVtxLvl = Math.min(vtx1Lvl, vtx2Lvl);
@@ -740,7 +740,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
                     + "  The threshold must be set at first.");
         else{
             for(int i=0;i<edgeWeights.size();i++){
-            double[][] weights = edgeWeights.get(i);
+            float[][] weights = edgeWeights.get(i);
             for(int j=0;j<weights.length;j++)
                 for(int k=0;k<weights[0].length;k++)
                     weights[j][k] +=thresh;
@@ -791,7 +791,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
     }
 
     @Override
-    public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, double edgeWeight) {
+    public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, float edgeWeight) {
         /* Check the vertex sets first. */
         if(vtx1.getVtxSet() - vtx2.getVtxSet() != 1 &&
                 vtx1.getVtxSet() - vtx2.getVtxSet() != -1)
@@ -845,11 +845,11 @@ public final class MatrixHierNpartiteGraph extends Graph2{
      * @param dispVector 
      */
     @Override
-    public void updatePos(double[][] dispVector) {
+    public void updatePos(float[][] dispVector) {
         /* For each vertex, update the position. */
         for(int i=0;i<vertexCount();i++){
             /* Compute the new coordinates. */
-            double[] coords = vertices.get(i).getCoords();
+            float[] coords = vertices.get(i).getCoords();
             for(int j=0;j<coords.length;j++){
                 coords[j] += dispVector[i][j];
             }
@@ -912,7 +912,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
             /* Output the matrix. */
             for(int l=0;l<setSizes.length-1;l++){
                 bw.write("<matrix matrixLevel=\""+l+"  "+(l+1)+"\">\n");
-                double[][] matrix = edgeWeights.get(l);
+                float[][] matrix = edgeWeights.get(l);
                 for(int j=0;j<matrix.length;j++){
                     for(int k=0;k<matrix[0].length-1;k++)
                         bw.write(matrix[j][k]+"\t");
@@ -948,7 +948,7 @@ public final class MatrixHierNpartiteGraph extends Graph2{
         bw.write(setSizes[setSizes.length-1]+"\n");
         for(int i=0;i<vertices.size();i++)
             for(int j=i+1;j<vertices.size();j++){
-                double ew = edgeWeight(vertices.get(i), vertices.get(j));
+                float ew = edgeWeight(vertices.get(i), vertices.get(j));
                 if(Double.isNaN(ew))
                     continue;
                 bw.write(vertices.get(i).getValue()+"\t"+vertices.get(i).getVtxSet()+"\t"+
@@ -1079,6 +1079,16 @@ public final class MatrixHierNpartiteGraph extends Graph2{
             System.err.println("(MatrixBiPartiteGraph2.writeResultInfoTo) Writing error.");
             return;
         }
+    }
+    
+    public void writerInterEwMatrix(String outFile, int idx){
+        
+    }
+    public void writeIntraEwMatrix(String outFile, int idx){
+        
+    }
+    public void writeDistanceMatrix(String file){
+        
     }
     
 }

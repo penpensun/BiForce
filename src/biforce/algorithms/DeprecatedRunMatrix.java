@@ -14,7 +14,7 @@ import biforce.matrices.BipartiteGraphMatrix;
  * @author Peng Sun
  * 
  */
-public class NoUsageRunMatrix {
+public class DeprecatedRunMatrix {
     
     /**
      * The main entrance
@@ -87,7 +87,7 @@ public class NoUsageRunMatrix {
     {
        Param p = Param.readParams(paramfile);
        if(thresh != -Double.MAX_VALUE)
-           p.setThresh(thresh);
+           p.setThresh((float)thresh);
        
        BufferedWriter bw = new BufferedWriter(new FileWriter(clusterout,true));
        bw.write("<\\output> "+input+"\r\n");

@@ -42,13 +42,15 @@ public class XmlInputParser {
             if(line.isEmpty())
                 continue;
             /* Split the line. */
-            String[] lineSplits = line.split("\\s+");
+            String[] lineSplits = line.split("\t");
             inputGraph.setSizes[setIdx] = lineSplits.length; /* The number of nodes in set i is the length of the splits on line i. */
             for(int j=0;j<lineSplits.length;j++){
                 /* For each split, we create node. */
                 String value = String.copyValueOf(lineSplits[j].toCharArray());
                 Vertex2 vtx = new Vertex2(value,setIdx,j); /* The value of the node is the split. 
                 The level is i. The index is j.*/
+                // Set the dist index of the given node.
+                vtx.setDistIdx(inputGraph.vertices.size()); // A big big bug, fixed on 31.03.2015
                 inputGraph.vertices.add(vtx); /* Push the node into vertices. */
             }
             setIdx++;
@@ -94,6 +96,8 @@ public class XmlInputParser {
                 String value = String.copyValueOf(lineSplits[j].toCharArray());
                 Vertex2 vtx = new Vertex2(value,setIdx,j); /* The value of the node is the split. 
                 The level is i. The index is j.*/
+                // Set the dist index of the given node.
+                vtx.setDistIdx(inputGraph.vertices.size()); // A big big bug, fixed on 31.03.2015
                 inputGraph.vertices.add(vtx); /* Push the node into vertices. */
             }
             setIdx++;
@@ -119,7 +123,7 @@ public class XmlInputParser {
     public void parseInterMatrixString(String matrixContent, int matrixLevel1, int matrixLevel2,
             MatrixHierGeneralGraph inputGraph){
         /* Get the inter matrix in the interEdgeWeights. The index of interMatrix is the min of matrixLevel1 and matrixLevel2. */
-        double[][] interMatrix = inputGraph.interEdgeWeights.get(Math.min(matrixLevel1, matrixLevel2));
+        float[][] interMatrix = inputGraph.interEdgeWeights.get(Math.min(matrixLevel1, matrixLevel2));
         /* Split the matrixContent. */
         String[] rowsStr = matrixContent.split("\n");
         for(int i=0;i<rowsStr.length;i++){
@@ -136,9 +140,9 @@ public class XmlInputParser {
                         ",setSize of the column:  "+inputGraph.setSizes[Math.max(matrixLevel1, matrixLevel2)]+" cols:"+cols.length);
             for(int j=0;j<cols.length;j++){
                 /* First check the number format in the matrix. */
-                double value = Double.NaN;
+                float value = Float.NaN;
                 try{
-                    value = Double.parseDouble(String.copyValueOf(cols[j].toCharArray()));
+                    value = Float.parseFloat(String.copyValueOf(cols[j].toCharArray()));
                 }catch(NumberFormatException e){
                     throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Number format error:  "+cols[j]);
                 }
@@ -174,7 +178,7 @@ public class XmlInputParser {
             return;
         }
         /* Get the inter matrix in the interEdgeWeights. The index of interMatrix is the min of matrixLevel1 and matrixLevel2. */
-        double[][] interMatrix = inputGraph.interEdgeWeights.get(Math.min(matrixLevel1, matrixLevel2));
+        float[][] interMatrix = inputGraph.interEdgeWeights.get(Math.min(matrixLevel1, matrixLevel2));
         int i =0; /* Create the row index.*/
         try{
         String row = null;
@@ -186,9 +190,9 @@ public class XmlInputParser {
             
             for(int j=0;j<cols.length;j++){
                 /* First check the number format in the matrix. */
-                double value = Double.NaN;
+                float value = Float.NaN;
                 try{
-                    value = Double.parseDouble(String.copyValueOf(cols[j].toCharArray()));
+                    value = Float.parseFloat(String.copyValueOf(cols[j].toCharArray()));
                 }catch(NumberFormatException e){
                     throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Number format error:  "+cols[j]);
                 }
@@ -226,7 +230,7 @@ public class XmlInputParser {
      */
     public void parseIntraMatrixString(String matrixContent, int matrixLevel,
             MatrixHierGeneralGraph inputGraph){
-        double[][] intraMatrix = inputGraph.intraEdgeWeights.get(matrixLevel);
+        float[][] intraMatrix = inputGraph.intraEdgeWeights.get(matrixLevel);
         /* Split the matrixContent. */
         String[] rowsStr = matrixContent.split("\n");
         for(int i=0;i<rowsStr.length;i++){
@@ -247,9 +251,9 @@ public class XmlInputParser {
                     continue;
                 else{/* If i!= j.*/
                     /* First check the number format of the value in the matrix. */
-                    double value = Double.NaN;
+                    float value = Float.NaN;
                     try{
-                        value = Double.parseDouble(String.copyValueOf(cols[j].toCharArray()));
+                        value = Float.parseFloat(String.copyValueOf(cols[j].toCharArray()));
                     }catch(NumberFormatException e){
                         e.printStackTrace();
                         throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Number format error:  "+cols[j]);
@@ -292,7 +296,7 @@ public class XmlInputParser {
             return;
         }
         /* Read the matrix in the file.*/
-        double[][] intraMatrix = inputGraph.intraEdgeWeights.get(matrixLevel);
+        float[][] intraMatrix = inputGraph.intraEdgeWeights.get(matrixLevel);
         /* Split the matrixContent. */
         String row = null;
         int i = 0; /* This is the row index.*/
@@ -312,9 +316,9 @@ public class XmlInputParser {
                 else if(i==j) {} 
                 else{/* If i!= j.*/
                     /* First check the number format of the value in the matrix. */
-                    double value = Double.NaN;
+                    float value = Float.NaN;
                     try{
-                        value = Double.parseDouble(String.copyValueOf(cols[j].toCharArray()));
+                        value = Float.parseFloat(String.copyValueOf(cols[j].toCharArray()));
                     }catch(NumberFormatException e){
                         e.printStackTrace();
                         throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Number format error:  "+cols[j]);

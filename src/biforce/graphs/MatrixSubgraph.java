@@ -120,7 +120,7 @@ public class MatrixSubgraph extends Subgraph2
      * @return 
      */
     @Override
-    public double edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
+    public float edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
         return supergraph.edgeWeight(vtx1, vtx2);
     }
 
@@ -160,7 +160,7 @@ public class MatrixSubgraph extends Subgraph2
      * @param EdgeWeight 
      */
     @Override
-    public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, double edgeWeight) {
+    public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, float edgeWeight) {
         supergraph.setEdgeWeight(vtx1, vtx2, edgeWeight);
     }
 

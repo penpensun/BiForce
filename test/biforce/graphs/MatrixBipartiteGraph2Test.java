@@ -270,12 +270,12 @@ public class MatrixBipartiteGraph2Test {
         MatrixBipartiteGraph2 graphDetracted = new MatrixBipartiteGraph2(testEdgeDetractInput,true,10);
         
         /* Get the edges. */
-        double[][] oriEdgeWeights =new double[graph.set0Size][graph.set1Size];
+        float[][] oriEdgeWeights =new float[graph.set0Size][graph.set1Size];
         for(int i=0;i<graph.set0Size;i++)
             for(int j=0;j<graph.set1Size;j++)
                 oriEdgeWeights[i][j] = graph.edgeWeight(i,j);
         /* This two flags serve as indicators of exception throwing. */
-        boolean nonSetFlag = false, doubleDetractFlag = false;
+        boolean nonSetFlag = false, floatDetractFlag = false;
         /* This tests the exception throwing out because of non-set threshold. */
         try{
             graph.detractThresh();
@@ -290,13 +290,13 @@ public class MatrixBipartiteGraph2Test {
         for(int i=0;i<graph.set0Size;i++)
             for(int j=0;j<graph.set1Size;j++)
                 assertEquals(oriEdgeWeights[i][j]-10,graph.edgeWeight(i, j),0.001);
-        /* This tests the exception throwing because of double thresh-detraction. */
+        /* This tests the exception throwing because of float thresh-detraction. */
         try{
             graph.detractThresh();
         }catch(IllegalArgumentException e){
-            doubleDetractFlag = true;
+            floatDetractFlag = true;
         }
-        assertEquals(doubleDetractFlag,true);
+        assertEquals(floatDetractFlag,true);
         /* This tests constructor threshold-detracting. */
         /* Check if the edge weights are detracted. */
         for(int i=0;i<graph.set0Size;i++)
@@ -313,10 +313,10 @@ public class MatrixBipartiteGraph2Test {
         System.out.println("### testDist starts.");
         MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testDistInput,true,0);
         /* Create the coords for all vertices. */
-        double[] a1Coords = {0,0};
-        double[] a2Coords = {0,3};
-        double[] b1Coords = {1,1};
-        double[] b2Coords = {5,1};
+        float[] a1Coords = {0,0};
+        float[] a2Coords = {0,3};
+        float[] b1Coords = {1,1};
+        float[] b2Coords = {5,1};
         /* Set the coords. */
         Vertex2 a1 = graph.getVertex("a1");
         a1.setCoords(a1Coords);
@@ -497,13 +497,13 @@ public class MatrixBipartiteGraph2Test {
         MatrixBipartiteGraph2 graphDetracted = new MatrixBipartiteGraph2(testEdgeDetractInput,true,10);
         
         /* Get the edges. */
-        double[][] oriEdgeWeights =new double[graph.set0Size][graph.set1Size];
+        float[][] oriEdgeWeights =new float[graph.set0Size][graph.set1Size];
         for(int i=0;i<graph.set0Size;i++)
             for(int j=0;j<graph.set1Size;j++)
                 oriEdgeWeights[i][j] = graph.edgeWeight(i,j);
         /* This two flags serve as indicators of exception throwing. */
-        boolean nonSetFlag = false, doubleDetractFlag = false;
-        boolean doubleRestoreFlag = false;
+        boolean nonSetFlag = false, floatDetractFlag = false;
+        boolean floatRestoreFlag = false;
         /* This tests the exception throwing out because of non-set threshold. */
         try{
             graph.restoreThresh();
@@ -518,13 +518,13 @@ public class MatrixBipartiteGraph2Test {
         for(int i=0;i<graph.set0Size;i++)
             for(int j=0;j<graph.set1Size;j++)
                 assertEquals(oriEdgeWeights[i][j]-10,graph.edgeWeight(i, j),0.001);
-        /* This tests the exception throwing because of double thresh-detraction. */
+        /* This tests the exception throwing because of float thresh-detraction. */
         try{
             graph.detractThresh();
         }catch(IllegalArgumentException e){
-            doubleDetractFlag = true;
+            floatDetractFlag = true;
         }
-        assertEquals(doubleDetractFlag,true);
+        assertEquals(floatDetractFlag,true);
         /* This tests constructor threshold-detracting. */
         /* Check if the edge weights are detracted. */
         for(int i=0;i<graph.set0Size;i++)
@@ -541,9 +541,9 @@ public class MatrixBipartiteGraph2Test {
         try{
             graph.restoreThresh();
         }catch(IllegalArgumentException e){
-            doubleRestoreFlag = true;
+            floatRestoreFlag = true;
         }
-        assertEquals(doubleRestoreFlag, false);
+        assertEquals(floatRestoreFlag, false);
         System.out.println("## testRestoreThresh ends.  ");
     }
 
@@ -623,7 +623,7 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testTakeActions() {
         System.out.println("### testTakeActions starts.");
-        MatrixBipartiteGraph2 instance = new MatrixBipartiteGraph2(testBfsInput,true,0.5);
+        MatrixBipartiteGraph2 instance = new MatrixBipartiteGraph2(testBfsInput,true,0.5f);
         /* We push 3 actions into the graph, 2 insertions and 1 deletion. */
         Vertex2 a1 = instance.getVertex("a1");
         Vertex2 b1 = instance.getVertex("b1");

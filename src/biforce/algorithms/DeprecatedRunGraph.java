@@ -14,7 +14,7 @@ import biforce.graphs.BipartiteGraph;
  *
  * @author Peng
  */
-public class NoUsageRunGraph {
+public class DeprecatedRunGraph {
     public static void main(String args[]) throws IOException
     {
         String input = null;
@@ -76,7 +76,7 @@ public class NoUsageRunGraph {
         Param p = Param.readParams(paramfile);
         
         if(thresh != -Double.MAX_VALUE)
-            p.setThresh(thresh);
+            p.setThresh((float)thresh);
         BipartiteGraph graph = new BipartiteGraph(input);
         BiForceOnGraph2.run(graph,p);
         BufferedWriter bw = new BufferedWriter(new FileWriter(clusterout,true));

@@ -14,15 +14,15 @@ import java.io.IOException;
  */
 public class Param {
     int maxIter = -1;
-    double fatt = -1;
-    double frep = -1;
-    double M0 = -1;
+    float fatt = -1;
+    float frep = -1;
+    float M0 = -1;
     int dim = -1;
-    double radius = -1;
-    double thresh = 0;
-    double upperth = -1;
-    double lowerth = -1;
-    double step=-1;
+    float radius = -1;
+    float thresh = 0;
+    float upperth = -1;
+    float lowerth = -1;
+    float step=-1;
     
     /**
      * Init the param with different parameters
@@ -38,10 +38,10 @@ public class Param {
      * @param step
      */
     public Param(int maxIter, 
-            double fatt, double frep, 
-            double M0, int dim, double radius,
-            double thresh,
-            double upperth, double lowerth, double step)
+            float fatt, float frep, 
+            float M0, int dim, float radius,
+            float thresh,
+            float upperth, float lowerth, float step)
     {
         this.maxIter = maxIter;
         this.fatt = fatt;
@@ -60,15 +60,15 @@ public class Param {
      */
     public Param()
     {
-        fatt = 2.4839598967501715;
-        frep = 1.3228008374592575;
-        M0=51.835535150936714;
-        radius = 112.46725298831082;
+        fatt = 2.4839598967501715f;
+        frep = 1.3228008374592575f;
+        M0=51.835535150936714f;
+        radius = 112.46725298831082f;
         dim = 3;
         thresh = 0;
         upperth = 200;
         lowerth = 0;
-        step = 0.5;
+        step = 0.5f;
     }
     
     public Param(String parafile)
@@ -87,16 +87,16 @@ public class Param {
             try{
                 switch (prefix) {
                     case "fatt":
-                        fatt = Double.parseDouble(value);
+                        fatt = Float.parseFloat(value);
                         break;
                     case "frep":
-                        frep = Double.parseDouble(value);
+                        frep = Float.parseFloat(value);
                         break;
                     case "M0":
-                        M0=Double.parseDouble(value);
+                        M0=Float.parseFloat(value);
                         break;
                     case "radius":
-                        radius = Double.parseDouble(value);
+                        radius = Float.parseFloat(value);
                         break;
                     case "maxIter":
                         maxIter = Integer.parseInt(value);
@@ -105,16 +105,16 @@ public class Param {
                         dim = Integer.parseInt(value);
                         break;
                     case "thresh":
-                        thresh= Double.parseDouble(value);
+                        thresh= Float.parseFloat(value);
                         break;
                     case "upperth":
-                        upperth = Double.parseDouble(value);
+                        upperth = Float.parseFloat(value);
                         break;
                     case "lowerth":
-                        lowerth= Double.parseDouble(value);
+                        lowerth= Float.parseFloat(value);
                         break;
                     case "step":
-                        step= Double.parseDouble(value);
+                        step= Float.parseFloat(value);
                         break;
                 }
             }catch(NullPointerException | NumberFormatException e)
@@ -135,22 +135,22 @@ public class Param {
         }
     }
     
-    public final double getFatt()
+    public final float getFatt()
     {
         return fatt;
     }
     
-    public final double getFrep()
+    public final float getFrep()
     {
         return frep;
     }
     
-    public final double getM0()
+    public final float getM0()
     {
         return M0;
     }
     
-    public final double getRadius()
+    public final float getRadius()
     {
         return radius;
     }
@@ -166,28 +166,28 @@ public class Param {
         return dim;
     }
     
-    public final double getThresh()
+    public final float getThresh()
     {
         return thresh;
     }
     
-    public final double getLowerth()
+    public final float getLowerth()
     {
         return lowerth;
     }
     
-    public final double getUpperth()
+    public final float getUpperth()
     {
         return upperth;
     }
     
-    public final double getStep()
+    public final float getStep()
     {
         return step;
     }
     
     
-    public final void setThresh(double thresh)
+    public final void setThresh(float thresh)
     {
         this.thresh = thresh;
     }

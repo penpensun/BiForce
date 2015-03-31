@@ -86,9 +86,9 @@ public class MatrixHierNpartiteGraphTest {
      * Test of detractThresh method, of class MatrixHierNpartiteGraph.
      */
     @Test
-    public void testDetractThresh_double() {
+    public void testDetractThresh_float() {
         System.out.println("detractThresh");
-        double thresh = 0.0;
+        float thresh = 0.0f;
         MatrixHierNpartiteGraph instance = null;
         instance.detractThresh(thresh);
         // TODO review the generated test code and remove the default call to fail.
@@ -104,8 +104,8 @@ public class MatrixHierNpartiteGraphTest {
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
         MatrixHierNpartiteGraph instance = null;
-        double expResult = 0.0;
-        double result = instance.dist(vtx1, vtx2);
+        float expResult = 0.0f;
+        float result = instance.dist(vtx1, vtx2);
         assertEquals(expResult, result, 0.0);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -147,8 +147,8 @@ public class MatrixHierNpartiteGraphTest {
     public void testGetCost() {
         System.out.println("getCost");
         MatrixHierNpartiteGraph instance = null;
-        double expResult = 0.0;
-        double result = instance.getCost();
+        float expResult = 0.0f;
+        float result = instance.getCost();
         assertEquals(expResult, result, 0.0);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -418,13 +418,13 @@ public class MatrixHierNpartiteGraphTest {
         assertEquals(true, Double.isNaN(instance.edgeWeight(c2,c1)));
         
         /* Set new weight to edges. */
-        instance.setEdgeWeight(a1, b1, 82.2);
+        instance.setEdgeWeight(a1, b1, 82.2f);
         assertEquals(82.2,instance.edgeWeight(a1,b1),0.0001);
         
         /* Test the exception .*/
         boolean exceptionFlag = false;
         try{
-            instance.setEdgeWeight(b1, b2, 4.5);
+            instance.setEdgeWeight(b1, b2, 4.5f);
         }catch(IllegalArgumentException e){
             exceptionFlag = true;
         }
@@ -481,7 +481,7 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testUpdatePos() {
         System.out.println("updatePos");
-        double[][] dispVector = null;
+        float[][] dispVector = null;
         MatrixHierNpartiteGraph instance = null;
         instance.updatePos(dispVector);
         // TODO review the generated test code and remove the default call to fail.

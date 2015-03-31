@@ -136,9 +136,9 @@ public class MatrixHierGeneralGraphTest {
      * Test of detractThresh method, of class MatrixHierGeneralGraph.
      */
     @Test
-    public void testDetractThresh_double() {
+    public void testDetractThresh_float() {
         System.out.println("detractThresh");
-        double thresh = 0.0;
+        float thresh = 0.0f;
         MatrixHierGeneralGraph instance = null;
         instance.detractThresh(thresh);
         // TODO review the generated test code and remove the default call to fail.
@@ -154,9 +154,9 @@ public class MatrixHierGeneralGraphTest {
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
         MatrixHierGeneralGraph instance = null;
-        double expResult = 0.0;
-        double result = instance.dist(vtx1, vtx2);
-        assertEquals(expResult, result, 0.0);
+        float expResult = 0.0f;
+        float result = instance.dist(vtx1, vtx2);
+        assertEquals(expResult, result, 0.0f);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -170,9 +170,9 @@ public class MatrixHierGeneralGraphTest {
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
         MatrixHierGeneralGraph instance = null;
-        double expResult = 0.0;
-        double result = instance.edgeWeight(vtx1, vtx2);
-        assertEquals(expResult, result, 0.0);
+        float expResult = 0.0f;
+        float result = instance.edgeWeight(vtx1, vtx2);
+        assertEquals(expResult, result, 0.0f);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -186,9 +186,9 @@ public class MatrixHierGeneralGraphTest {
         int vtxIdx1 = 0;
         int vtxIdx2 = 0;
         MatrixHierGeneralGraph instance = null;
-        double expResult = 0.0;
-        double result = instance.edgeWeight(vtxIdx1, vtxIdx2);
-        assertEquals(expResult, result, 0.0);
+        float expResult = 0.0f;
+        float result = instance.edgeWeight(vtxIdx1, vtxIdx2);
+        assertEquals(expResult, result, 0.0f);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -201,8 +201,8 @@ public class MatrixHierGeneralGraphTest {
         System.out.println("interEdgeWeightMatrix");
         int i = 0;
         MatrixHierGeneralGraph instance = null;
-        double[][] expResult = null;
-        double[][] result = instance.interEdgeWeightMatrix(i);
+        float[][] expResult = null;
+        float[][] result = instance.interEdgeWeightMatrix(i);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -216,8 +216,8 @@ public class MatrixHierGeneralGraphTest {
         System.out.println("intraEdgeWeightMatrix");
         int i = 0;
         MatrixHierGeneralGraph instance = null;
-        double[][] expResult = null;
-        double[][] result = instance.intraEdgeWeightMatrix(i);
+        float[][] expResult = null;
+        float[][] result = instance.intraEdgeWeightMatrix(i);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -230,9 +230,9 @@ public class MatrixHierGeneralGraphTest {
     public void testGetCost() {
         System.out.println("getCost");
         MatrixHierGeneralGraph instance = null;
-        double expResult = 0.0;
-        double result = instance.getCost();
-        assertEquals(expResult, result, 0.0);
+        float expResult = 0.0f;
+        float result = instance.getCost();
+        assertEquals(expResult, result, 0.0f);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -455,40 +455,40 @@ public class MatrixHierGeneralGraphTest {
         
         /* Check the edge weights. */
         /* Init the intra matrices. */
-        double[][] intraMatrix1 ={
-            {Double.NaN,1.2,1.3,1.4},
-            {1.2,Double.NaN,1.5,1.6},
-            {1.3,1.5,Double.NaN,1.7},
-            {1.4,1.6,1.7,Double.NaN}};
-        double[][] intraMatrix2 = {
-            {Double.NaN, 2.1, 2.2, 2.3, 2.4},
-            {2.1, Double.NaN, 2.5, 2.6, 2.7},
-            {2.2, 2.5, Double.NaN, 2.8, 2.9},
-            {2.3, 2.6, 2.8, Double.NaN, 3.0},
-            {2.4, 2.7, 2.9, 3.0, Double.NaN}};
-        double[][] intraMatrix3 = {
-            {Double.NaN, 3.1, 3.2},
-            {3.1, Double.NaN, 3.3},
-            {3.2, 3.3, Double.NaN}};
-        double[][] intraMatrix4 = {
-            {Double.NaN, 4.0},
-            {4.0, Double.NaN}};
+        float[][] intraMatrix1 ={
+            {Float.NaN,1.2f,1.3f,1.4f},
+            {1.2f,Float.NaN,1.5f,1.6f},
+            {1.3f,1.5f,Float.NaN,1.7f},
+            {1.4f,1.6f,1.7f,Float.NaN}};
+        float[][] intraMatrix2 = {
+            {Float.NaN, 2.1f, 2.2f, 2.3f, 2.4f},
+            {2.1f, Float.NaN, 2.5f, 2.6f, 2.7f},
+            {2.2f, 2.5f, Float.NaN, 2.8f, 2.9f},
+            {2.3f, 2.6f, 2.8f, Float.NaN, 3.0f},
+            {2.4f, 2.7f, 2.9f, 3.0f, Float.NaN}};
+        float[][] intraMatrix3 = {
+            {Float.NaN, 3.1f, 3.2f},
+            {3.1f, Float.NaN, 3.3f},
+            {3.2f, 3.3f, Float.NaN}};
+        float[][] intraMatrix4 = {
+            {Float.NaN, 4.0f},
+            {4.0f, Float.NaN}};
         /* Init the inter matrix. */
-        double[][] interMatrix1={
-            {1.1, 1.2, 1.3, 1.4, 1.5},
-            {2.1, 2.2, 2.3, 2.4, 2.5},
-            {3.1, 3.2, 3.3, 3.4, 3.5},
-            {4.1, 4.2, 4.3, 4.4, 4.5}};
-        double[][] interMatrix2={
-            {1.6, 1.7, 1.8},
-            {2.6, 2.7, 2.8},
-            {3.6, 3.7, 3.8},
-            {4.6, 4.7, 4.8},
-            {5.6, 5.7, 5.8}};
-        double[][] interMatrix3={
-            {6.1, 6.2},
-            {7.1, 7.2},
-            {8.1, 8.2}};
+        float[][] interMatrix1={
+            {1.1f, 1.2f, 1.3f, 1.4f, 1.5f},
+            {2.1f, 2.2f, 2.3f, 2.4f, 2.5f},
+            {3.1f, 3.2f, 3.3f, 3.4f, 3.5f},
+            {4.1f, 4.2f, 4.3f, 4.4f, 4.5f}};
+        float[][] interMatrix2={
+            {1.6f, 1.7f, 1.8f},
+            {2.6f, 2.7f, 2.8f},
+            {3.6f, 3.7f, 3.8f},
+            {4.6f, 4.7f, 4.8f},
+            {5.6f, 5.7f, 5.8f}};
+        float[][] interMatrix3={
+            {6.1f, 6.2f},
+            {7.1f, 7.2f},
+            {8.1f, 8.2f}};
         ArrayList<Vertex2[]> nodes = new ArrayList<>();
         Vertex2[] row1 = {a1,a2,a3,a4};
         nodes.add(row1);
@@ -602,40 +602,40 @@ public class MatrixHierGeneralGraphTest {
         
         /* Check the edge weights. */
         /* Init the intra matrices. */
-        double[][] intraMatrix1 ={
-            {Double.NaN,1.2,1.3,1.4},
-            {1.2,Double.NaN,1.5,1.6},
-            {1.3,1.5,Double.NaN,1.7},
-            {1.4,1.6,1.7,Double.NaN}};
-        double[][] intraMatrix2 = {
-            {Double.NaN, 2.1, 2.2, 2.3, 2.4},
-            {2.1, Double.NaN, 2.5, 2.6, 2.7},
-            {2.2, 2.5, Double.NaN, 2.8, 2.9},
-            {2.3, 2.6, 2.8, Double.NaN, 3.0},
-            {2.4, 2.7, 2.9, 3.0, Double.NaN}};
-        double[][] intraMatrix3 = {
-            {Double.NaN, 3.1, 3.2},
-            {3.1, Double.NaN, 3.3},
-            {3.2, 3.3, Double.NaN}};
-        double[][] intraMatrix4 = {
-            {Double.NaN, 4.0},
-            {4.0, Double.NaN}};
+        float[][] intraMatrix1 ={
+            {Float.NaN,1.2f,1.3f,1.4f},
+            {1.2f,Float.NaN,1.5f,1.6f},
+            {1.3f,1.5f,Float.NaN,1.7f},
+            {1.4f,1.6f,1.7f,Float.NaN}};
+        float[][] intraMatrix2 = {
+            {Float.NaN, 2.1f, 2.2f, 2.3f, 2.4f},
+            {2.1f, Float.NaN, 2.5f, 2.6f, 2.7f},
+            {2.2f, 2.5f, Float.NaN, 2.8f, 2.9f},
+            {2.3f, 2.6f, 2.8f, Float.NaN, 3.0f},
+            {2.4f, 2.7f, 2.9f, 3.0f, Float.NaN}};
+        float[][] intraMatrix3 = {
+            {Float.NaN, 3.1f, 3.2f},
+            {3.1f, Float.NaN, 3.3f},
+            {3.2f, 3.3f, Float.NaN}};
+        float[][] intraMatrix4 = {
+            {Float.NaN, 4.0f},
+            {4.0f, Float.NaN}};
         /* Init the inter matrix. */
-        double[][] interMatrix1={
-            {1.1, 1.2, 1.3, 1.4, 1.5},
-            {2.1, 2.2, 2.3, 2.4, 2.5},
-            {3.1, 3.2, 3.3, 3.4, 3.5},
-            {4.1, 4.2, 4.3, 4.4, 4.5}};
-        double[][] interMatrix2={
-            {1.6, 1.7, 1.8},
-            {2.6, 2.7, 2.8},
-            {3.6, 3.7, 3.8},
-            {4.6, 4.7, 4.8},
-            {5.6, 5.7, 5.8}};
-        double[][] interMatrix3={
-            {6.1, 6.2},
-            {7.1, 7.2},
-            {8.1, 8.2}};
+        float[][] interMatrix1={
+            {1.1f, 1.2f, 1.3f, 1.4f, 1.5f},
+            {2.1f, 2.2f, 2.3f, 2.4f, 2.5f},
+            {3.1f, 3.2f, 3.3f, 3.4f, 3.5f},
+            {4.1f, 4.2f, 4.3f, 4.4f, 4.5f}};
+        float[][] interMatrix2={
+            {1.6f, 1.7f, 1.8f},
+            {2.6f, 2.7f, 2.8f},
+            {3.6f, 3.7f, 3.8f},
+            {4.6f, 4.7f, 4.8f},
+            {5.6f, 5.7f, 5.8f}};
+        float[][] interMatrix3={
+            {6.1f, 6.2f},
+            {7.1f, 7.2f},
+            {8.1f, 8.2f}};
         ArrayList<Vertex2[]> nodes = new ArrayList<>();
         Vertex2[] row1 = {a1,a2,a3,a4};
         nodes.add(row1);
@@ -723,7 +723,7 @@ public class MatrixHierGeneralGraphTest {
         System.out.println("setEdgeWeight");
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
-        double edgeWeight = 0.0;
+        float edgeWeight = 0.0f;
         MatrixHierGeneralGraph instance = null;
         instance.setEdgeWeight(vtx1, vtx2, edgeWeight);
         // TODO review the generated test code and remove the default call to fail.
@@ -773,7 +773,7 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testUpdatePos() {
         System.out.println("updatePos");
-        double[][] dispVector = null;
+        float[][] dispVector = null;
         MatrixHierGeneralGraph instance = null;
         instance.updatePos(dispVector);
         // TODO review the generated test code and remove the default call to fail.

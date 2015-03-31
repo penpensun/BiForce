@@ -26,7 +26,7 @@ public abstract class Subgraph2 {
     public abstract List<? extends Subgraph2> connectedComponents();
     
     /* This method returns the edge weight. */
-    public abstract double edgeWeight(Vertex2 vtx1, Vertex2 vtx2);
+    public abstract float edgeWeight(Vertex2 vtx1, Vertex2 vtx2);
     
     /* This method returns true, since it's a subgraph. */
     public final boolean isSubgraph(){
@@ -45,7 +45,7 @@ public abstract class Subgraph2 {
     public abstract ArrayList<Vertex2> neighbours(Vertex2 vtx);
     
     
-    public abstract void setEdgeWeight(Vertex2 Vtx1, Vertex2 Vtx2, double EdgeWeight);
+    public abstract void setEdgeWeight(Vertex2 Vtx1, Vertex2 Vtx2, float EdgeWeight);
     /* Set the sub vertices. */
     public final void setSubvertices(ArrayList<Vertex2> Subvertices){
         this.subvertices = Subvertices;

@@ -14,7 +14,7 @@ public class Vertex2 implements Comparable<Vertex2>{
     private String value= null;
     private int vtxIdx = 0;
     private int distIdx = 0; /* This is for MatirxHierNpartiteGraph, distance matrix 2nd version. */
-    private double[] coords = null;
+    private float[] coords = null;
     private int clustNum=-1;
     
     /**
@@ -37,7 +37,7 @@ public class Vertex2 implements Comparable<Vertex2>{
      * @param coords
      * @param vtxidx 
      */
-    public Vertex2(String value, int level, double[] coords, int vtxidx)
+    public Vertex2(String value, int level, float[] coords, int vtxidx)
     {
         this.value = value;
         this.vtxSet = level;
@@ -82,7 +82,7 @@ public class Vertex2 implements Comparable<Vertex2>{
      * Accessor for coords.
      * @return 
      */
-    public final double[] getCoords(){
+    public final float[] getCoords(){
         return coords;
     }
     
@@ -128,7 +128,7 @@ public class Vertex2 implements Comparable<Vertex2>{
      * Mutator for coords.
      * @param coords 
      */
-    public final void setCoords(double[] coords){
+    public final void setCoords(float[] coords){
         this.coords = coords;
     }
     

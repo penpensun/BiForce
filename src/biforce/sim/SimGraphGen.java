@@ -26,8 +26,8 @@ public class SimGraphGen {
      * @param vtxNum 
      * @return The ideal editing cost.
      */
-    public double generatorGeneralGraph1(int vtxNum, String outputFile, 
-            double mean, double stdev){
+    public float generatorGeneralGraph1(int vtxNum, String outputFile, 
+            float mean, float stdev){
         
         /* The pivots pivotIndexes stands tell the division of the pre-defined clusters.
          Each cluster contains the vertices with index from pivotIdexes[i] to (but not
@@ -43,12 +43,12 @@ public class SimGraphGen {
         }while(vtxNum-assignedElements != 0);
                 
         /* Now create the edge weight matrix. */
-        double[][] edgeWeights = new double[vtxNum][vtxNum] ;
+        float[][] edgeWeights = new float[vtxNum][vtxNum] ;
         for(int i =0;i<edgeWeights.length;i++)
             for(int j=0;j<edgeWeights[0].length;j++)
-                edgeWeights[i][j] = Double.NaN;
+                edgeWeights[i][j] = Float.NaN;
         /* Init the cost. */
-        double cost = 0;
+        float cost = 0;
         /* Assign the edge weights. */
         for(int i=0;i<edgeWeights.length;i++)
             for(int j=i+1;j<edgeWeights[0].length;j++){
@@ -56,7 +56,7 @@ public class SimGraphGen {
                     /* Use util.Random to generate normal distribution and get edge
                      weights for intra-edges.*/
                     Random r = new Random();
-                    double ew = r.nextGaussian()*stdev+mean;
+                    float ew = (float)r.nextGaussian()*stdev+mean;
                     edgeWeights[i][j] = ew;
                     edgeWeights[j][i] = ew;
                     if(edgeWeights[i][j]<0)
@@ -66,7 +66,7 @@ public class SimGraphGen {
                 else{
                     /* For the inter-edges. */
                     Random r = new Random();
-                    double ew = r.nextGaussian()*stdev-mean;
+                    float ew = (float)r.nextGaussian()*stdev-mean;
                     edgeWeights[i][j] = ew;
                     edgeWeights[j][i] = ew;
                     if(edgeWeights[i][j] >0)
@@ -103,9 +103,9 @@ public class SimGraphGen {
      * @param stdev
      * @return 
      */
-    public double generatorHierNpartiteGraph(int[] setSizes,
-            String outputFile, double mean, double stdev){
-        double cost = 0; /* The cost */
+    public float generatorHierNpartiteGraph(int[] setSizes,
+            String outputFile, float mean, float stdev){
+        float cost = 0; /* The cost */
         /* Get the vertex count. */
         int vertexCount = 0;
         for(int i=0;i<setSizes.length;i++)
@@ -133,9 +133,9 @@ public class SimGraphGen {
         }while(vertexCount-assignedElements != 0);
         
         /* Assign the edge weights. */
-        ArrayList<double[][]> edgeWeights = new ArrayList<>();
+        ArrayList<float[][]> edgeWeights = new ArrayList<>();
         for(int i=0;i<setSizes.length-1;i++){
-            double[][] weights = new double[setSizes[i]][setSizes[i+1]];
+            float[][] weights = new float[setSizes[i]][setSizes[i+1]];
             for(int j=0;j<setSizes[i];j++)
                 for(int k=0;k<setSizes[i+1];k++){
                     /* Get the indexes of the two vertices in the vertices array. */
@@ -146,13 +146,13 @@ public class SimGraphGen {
                     /* Check if these two vertices are in the same pre-defiend cluster. */
                     if(inSameClust(idx1,idx2,pivotIndexes)){
                         Random r = new Random();
-                        weights[j][k] = r.nextGaussian()*stdev+mean;
+                        weights[j][k] = (float)r.nextGaussian()*stdev+mean;
                         if(weights[j][k] <0)
                             cost -= weights[j][k];
                     }
                     else{
                         Random r = new Random();
-                        weights[j][k] = r.nextGaussian()*stdev-mean;
+                        weights[j][k] = (float)r.nextGaussian()*stdev-mean;
                         if(weights[j][k]>0)
                             cost+= weights[j][k];
                     }    
@@ -192,9 +192,9 @@ public class SimGraphGen {
      * @param stdev
      * @return 
      */
-    public double generateHierGeneralGraph(int[] setSizes,
-            String outputFile, double mean, double stdev){
-        double cost = 0; /* The cost */
+    public float generateHierGeneralGraph(int[] setSizes,
+            String outputFile, float mean, float stdev){
+        float cost = 0; /* The cost */
         /* Get the vertex count. */
         int vertexCount = 0;
         for(int i=0;i<setSizes.length;i++)
@@ -221,9 +221,9 @@ public class SimGraphGen {
         }while(vertexCount-assignedElements != 0);
         
         /* Assign the intra-set edge weights. */
-        ArrayList<double[][]> intraEdgeWeights = new ArrayList<>();
+        ArrayList<float[][]> intraEdgeWeights = new ArrayList<>();
         for(int i=0;i<setSizes.length;i++){
-            double[][] weights = new double[setSizes[i]][setSizes[i]];
+            float[][] weights = new float[setSizes[i]][setSizes[i]];
             /* Generate edge weights. */
             for(int j=0;j<setSizes[i];j++)
                 for(int k=j+1;k<setSizes[i];k++){
@@ -236,7 +236,7 @@ public class SimGraphGen {
                     if(inSameClust(idx1, idx2,pivotIndexes)){
                         Random r = new Random();
                         /* In the intra edge weight matrix, we have to assign two edge weights. */
-                        weights[j][k] = r.nextGaussian()*stdev+mean;
+                        weights[j][k] = (float)r.nextGaussian()*stdev+mean;
                         weights[k][j] = weights[j][k];
                         if(weights[j][k]<0)
                             cost-= weights[j][k];
@@ -244,7 +244,7 @@ public class SimGraphGen {
                     else{
                         Random r = new Random();
                         /* In the intra edge weight matrix, we have to assign two edge weights. */
-                        weights[j][k] = r.nextGaussian()*stdev-mean;
+                        weights[j][k] = (float)r.nextGaussian()*stdev-mean;
                         weights[k][j] = weights[j][k];
                         if(weights[j][k]>0)
                             cost+= weights[j][k];
@@ -253,9 +253,9 @@ public class SimGraphGen {
             intraEdgeWeights.add(weights);
         }
         /* Assign the inter-set edge weights. */
-        ArrayList<double[][]> interEdgeWeights = new ArrayList<>();
+        ArrayList<float[][]> interEdgeWeights = new ArrayList<>();
         for(int i=0;i<setSizes.length-1;i++){
-            double[][] weights = new double[setSizes[i]][setSizes[i+1]];
+            float[][] weights = new float[setSizes[i]][setSizes[i+1]];
             for(int j=0;j<setSizes[i];j++)
                 for(int k=0;k<setSizes[i+1];k++){
                     /* Get the indexes of the two vertices in the vertices array. */
@@ -266,13 +266,13 @@ public class SimGraphGen {
                     /* Check if these two vertices are in the same pre-defiend cluster. */
                     if(inSameClust(idx1,idx2,pivotIndexes)){
                         Random r = new Random();
-                        weights[j][k] = r.nextGaussian()*stdev+mean;
+                        weights[j][k] = (float)r.nextGaussian()*stdev+mean;
                         if(weights[j][k] <0)
                             cost -= weights[j][k];
                     }
                     else{
                         Random r = new Random();
-                        weights[j][k] = r.nextGaussian()*stdev-mean;
+                        weights[j][k] = (float)r.nextGaussian()*stdev-mean;
                         if(weights[j][k]>0)
                             cost+= weights[j][k];
                     }    
@@ -323,8 +323,8 @@ public class SimGraphGen {
      * @param stdev
      * @return 
      */
-    public double generateHierGeneralGraphXml(int[] setSizes,
-            String outputFile, double mean, double stdev){
+    public float generateHierGeneralGraphXml(int[] setSizes,
+            String outputFile, float mean, float stdev){
         /* First and foremost, check the legality of all parameters. */
         /* setSizes cannot be null.*/
         if(setSizes == null)
@@ -349,13 +349,13 @@ public class SimGraphGen {
             e.printStackTrace();
             return -1;
         }
-        /* The mean must be a legal double. */
+        /* The mean must be a legal float. */
         if(Double.isNaN(mean))
-            throw new IllegalArgumentException("(biforce.sim.SimGraphGen.generatorHierGeneralGraphXml) Parameter mean is not a double float number.");
+            throw new IllegalArgumentException("(biforce.sim.SimGraphGen.generatorHierGeneralGraphXml) Parameter mean is not a float float number.");
         if(Double.isNaN(stdev) || stdev<0)
             throw new IllegalArgumentException("(biforce.sim.SimGraphGen.generatorHierGeneralGraphXml) Parameter stdev is illegal:  "+stdev);
         
-        double cost = 0; /* The cost */
+        float cost = 0; /* The cost */
         /* Get the vertex count. */
         int vertexCount = 0;
         for(int i=0;i<setSizes.length;i++)
@@ -381,9 +381,9 @@ public class SimGraphGen {
             pivotIndexes.add(assignedElements);
         }while(vertexCount-assignedElements != 0);
         /* Assign the intra-set edge weights. */
-        ArrayList<double[][]> intraEdgeWeights = new ArrayList<>();
+        ArrayList<float[][]> intraEdgeWeights = new ArrayList<>();
         for(int i=0;i<setSizes.length;i++){
-            double[][] weights = new double[setSizes[i]][setSizes[i]];
+            float[][] weights = new float[setSizes[i]][setSizes[i]];
             /* Generate edge weights. */
             for(int j=0;j<setSizes[i];j++)
                 for(int k=j+1;k<setSizes[i];k++){
@@ -396,7 +396,7 @@ public class SimGraphGen {
                     if(inSameClust(idx1, idx2,pivotIndexes)){
                         Random r = new Random();
                         /* In the intra edge weight matrix, we have to assign two edge weights. */
-                        weights[j][k] = r.nextGaussian()*stdev+mean;
+                        weights[j][k] = (float)r.nextGaussian()*stdev+mean;
                         weights[k][j] = weights[j][k];
                         if(weights[j][k]<0)
                             cost-= weights[j][k];
@@ -404,7 +404,7 @@ public class SimGraphGen {
                     else{
                         Random r = new Random();
                         /* In the intra edge weight matrix, we have to assign two edge weights. */
-                        weights[j][k] = r.nextGaussian()*stdev-mean;
+                        weights[j][k] = (float)r.nextGaussian()*stdev-mean;
                         weights[k][j] = weights[j][k];
                         if(weights[j][k]>0)
                             cost+= weights[j][k];
@@ -413,9 +413,9 @@ public class SimGraphGen {
             intraEdgeWeights.add(weights);
         }
         /* Assign the inter-set edge weights. */
-        ArrayList<double[][]> interEdgeWeights = new ArrayList<>();
+        ArrayList<float[][]> interEdgeWeights = new ArrayList<>();
         for(int i=0;i<setSizes.length-1;i++){
-            double[][] weights = new double[setSizes[i]][setSizes[i+1]];
+            float[][] weights = new float[setSizes[i]][setSizes[i+1]];
             for(int j=0;j<setSizes[i];j++)
                 for(int k=0;k<setSizes[i+1];k++){
                     /* Get the indexes of the two vertices in the vertices array. */
@@ -426,13 +426,13 @@ public class SimGraphGen {
                     /* Check if these two vertices are in the same pre-defiend cluster. */
                     if(inSameClust(idx1,idx2,pivotIndexes)){
                         Random r = new Random();
-                        weights[j][k] = r.nextGaussian()*stdev+mean;
+                        weights[j][k] = (float)r.nextGaussian()*stdev+mean;
                         if(weights[j][k] <0)
                             cost -= weights[j][k];
                     }
                     else{
                         Random r = new Random();
-                        weights[j][k] = r.nextGaussian()*stdev-mean;
+                        weights[j][k] = (float)r.nextGaussian()*stdev-mean;
                         if(weights[j][k]>0)
                             cost+= weights[j][k];
                     }    
@@ -454,7 +454,7 @@ public class SimGraphGen {
             for(int i=0;i<setSizes.length;i++){
                 bw.write("<matrix matrixLevel=\""+i+" "+i+"\">\n");
                 /* Output the ith intra-matrix. */
-                double[][] intraMatrix = intraEdgeWeights.get(i);
+                float[][] intraMatrix = intraEdgeWeights.get(i);
                 for(int j=0;j<intraMatrix.length;j++){
                     for(int k=0;k<intraMatrix[0].length-1;k++)
                         bw.write(intraMatrix[j][k]+"\t"); 
@@ -466,7 +466,7 @@ public class SimGraphGen {
             for(int i=0;i<setSizes.length-1;i++){
                 bw.write("<matrix matrixLevel=\""+i+" "+(i+1)+"\">\n");
                 /* Output the ith inter-matrix. */
-                double[][] interMatrix = interEdgeWeights.get(i);
+                float[][] interMatrix = interEdgeWeights.get(i);
                 for(int j=0;j<interMatrix.length;j++){
                     for(int k=0;k<interMatrix[0].length-1;k++)
                         bw.write(interMatrix[j][k]+"\t");
@@ -496,7 +496,7 @@ public class SimGraphGen {
      * @param dev 
      */
     public void writeRandomInterMatrix(String outputFile, int manyRows, int manyCols,
-            double mean, double dev){
+            float mean, float dev){
         FileWriter fw = null;
         BufferedWriter bw = null;
         try{
@@ -509,10 +509,10 @@ public class SimGraphGen {
         try{
         for(int i=0;i<manyRows;i++){
             for(int j=0;j<manyCols-1;j++){
-                double ew = r.nextGaussian()*dev+mean;
+                float ew = (float)r.nextGaussian()*dev+mean;
                 bw.write(ew+"\t");
             }
-            double ew = r.nextGaussian()*dev+mean;
+            float ew = (float)r.nextGaussian()*dev+mean;
             bw.write(ew+"\n");
         }
         bw.flush();
@@ -524,7 +524,7 @@ public class SimGraphGen {
     }
     
     public void writeRandomIntraMatrix(String outputFile, int manyRows,
-            double mean, double dev){
+            float mean, float dev){
         FileWriter fw = null;
         BufferedWriter bw = null;
         try{
@@ -535,14 +535,14 @@ public class SimGraphGen {
         }
         Random r = new Random();
         /* Generate the matrix.*/
-        double[][] ew = new double[manyRows][manyRows];
+        float[][] ew = new float[manyRows][manyRows];
         for(int i=0;i<ew.length;i++)
             for(int j=0;j<ew[0].length;j++)
-                ew[i][j] = Double.NaN;
+                ew[i][j] = Float.NaN;
         
         for(int i=0;i<manyRows;i++)
             for(int j=i+1;j<manyRows;j++){
-                ew[i][j]=r.nextGaussian()*dev+mean;
+                ew[i][j]=(float)r.nextGaussian()*dev+mean;
                 ew[j][i]=ew[i][j];
             }
         try{

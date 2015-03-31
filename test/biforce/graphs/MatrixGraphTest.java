@@ -88,9 +88,9 @@ public class MatrixGraphTest {
      * Test of detractThresh method, of class MatrixGraph.
      */
     @Test
-    public void testDetractThresh_double() {
+    public void testDetractThresh_float() {
         System.out.println("detractThresh");
-        double thresh = 0.0;
+        float thresh = 0.0f;
         MatrixGraph instance = null;
         instance.detractThresh(thresh);
         // TODO review the generated test code and remove the default call to fail.
@@ -106,8 +106,8 @@ public class MatrixGraphTest {
         Vertex2 Vtx1 = null;
         Vertex2 Vtx2 = null;
         MatrixGraph instance = null;
-        double expResult = 0.0;
-        double result = instance.dist(Vtx1, Vtx2);
+        float expResult = 0.0f;
+        float result = instance.dist(Vtx1, Vtx2);
         assertEquals(expResult, result, 0.0);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -122,8 +122,8 @@ public class MatrixGraphTest {
         Vertex2 Vtx1 = null;
         Vertex2 Vt2 = null;
         MatrixGraph instance = null;
-        double expResult = 0.0;
-        double result = instance.edgeWeight(Vtx1, Vt2);
+        float expResult = 0.0f;
+        float result = instance.edgeWeight(Vtx1, Vt2);
         assertEquals(expResult, result, 0.0);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -138,8 +138,8 @@ public class MatrixGraphTest {
         int vtxIdx1 = 0;
         int vtxIdx2 = 0;
         MatrixGraph instance = null;
-        double expResult = 0.0;
-        double result = instance.edgeWeight(vtxIdx1, vtxIdx2);
+        float expResult = 0.0f;
+        float result = instance.edgeWeight(vtxIdx1, vtxIdx2);
         assertEquals(expResult, result, 0.0);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -152,8 +152,8 @@ public class MatrixGraphTest {
     public void testGetCost() {
         System.out.println("getCost");
         MatrixGraph instance = null;
-        double expResult = 0.0;
-        double result = instance.getCost();
+        float expResult = 0.0f;
+        float result = instance.getCost();
         assertEquals(expResult, result, 0.0);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -340,7 +340,7 @@ public class MatrixGraphTest {
         System.out.println("setEdgeWeight");
         Vertex2 Vtx1 = null;
         Vertex2 Vtx2 = null;
-        double EdgeWeight = 0.0;
+        float EdgeWeight = 0.0f;
         MatrixGraph instance = null;
         instance.setEdgeWeight(Vtx1, Vtx2, EdgeWeight);
         // TODO review the generated test code and remove the default call to fail.
@@ -394,7 +394,7 @@ public class MatrixGraphTest {
     @Test
     public void testUpdatePos() {
         System.out.println("updatePos");
-        double[][] dispVector = null;
+        float[][] dispVector = null;
         MatrixGraph instance = null;
         instance.updatePos(dispVector);
         // TODO review the generated test code and remove the default call to fail.

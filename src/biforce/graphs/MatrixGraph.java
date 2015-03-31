@@ -19,16 +19,16 @@ import java.util.*;
  * @author Peng Sun
  */
 public class MatrixGraph extends Graph2 {
-    /* The double value for cost. */
-    double cost = 0;
+    /* The float value for cost. */
+    float cost = 0;
     /* The two dimensional array stores the adjacency matrix.*/
-    double[][] edgeWeights = null;
+    float[][] edgeWeights = null;
     /* This matrix stores the distances. */
     /* Distances, unlike edge weight, must be defined between two arbitrary vertices. It does not matter 
     whether the two vertices come from the same set or not, since later single-linkage and kmeans clustering
     use pairwise distances. */
     /* Note that the distance matrix is a LOWER TRIANGULAR MATRIX. */
-    double[][] distances = null;
+    float[][] distances = null;
     /**
      * Constructor.
      * @param filePath
@@ -52,7 +52,7 @@ public class MatrixGraph extends Graph2 {
                         +" "+filePath);
             }
         /* Init the distance matrix. */
-        distances = new double[vertices.size()][vertices.size()];
+        distances = new float[vertices.size()][vertices.size()];
         for(int i=0;i<vertices.size();i++)
             for(int j=0;j<vertices.size();j++)
                 distances[i][j] = -1;
@@ -63,7 +63,7 @@ public class MatrixGraph extends Graph2 {
      * @param isHeader
      * @param thresh 
      */
-    public MatrixGraph(String filePath, boolean isHeader, double thresh){
+    public MatrixGraph(String filePath, boolean isHeader, float thresh){
         if(isHeader)
             try{
                 readGraphWithHeader(filePath);
@@ -79,7 +79,7 @@ public class MatrixGraph extends Graph2 {
         setThreshold(thresh);
         detractThresh();
         /* Init the distance matrix. */
-        distances = new double[vertices.size()][vertices.size()];
+        distances = new float[vertices.size()][vertices.size()];
         for(int i=0;i<vertices.size();i++)
             for(int j=0;j<vertices.size();j++)
                 distances[i][j] = -1;
@@ -180,7 +180,7 @@ public class MatrixGraph extends Graph2 {
     }
 
     @Override
-    public final void detractThresh(double thresh) {
+    public final void detractThresh(float thresh) {
         /* Check if the threshold has already detracted */
         if(threshDetracted)
             throw new IllegalArgumentException("(MatrixBipartiteGraph2.detractThresh)"
@@ -197,19 +197,19 @@ public class MatrixGraph extends Graph2 {
      * @return 
      */
     @Override
-    public double dist(Vertex2 vtx1, Vertex2 vtx2) {
+    public float dist(Vertex2 vtx1, Vertex2 vtx2) {
         return distances[vtx1.getVtxIdx()][vtx2.getVtxIdx()];
     }
 
     @Override
-    public double edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
+    public float edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
        int vtxIdx1 = vtx1.getVtxIdx();
        int vtxIdx2 = vtx2.getVtxIdx();
        return edgeWeight(vtxIdx1, vtxIdx2);
     }
 
     @Override
-    public double edgeWeight(int vtxIdx1, int vtxIdx2) {
+    public float edgeWeight(int vtxIdx1, int vtxIdx2) {
         /* Check the bound. */
         if(vtxIdx1>= vertices.size() || vtxIdx2>= vertices.size() || vtxIdx1 <0 || vtxIdx2 <0)
             throw new IndexOutOfBoundsException("(MatrixGraph edgeWeight) Index out of bound. "+vtxIdx1+" "+vtxIdx2+" size: "+vertices.size());
@@ -222,7 +222,7 @@ public class MatrixGraph extends Graph2 {
      * @param vtx2
      * @return 
      */
-    private double euclidDist(Vertex2 vtx1, Vertex2 vtx2){
+    private float euclidDist(Vertex2 vtx1, Vertex2 vtx2){
         if(vtx1.getCoords() == null ||
                 vtx2.getCoords() == null)
             throw new IllegalArgumentException ("(MatrixBipartiteGraph.euclidDist) Null coordinates:  "+
@@ -230,18 +230,18 @@ public class MatrixGraph extends Graph2 {
         //check if they have the same dimension
         if(vtx1.getCoords().length !=vtx2.getCoords().length )
             throw new IllegalArgumentException("Point 1 and Point 2 have different dimension");
-        double Dist= 0;
+        float Dist= 0;
         for(int i=0;i<vtx1.getCoords().length;i++)
         {
             Dist+= (vtx1.getCoords()[i]-vtx2.getCoords()[i])*
                     (vtx1.getCoords()[i]-vtx2.getCoords()[i]);
         }
-        Dist = Math.sqrt(Dist);
+        Dist = (float)Math.sqrt(Dist);
         return Dist;
     }
 
     @Override
-    public double getCost() {
+    public float getCost() {
        return cost;
     }
 
@@ -277,7 +277,7 @@ public class MatrixGraph extends Graph2 {
      * @param matrix2
      * @return 
      */
-    public boolean isMatrixEqual(double[][] matrix1, double[][] matrix2){
+    public boolean isMatrixEqual(float[][] matrix1, float[][] matrix2){
         if(matrix1.length != matrix2.length)
             return false;
         if(matrix1[0].length != matrix2[0].length)
@@ -318,7 +318,7 @@ public class MatrixGraph extends Graph2 {
         if(!threshDetracted)
             detractThresh();
         
-        double ew = edgeWeight(vtx1, vtx2);
+        float ew = edgeWeight(vtx1, vtx2);
         if(ew == 0)
             throw new IllegalArgumentException("There is a null-edge between vtx1 and vtx2");
         Action2 act = null;
@@ -365,11 +365,11 @@ public class MatrixGraph extends Graph2 {
             }  
         }
         
-        edgeWeights = new double[vertexValues.size()][vertexValues.size()];
+        edgeWeights = new float[vertexValues.size()][vertexValues.size()];
         /* Initialize the edge weights. */
         for(int i=0;i<edgeWeights.length;i++)
             for(int j=0;j<edgeWeights[0].length;j++)
-                edgeWeights[i][j] = Double.NaN;
+                edgeWeights[i][j] = Float.NaN;
         fr.close();
         br.close();
         /* Second read, initialize the elements and the edge weights. Re-open the file.*/
@@ -413,8 +413,8 @@ public class MatrixGraph extends Graph2 {
                 /* If the index is a self loop. */
                 if(idx1 == idx2)
                     continue;
-                edgeWeights[idx1][idx2] = Double.parseDouble(String.copyValueOf(split[2].toCharArray()));
-                edgeWeights[idx2][idx1] = Double.parseDouble(String.copyValueOf(split[2].toCharArray()));
+                edgeWeights[idx1][idx2] = Float.parseFloat(String.copyValueOf(split[2].toCharArray()));
+                edgeWeights[idx2][idx1] = Float.parseFloat(String.copyValueOf(split[2].toCharArray()));
             }     
         }
         fr.close();
@@ -444,11 +444,11 @@ public class MatrixGraph extends Graph2 {
             return;
         }
         /* Create the edge weights matrix. */
-        edgeWeights = new double[size][size];
+        edgeWeights = new float[size][size];
         /* Init the values in the edgeWeight matrix to NaN */
         for(int i=0;i<size;i++)
             for(int j=0;j<size;j++)
-                edgeWeights[i][j] = Double.NaN;
+                edgeWeights[i][j] = Float.NaN;
         
         while((line = br.readLine())!= null){
             String[] split = line.split("\\s+");
@@ -489,8 +489,8 @@ public class MatrixGraph extends Graph2 {
                 if(idx1 == idx2)
                     continue;
                 /* Assign the value in edge weight matrix. */
-                edgeWeights[idx1][idx2] = Double.parseDouble(String.copyValueOf(split[2].toCharArray()));
-                edgeWeights[idx2][idx1] = Double.parseDouble(String.copyValueOf(split[2].toCharArray()));
+                edgeWeights[idx1][idx2] = Float.parseFloat(String.copyValueOf(split[2].toCharArray()));
+                edgeWeights[idx2][idx1] = Float.parseFloat(String.copyValueOf(split[2].toCharArray()));
             }
         }
         br.close();
@@ -535,7 +535,7 @@ public class MatrixGraph extends Graph2 {
     }
 
     @Override
-    public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, double edgeWeight) {
+    public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, float edgeWeight) {
         int idx1 = vtx1.getVtxIdx();
         int idx2 = vtx2.getVtxIdx();
         /* Check if out of bounds. */
@@ -581,18 +581,18 @@ public class MatrixGraph extends Graph2 {
             for(int j=i+1;j<vertices.size();j++){
                 Vertex2 vtx1 = vertices.get(i);
                 Vertex2 vtx2 = vertices.get(j);
-                double dist = euclidDist(vtx1,vtx2);
+                float dist = euclidDist(vtx1,vtx2);
                 distances[vtx1.getVtxIdx()][vtx2.getVtxIdx()] = dist;
                 distances[vtx2.getVtxIdx()][vtx1.getVtxIdx()] = dist;
             }
     }
 
     @Override
-    public void updatePos(double[][] dispVector) {
+    public void updatePos(float[][] dispVector) {
         /* For each vertex, update the position. */
         for(int i=0;i<vertexCount();i++){
             /* Compute the new coordinates. */
-            double[] coords = vertices.get(i).getCoords();
+            float[] coords = vertices.get(i).getCoords();
             for(int j=0;j<coords.length;j++){
                 coords[j] += dispVector[i][j];
             }
@@ -710,6 +710,16 @@ public class MatrixGraph extends Graph2 {
             System.err.println("(MatrixBiPartiteGraph2.writeResultInfoTo) Writing error.");
             return;
         }
+    }
+    
+    public void writerInterEwMatrix(String outFile, int idx){
+        
+    }
+    public void writeIntraEwMatrix(String outFile, int idx){
+        
+    }
+    public void writeDistanceMatrix(String file){
+        
     }
     
 }

@@ -111,9 +111,9 @@ public class MatrixHierGeneralSubgraphTest {
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
         MatrixHierGeneralSubgraph instance = null;
-        double expResult = 0.0;
-        double result = instance.edgeWeight(vtx1, vtx2);
-        assertEquals(expResult, result, 0.0);
+        float expResult = 0.0f;
+        float result = instance.edgeWeight(vtx1, vtx2);
+        assertEquals(expResult, result, 0.0f);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -155,7 +155,7 @@ public class MatrixHierGeneralSubgraphTest {
         System.out.println("setEdgeWeight");
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
-        double edgeWeight = 0.0;
+        float edgeWeight = 0.0f;
         MatrixHierGeneralSubgraph instance = null;
         instance.setEdgeWeight(vtx1, vtx2, edgeWeight);
         // TODO review the generated test code and remove the default call to fail.

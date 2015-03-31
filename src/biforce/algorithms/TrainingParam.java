@@ -12,12 +12,12 @@ package biforce.algorithms;
  * 
  */
 public class TrainingParam extends Param {
-    double cost;
+    float cost;
     public TrainingParam(int maxIter, 
-            double fatt, double frep, 
-            double M0, int dim, double radius,
-            double thresh,
-            double upperth, double lowerth, double step)
+            float fatt, float frep, 
+            float M0, int dim, float radius,
+            float thresh,
+            float upperth, float lowerth, float step)
     {
         super.maxIter = maxIter;
         super.fatt = fatt;
@@ -32,11 +32,11 @@ public class TrainingParam extends Param {
         this.cost = 0; 
     }
     
-    public double getCost()
+    public float getCost()
     {
         return cost;
     }
-    public void setCost(double cost)
+    public void setCost(float cost)
     {
         this.cost = cost;
     }

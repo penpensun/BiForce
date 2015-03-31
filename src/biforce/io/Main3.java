@@ -25,7 +25,7 @@ public class Main3 {
     }
     
     public static void runGraph(int graphType,
-            double thresh,
+            float thresh,
             String graphIn,
             String graphOut,
             String clusterOut,
@@ -58,7 +58,7 @@ public class Main3 {
      * @param p 
      */
     public static void runGraph(int graphType,
-            double thresh,
+            float thresh,
             String graphIn,
             String graphOut,
             String clusterOut,
@@ -188,13 +188,13 @@ public class Main3 {
      * @param isOutXmlFile This is the output format: false, plain foramt; true, xml format.
      */
     public static void runGraph(int graphType,
-            double thresh,
-            double fatt, double frep,
-            int maxIter, double M0, int dim,
-            double radius, 
-            double upperth,
-            double lowerth,
-            double step,
+            float thresh,
+            float fatt, float frep,
+            int maxIter, float M0, int dim,
+            float radius, 
+            float upperth,
+            float lowerth,
+            float step,
             boolean isHeader,
             boolean isInXmlFile,
             boolean isOutXmlFile,

@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.io.IOException;
 import java.util.Collections;
+
+import biforce.log.Setting;
 /**
  * This biforce is based on Graph2.
  * @author Peng Sun.
@@ -40,9 +42,9 @@ public class BiForceOnGraph4 {
                 Vertex2 vtx1 = graph.getVertices().get(i);
                 Vertex2 vtx2 = graph.getVertices().get(j);
                 
-                double ew = graph.edgeWeight(vtx1, vtx2);
+                float ew = graph.edgeWeight(vtx1, vtx2);
                 //if there is no edge between them, then continue;
-                if(ew == 0 || Double.isNaN(ew))
+                if(ew == 0 || Float.isNaN(ew))
                     continue;
                 //case 1, in the same cluster with negative edge: then we need an addition
                 if(vtx1.getClustNum() ==vtx2.getClustNum() &&
@@ -97,9 +99,9 @@ public class BiForceOnGraph4 {
      * @param p
      * @return 
      */
-    public double computeCost(Graph2 graph){
+    public float computeCost(Graph2 graph){
 
-        double cost = 0;
+        float cost = 0;
         //first check if there is no unassigned vertex
         for(Vertex2 vtx:graph.getVertices())
             if(vtx.getClustNum() ==-1)
@@ -110,7 +112,7 @@ public class BiForceOnGraph4 {
                 Vertex2 vtx1 = graph.getVertices().get(i);
                 Vertex2 vtx2 = graph.getVertices().get(j);
                 
-                double ew = graph.edgeWeight(vtx1, vtx2);
+                float ew = graph.edgeWeight(vtx1, vtx2);
                 /* If there is no edge between vtx1 and vtx2, then continue. */
                 if(Double.isNaN(ew))
                     continue;
@@ -136,11 +138,11 @@ public class BiForceOnGraph4 {
      * @param c2
      * @return 
      */
-    private double computeMergeCost(Graph2 graph, Cluster2 c1, Cluster2 c2 ){
-        double CostDiff = 0;
+    private float computeMergeCost(Graph2 graph, Cluster2 c1, Cluster2 c2 ){
+        float CostDiff = 0;
         for(Vertex2 pt1: c1.getVertices())
             for(Vertex2 pt2:c2.getVertices()){
-                double ew = graph.edgeWeight(pt1, pt2);
+                float ew = graph.edgeWeight(pt1, pt2);
                 if(ew == 0 || Double.isNaN(ew))
                     continue;
                 if(ew<0)
@@ -161,7 +163,7 @@ public class BiForceOnGraph4 {
     * @param destClr
     * @return 
     */
-    private double computeMoveCost(Graph2 graph, Vertex2 toMove, 
+    private float computeMoveCost(Graph2 graph, Vertex2 toMove, 
             Cluster2 sourceClr, Cluster2 destClr){
         //check if the point toMove belongs to the cluster sourceClr
         if(toMove.getClustNum() != sourceClr.getClustIdx()){
@@ -172,10 +174,10 @@ public class BiForceOnGraph4 {
             throw new IllegalArgumentException("(BiForceOnGraph4 computeMoveCost) "
                     + "The point to move does not belong to the source cluster.");
         }
-        double costDiff = 0;
+        float costDiff = 0f;
         /* Compute the costDiff for moving the given vertex out of the sourceClr. */
         for(Vertex2 vtx: sourceClr.getVertices()){
-            double ew = graph.edgeWeight(toMove, vtx);
+            float ew = graph.edgeWeight(toMove, vtx);
             /* If there is a non-defined edge, then we continue. */
             if(Double.isNaN(ew))
                 continue;
@@ -191,7 +193,7 @@ public class BiForceOnGraph4 {
         /* Compute the costDiff for moving the given vertex into the given destClr. */
         for(Vertex2 vtx: destClr.getVertices()){
             
-            double ew = graph.edgeWeight(toMove,vtx);
+            float ew = graph.edgeWeight(toMove,vtx);
             /* If there is a non-defined edge, then we continue. */
             if(ew == 0)
                 continue;
@@ -213,13 +215,13 @@ public class BiForceOnGraph4 {
      * @param iter
      * @return 
      */
-    private double cooling(double M0, int iter)
+    private float cooling(float M0, int iter)
     {
         
         if(iter == 1)
             return M0;
         else if(iter == 2)
-            return M0/3.0*2.0;
+            return M0/3.0f*2.0f;
         else
             return M0/iter*3;
     }
@@ -230,36 +232,36 @@ public class BiForceOnGraph4 {
      * @param p
      * @return 
      */
-    private double[][] displace(Graph2 graph, Param p, int iter){
-        double[][] dispVectors = new double[graph.vertexCount()][p.getDim()];
+    private float[][] displace(Graph2 graph, Param p, int iter){
+        float[][] dispVectors = new float[graph.vertexCount()][p.getDim()];
         
         /* To avoid unnecessary calculation, we calculate attCoeff and repCoeff first. */
-        double attCoeff =p.getFatt()/graph.vertexCount();
-        double repCoeff = p.getFrep()/graph.vertexCount();
+        float attCoeff =p.getFatt()/graph.vertexCount();
+        float repCoeff = p.getFrep()/graph.vertexCount();
         
         /* Calculate the displacement vector for each point. */
         for(int i=1;i<graph.vertexCount();i++){
             for(int j=0;j<i;j++){
                 Vertex2 vtx1 = graph.getVertices().get(i);
                 Vertex2 vtx2 = graph.getVertices().get(j);
-                double ew = graph.edgeWeight(vtx1, vtx2);
+                float ew = graph.edgeWeight(vtx1, vtx2);
                 /* If there is no edge between Pt1 and Pt2, continue. */
                 if(Double.isNaN(ew))
                     continue;
-                double dist = graph.dist(vtx1,vtx2);
+                float dist = graph.dist(vtx1,vtx2);
                 if(dist == 0)
                     continue;
                 /* Calculate the force */
                 /* If there is an edge between two node, then we calculate 
                  * the attration force threshold. */
-                double force;
+                float force;
                 
                 if(ew >p.getThresh()){
-                    force = (ew- p.getThresh())*Math.log10(dist+1)*attCoeff/dist; 
+                    force = (float)((ew- p.getThresh())*Math.log10(dist+1)*attCoeff/dist); 
                 }
                 else{
                     /* Else, we calculate the repulsion force. */
-                    force = repCoeff*(ew - p.getThresh())/Math.log10(dist+1)/dist;
+                    force = (float)(repCoeff*(ew - p.getThresh())/Math.log10(dist+1)/dist);
                 }
                 //for each dim
                 for(int d=0;d<p.getDim();d++){
@@ -271,13 +273,13 @@ public class BiForceOnGraph4 {
             }
         }
         /* Adjust the dispVectors according to the cooling factor. */
-        double Mi = cooling(p.getM0(),iter);
+        float Mi = cooling(p.getM0(),iter);
         for(int i=0;i<graph.vertexCount();i++){
             /* The magnitude of the original displacement vector. */
-            double Mag = getMagnitude(dispVectors[i]);
+            float Mag = getMagnitude(dispVectors[i]);
             //System.out.println("i: "+iter+"\tmagnitude: "+Mag+"\tcooling: "+Mi);
             /* The minor of Mi and Mag. */
-            double MinM = Math.min(1, Mi/Mag);
+            float MinM = Math.min(1, Mi/Mag);
             for(int j=0;j<p.getDim();j++)
                 dispVectors[i][j] *= MinM;
         }
@@ -305,13 +307,13 @@ public class BiForceOnGraph4 {
      * @param Coords
      * @return 
      */
-    private double getMagnitude(double[] Coords)
+    private float getMagnitude(float[] Coords)
     {
-        double M = 0;
+        float M = 0;
         for(int i=0;i<Coords.length;i++){
             M+= Coords[i]*Coords[i];
         }
-        return Math.sqrt(M);
+        return (float)Math.sqrt(M);
     }
     
     /**
@@ -323,7 +325,7 @@ public class BiForceOnGraph4 {
     private ArrayList<Vertex2> initLayout(Graph2 graph, Param p){
         
         int dim = p.getDim();
-        double radius = p.getRadius();
+        float radius = p.getRadius();
         
         Random rd = new Random();
         int vtces = graph.vertexCount();
@@ -334,18 +336,18 @@ public class BiForceOnGraph4 {
         //for each vertex create a point with random coordinates
         
         //initiate two constant, used to distribute points on the surface of a sphere
-        double inc = (double)(Math.PI * (3- Math.sqrt(5)));
-        double off = (double)2.0/vtces;
+        float inc = (float)(Math.PI * (3- Math.sqrt(5)));
+        float off = (float)2.0/vtces;
         while(it.hasNext()){
-            double[] coords = new double[dim];
+            float[] coords = new float[dim];
             //retrieve the vertex
             Vertex2 vtx=(Vertex2)it.next();
             // if dim==2 distribute points equidistantly on the circle
             if (dim==2){
                 //coords[0] = (radius*Math.cos((i*2*Math.PI)/vtces)) + rd.nextGaussian();
-                coords[0] = (double)(radius*Math.cos((i*2*Math.PI)/vtces));
+                coords[0] = (float)(radius*Math.cos((i*2*Math.PI)/vtces));
                 //coords[1] = radius*Math.sin((i*2*Math.PI)/vtces)+rd.nextGaussian();
-                coords[1] = (double)(radius*Math.sin((i*2*Math.PI)/vtces));
+                coords[1] = (float)(radius*Math.sin((i*2*Math.PI)/vtces));
                 vtx.setCoords(coords);
                 vertexList.add(vtx);
                 i++;
@@ -354,25 +356,25 @@ public class BiForceOnGraph4 {
             //Here, we use an algorithm called on greek golden ratio, the "Golden Section Spiral"
             else if(dim == 3)
             {
-                double y = i * off -1 +(off/2.0);
-                double r = Math.sqrt(1-y*y);
-                double phi = i*inc;
-                coords[0] = Math.cos(phi)*r*radius;
+                float y = i * off -1 +(off/2.0f);
+                float r = (float)Math.sqrt(1-y*y);
+                float phi = i*inc;
+                coords[0] = (float)Math.cos(phi)*r*radius;
                 coords[1] = y*radius;
-                coords[2] = Math.sin(phi)*r*radius;
+                coords[2] = (float)Math.sin(phi)*r*radius;
                 vtx.setCoords(coords);
                 vertexList.add(vtx);
                 i++;
             }
             else {
-                double norm=0;
+                float norm=0;
                 //generate dim pseudorandom numbers between -1 and 1
                 // normalize these vectors and scale them to a length of 50
                 for (int j=0; j<dim; j++){
-                    coords[j] = rd.nextDouble()*2 -1;
+                    coords[j] = rd.nextFloat()*2 -1;
                     norm += Math.pow(coords[j], 2);
                 }
-                norm = Math.sqrt(norm);
+                norm = (float)Math.sqrt(norm);
                 for (int j=0; j<dim; j++){
                     coords[j] /= norm;
                     coords[j] *= radius;
@@ -397,14 +399,14 @@ public class BiForceOnGraph4 {
         /* Randomly choose k points as k centroids. */
         ArrayList<Integer> vtxIndexes = new ArrayList<>();
         /* Init the coords array for centroids. */
-        double[][] centroids = new double[k][p.getDim()];
+        float[][] centroids = new float[k][p.getDim()];
         /* Create an array to record the sizes of all clusters. */
         int[] clusterSizes = new int[k];
         for(int i=0;i<clusterSizes.length;i++){
             clusterSizes[i] = 0;
         }
         /* Init the coordinates of centroids. */
-        for (double[] cen : centroids){
+        for (float[] cen : centroids){
             for (int j = 0; j<p.getDim(); j++){
                 cen[j] = -1;
             }
@@ -428,10 +430,10 @@ public class BiForceOnGraph4 {
             isConverged = true;
             /* Assign the points to closest centroid. */
             for(Vertex2 vtx:input.getVertices()){
-                double minDist = Double.MAX_VALUE;
+                float minDist = Float.MAX_VALUE;
                 int closestCentroidIdx = -1;
                 for(int i=0;i<centroids.length;i++){
-                    double dist = euclidDist(vtx,centroids[i],p);
+                    float dist = euclidDist(vtx,centroids[i],p);
                     if(dist<minDist){
                         minDist = dist;
                         closestCentroidIdx = i;
@@ -505,9 +507,35 @@ public class BiForceOnGraph4 {
         initLayout(graph, p);
         System.out.println("Compute the displacement and update the nodes position.");
         graph.updateDist();
+        /* Write to log file:
+        1. The vertex info.
+        2. The distance info.
+        3. The edge weight info.
+        */
+        graph.writeVertexInfo(Setting.VERTEX_LOG+"_start");
+        graph.writeDistanceMatrix(Setting.DIST_LOG+"_start");
+        for(int i=0;i<graph.vertexSetCount()-1;i++){
+            graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+i+"_start", i);
+            graph.writerInterEwMatrix(Setting.INTER_EW_LOG+i+"_start", i);
+        }
+        graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+(graph.vertexSetCount()-1), graph.vertexSetCount()-1);
+        
+            
         /* For a certain number of iterations, we compute the displacement 
          * vector and update the vertex positions. */       
         for(int i=0;i< p.getMaxIter();i++){
+            /* Mid-way info output. */
+            if(i == p.getMaxIter()/2){
+                graph.writeVertexInfo(Setting.VERTEX_LOG+"_mid");
+                graph.writeDistanceMatrix(Setting.DIST_LOG+"_mid");
+                for(int idx=0;idx<graph.vertexSetCount()-1;idx++){
+                    graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+idx+"_mid", idx);
+                    graph.writerInterEwMatrix(Setting.INTER_EW_LOG+idx+"_mid", idx);
+                }
+                graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+(graph.vertexSetCount()-1)+"_mid"
+                    , graph.vertexSetCount()-1);
+            }
+                
             graph.updatePos(displace(graph,p,i));
             graph.updateDist();
             if(i % 5==0)
@@ -521,14 +549,14 @@ public class BiForceOnGraph4 {
          *we record the best DistThr. */
         
         System.out.println("Partition the nodes. ");
-        double minCostSL = Double.MAX_VALUE;
-        double costAti;
-        double minCostThresh=0;
+        float minCostSL = Float.MAX_VALUE;
+        float costAti;
+        float minCostThresh=0;
         System.out.println("Start single-linkage partitioning.");
         int[] slClusters = new int[graph.getVertices().size()];
         // Normal sl clustering
         if(slType == 1){
-                for(double i = p.getLowerth(); i<= p.getUpperth();i+= p.getStep()){
+                for(float i = p.getLowerth(); i<= p.getUpperth();i+= p.getStep()){
                 singleLinkageClust(graph,i);
                 costAti = computeCost(graph);
                 if(costAti< minCostSL){
@@ -542,7 +570,7 @@ public class BiForceOnGraph4 {
         }
         // Chain sl clustering
         else if(slType ==2){
-                for(double i = p.getLowerth(); i<= p.getUpperth();i+= p.getStep()){
+                for(float i = p.getLowerth(); i<= p.getUpperth();i+= p.getStep()){
                 singleLinkageClustChain(graph,i);
                 costAti = computeCost(graph);
                 if(costAti< minCostSL){
@@ -555,9 +583,9 @@ public class BiForceOnGraph4 {
             }
         }
         
-        double minCostKmeans = Double.MAX_VALUE;
+        float minCostKmeans = Float.MAX_VALUE;
         int minK = 0;
-        double costAtk;
+        float costAtk;
         int[] kmeansClusters = new int[graph.getVertices().size()];
         System.out.println("Start k-mean partitioning.");
         //in case the initial k=2 is larger than or equal to VertexList.size()/3
@@ -671,6 +699,18 @@ public class BiForceOnGraph4 {
         assignActions(graph);
         //Carry out all actions.
         graph.takeActions();
+        
+        // Final info output.
+        graph.writeVertexInfo(Setting.VERTEX_LOG+"_final");
+        graph.writeDistanceMatrix(Setting.DIST_LOG+"_final");
+        for(int idx=0;idx<graph.vertexSetCount()-1;idx++){
+            graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+idx+"_final", idx);
+            graph.writerInterEwMatrix(Setting.INTER_EW_LOG+idx+"_final", idx);
+        }
+        graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+(graph.vertexSetCount()-1)+"_final"
+            , graph.vertexSetCount()-1);
+        graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+(graph.vertexSetCount()-1), graph.vertexSetCount()-1);
+        
         return graph;
     }
     
@@ -682,7 +722,7 @@ public class BiForceOnGraph4 {
      * @param graph
      * @param distThresh 
      */
-    private void singleLinkageClustChain(Graph2 graph, double distThresh){
+    private void singleLinkageClustChain(Graph2 graph, float distThresh){
         //init all the clust num to be -1
         for(Vertex2 vtx:graph.getVertices())
             vtx.setClustNum(-1);
@@ -739,9 +779,9 @@ public class BiForceOnGraph4 {
         // Get the chain
         for(int i= firstUnassigned.getVtxSet()+1;i<graph.vertexSetCount();i++){
             Vertex2 minDistVtx = null;
-            double minDist = Double.MAX_VALUE;
+            float minDist = Float.MAX_VALUE;
             for(Vertex2 vtx: graph.getVertices()){
-                double dist = graph.dist(chainSeed, vtx); // Compute the dist.
+                float dist = graph.dist(chainSeed, vtx); // Compute the dist.
                 if(vtx.getVtxSet() == i && dist<minDist){ // Get the vertex with minimum distance.
                     minDistVtx = vtx;
                     minDist = dist;
@@ -762,7 +802,7 @@ public class BiForceOnGraph4 {
      * @param VertexList
      * @param distThresh 
      */
-    private void singleLinkageClust(Graph2 graph, double distThresh){
+    private void singleLinkageClust(Graph2 graph, float distThresh){
 
         //init all the clust num to be -1
         for(Vertex2 vtx:graph.getVertices())
@@ -801,7 +841,7 @@ public class BiForceOnGraph4 {
      * @param p
      * @return 
      */
-    private double euclidDist(Vertex2 vtx, double[] coords, Param p){
+    private float euclidDist(Vertex2 vtx, float[] coords, Param p){
         //check if they have the same dimension
         //System.out.println(pt.getCoordinates().length);
         //System.out.println(coords.length);
@@ -811,13 +851,13 @@ public class BiForceOnGraph4 {
             System.out.println(coords.length);
             throw new IllegalArgumentException("Point 1 and the given coordinates have different dimension");
         }
-        double Dist= 0;
+        float Dist= 0;
         for(int i=0;i<p.getDim();i++)
         {
             Dist+= (vtx.getCoords()[i]-coords[i])*
                     (vtx.getCoords()[i]-coords[i]);
         }
-        Dist = Math.sqrt(Dist);
+        Dist = (float)Math.sqrt(Dist);
         return Dist;
         
     }

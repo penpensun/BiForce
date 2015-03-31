@@ -33,8 +33,8 @@ import java.util.ArrayList;
  */
 public class PerformanceAnalyzer {
     int repeat = 5; /* How many repeats of artificial graphs to generate . */
-    double mean = 20;
-    double dev = 10;
+    float mean = 20;
+    float dev = 10;
     /**
      * This method generates the artificial graphs for performance analysis.
      * @param type
@@ -46,12 +46,12 @@ public class PerformanceAnalyzer {
      * @param outputPrefix 
      * @return  
      */
-    public ArrayList<Double> graphGenerator(String type, 
-            int size,int[] setSizes, int number, double mean, double dev, 
+    public ArrayList<Float> graphGenerator(String type, 
+            int size,int[] setSizes, int number, float mean, float dev, 
             String outputPrefix, String costsOutput){
         SimGraphGen gen = new SimGraphGen();
-        /* The ArrayList<Double> contains the standard costs. */
-        ArrayList<Double> stdCosts = new ArrayList<>(number);
+        /* The ArrayList<Float> contains the standard costs. */
+        ArrayList<Float> stdCosts = new ArrayList<>(number);
         /* Generate graphs according to types. */
         if(type.equals("npartite")){
             /* Check if the set sizes are null.*/
@@ -128,7 +128,7 @@ public class PerformanceAnalyzer {
         String costsOutput ="../../data/testdata/performance_profile/standard_costs/xml_hier_general_400nodes_costs.txt";
         /* Each graph is with four levels. The verices are evenly distributed. */
         int setSizes[] = {100,100,100,100};
-        ArrayList<Double> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
+        ArrayList<Float> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
                 inputPrefix,costsOutput);
     }
     /**
@@ -139,7 +139,7 @@ public class PerformanceAnalyzer {
         String costsOutput ="../../data/testdata/performance_profile/standard_costs/xml_hier_general_800nodes_costs.txt";
         /* Each graph is with four levels. The verices are evenly distributed. */
         int setSizes[] = {200,200,200,200};
-        ArrayList<Double> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
+        ArrayList<Float> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
                 inputPrefix,costsOutput);
     }
     
@@ -151,7 +151,7 @@ public class PerformanceAnalyzer {
         String costsOutput ="../../data/testdata/performance_profile/standard_costs/xml_hier_general_1600nodes_costs.txt";
         /* Each graph is with four levels. The verices are evenly distributed. */
         int setSizes[] = {400,400,400,400};
-        ArrayList<Double> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
+        ArrayList<Float> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
                 inputPrefix,costsOutput);
     }
     
@@ -163,7 +163,7 @@ public class PerformanceAnalyzer {
         String costsOutput ="../../data/testdata/performance_profile/standard_costs/xml_hier_general_3200nodes_costs.txt";
         /* Each graph is with four levels. The verices are evenly distributed. */
         int setSizes[] = {800,800,800,800};
-        ArrayList<Double> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
+        ArrayList<Float> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
                 inputPrefix,costsOutput);
     }
     /**
@@ -174,7 +174,7 @@ public class PerformanceAnalyzer {
         String costsOutput ="../../data/testdata/performance_profile/standard_costs/xml_hier_general_6400nodes_costs.txt";
         /* Each graph is with four levels. The verices are evenly distributed. */
         int setSizes[] = {1600,1600,1600,1600};
-        ArrayList<Double> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
+        ArrayList<Float> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
                 inputPrefix,costsOutput);
     }
     
@@ -186,7 +186,7 @@ public class PerformanceAnalyzer {
         String costsOutput ="../../data/testdata/performance_profile/standard_costs/xml_hier_general_9600nodes_costs.txt";
         /* Each graph is with four levels. The verices are evenly distributed. */
         int setSizes[] = {2400,2400,2400,2400};
-        ArrayList<Double> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,3,mean,dev,
+        ArrayList<Float> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,3,mean,dev,
                 inputPrefix,costsOutput);
     }
     
@@ -198,7 +198,7 @@ public class PerformanceAnalyzer {
         String costsOutput ="../../data/testdata/performance_profile/standard_costs/xml_hier_general_12800nodes_costs.txt";
         /* Each graph is with four levels. The verices are evenly distributed. */
         int setSizes[] = {3200,3200,3200,3200};
-        ArrayList<Double> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
+        ArrayList<Float> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
                 inputPrefix,costsOutput);
     }
     
@@ -211,7 +211,7 @@ public class PerformanceAnalyzer {
         String costsOutput="../../data/testdata/performance_profile/standard_costs/xml_hier_general_800nodes_costs.txt";
         /* Each graph is with four levels. The verices are evenly distributed. */
         int setSizes[] = {4200,4200,4200,4200};
-        ArrayList<Double> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
+        ArrayList<Float> stdCosts=  graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
                 inputPrefix,costsOutput);
     }
     
@@ -272,7 +272,7 @@ public class PerformanceAnalyzer {
      * @param number 
      */
     public void runAlgorithm(String inputPrefix, String resultOutput,String paramFile, boolean append,
-            ArrayList<Double> stdCosts, int number, boolean isXml){
+            ArrayList<Float> stdCosts, int number, boolean isXml){
         /* Create the output file. */
         FileWriter fw = null;
         BufferedWriter bw = null;
@@ -326,13 +326,13 @@ public class PerformanceAnalyzer {
         String paramFile = "./parameters.ini"; /* This is the parameter file for biforce. */
         String inputPrefix=  "../../data/testdata/performance_profile/inputs/hiergeneral_50nodes";
         int number = 10; /* This is the number of repeats. */
-        double mean = 20;  /* The mean of the normal distribution. */
-        double dev = 10; /* The deviation of the normal distribution .*/
+        float mean = 20;  /* The mean of the normal distribution. */
+        float dev = 10; /* The deviation of the normal distribution .*/
         
         /* Each graph is with four levels. The vertices are evenly distributed. */
         /* For the graphs with 1600 nodes. */
         int setSizes[] = {400,400,400,400}; /* The 50 nodes are distributed to each level as 14,12,12,12 nodes. */
-        ArrayList<Double> stdCosts=  graphGenerator("hiergeneral",-1,setSizes,number,mean,dev,inputPrefix,costsOutput);
+        ArrayList<Float> stdCosts=  graphGenerator("hiergeneral",-1,setSizes,number,mean,dev,inputPrefix,costsOutput);
         /* Run BiforceOnGraph4 on the graphs with 50 nodes. */
         runAlgorithm(inputPrefix, resultOutput,paramFile,true, stdCosts,number,false);
     }
@@ -345,11 +345,11 @@ public class PerformanceAnalyzer {
         String paramFile="./parameters.ini"; /* This is the parameter file for biforce. */
         String inputPrefix="../../data/testdata/performance_profile/inputs/hier_general_200nodes";
         int repeat = 1;
-        double mean = 20;
-        double dev=10;
+        float mean = 20;
+        float dev=10;
         /* Each graph is with four levels. The verices are evenly distributed. */
         int setSizes[] = {50,50,50,50};
-        ArrayList<Double> stdCosts = graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
+        ArrayList<Float> stdCosts = graphGenerator("hiergeneralxml",-1,setSizes,repeat,mean,dev,
                 inputPrefix,costsOutput);
         /* Run BiforceGraph4 on the graphs with 1600 nodes.*/
         runAlgorithm(inputPrefix, resultOutput,paramFile,true,stdCosts,repeat,true);

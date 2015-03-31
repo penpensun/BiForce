@@ -4,9 +4,13 @@
  */
 package biforce.graphs;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
 
 /**
  * This Graph2 abstract class is the new design for more modulized bi-force (bi-forceV4).
@@ -37,7 +41,7 @@ public abstract class Graph2 {
      * Hopefully, this new design is abe to cut running time.
      */
     protected boolean threshDetracted = false;
-    protected double thresh = Double.MAX_VALUE;
+    protected float thresh = Float.MAX_VALUE;
     /* This method returns a connected component (Subgraph2) given a vertex, based on
      * breadth-first search.*/
     public abstract Subgraph2 bfs(Vertex2 Vtx);
@@ -50,14 +54,14 @@ public abstract class Graph2 {
     
     /* This method detracts all edge weights with the given threshold, provided
     no threshold-detraction has been performed.*/
-    public abstract void detractThresh(double thresh);
+    public abstract void detractThresh(float thresh);
        
     /* This method returns the distance between two vertices. */
-    public abstract double dist(Vertex2 Vtx1, Vertex2 Vtx2);
+    public abstract float dist(Vertex2 Vtx1, Vertex2 Vtx2);
     /* This method returns the edge weight given two vertices. */
-    public abstract double edgeWeight(Vertex2 Vtx1, Vertex2 Vt2);
+    public abstract float edgeWeight(Vertex2 Vtx1, Vertex2 Vt2);
     /* This method returns the edge weight given two indexes. */
-    public abstract double edgeWeight(int vtxIdx1, int vtxIdx2);
+    public abstract float edgeWeight(int vtxIdx1, int vtxIdx2);
      /* This method returns all actions. */
     public final ArrayList<Action2> getActions(){
         return actions;
@@ -69,13 +73,13 @@ public abstract class Graph2 {
     }
     
     /* This method returns the editing cost. */
-    public abstract double getCost();
+    public abstract float getCost();
     
     /**
      * This method returns the threshold.
      * @return 
      */
-    public final double getThreshold(){
+    public final float getThreshold(){
         return thresh;
     }
     
@@ -142,10 +146,10 @@ public abstract class Graph2 {
     }
     
     /* This method sets the edge weight given two vertices. */
-    public abstract void setEdgeWeight(Vertex2 Vtx1, Vertex2 Vtx2, double EdgeWeight);
+    public abstract void setEdgeWeight(Vertex2 Vtx1, Vertex2 Vtx2, float EdgeWeight);
     
     /* This method sets the threshold. */
-    public void setThreshold(double thresh){
+    public void setThreshold(float thresh){
         this.thresh = thresh;
     }
     /* This method sets the vertices. */
@@ -162,7 +166,7 @@ public abstract class Graph2 {
     public abstract void updateDist();
     
     /* This method updates the positions using the displacement vector.*/
-    public abstract void updatePos(double[][] dispVector);
+    public abstract void updatePos(float[][] dispVector);
     /* This method returns the number of vertex sets. */
     public abstract int vertexSetCount();
     
@@ -186,4 +190,32 @@ public abstract class Graph2 {
     
     /* This method writes the info of result into a given file path. */
     public abstract void writeResultInfoTo(String FilePath);
+    
+    /**
+     * This method writes the information of vertices into the given file, used to output log file.
+     * @param filePath 
+     */
+    public void writeVertexInfo(String filePath){
+        try{
+        FileWriter fw = new FileWriter(filePath);
+        BufferedWriter bw  = new BufferedWriter(fw);
+        String line =null;
+        for(Vertex2 vtx: vertices){
+            bw.write(vtx.getValue()+"\t"+vtx.getVtxSet()+"\t"+vtx.getVtxIdx()+"\t"+vtx.getDistIdx()+"\t"+
+                    vtx.getClustNum());
+            for(int i=0;i<vtx.getCoords().length;i++)
+                bw.write("\t"+vtx.getCoords()[i]);
+            bw.write("\n");
+        }
+        bw.flush();
+        bw.close();
+        fw.close();
+        }catch(IOException e){
+            System.err.println("(Graph2.writeVertexInfo) The file writer init error.");
+        }
+    }
+    
+    public abstract void writerInterEwMatrix(String outFile, int idx);
+    public abstract void writeIntraEwMatrix(String outFile, int idx);
+    public abstract void writeDistanceMatrix(String file);
 }
