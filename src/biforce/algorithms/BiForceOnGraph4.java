@@ -487,6 +487,121 @@ public class BiForceOnGraph4 {
         }
     }
     
+    /**
+     * Kmeans for chain clustering.
+     * @param input
+     * @param k
+     * @param p 
+     */
+    private void kmeansClustChain(Graph2 input, int k, Param p){
+        /* Init the cluster number of the vertices. */
+        for(Vertex2 vtx: input.getVertices())
+            vtx.setClustNum(-1);
+        /* Randomly choose k points as k centroids. */
+        ArrayList<Integer> vtxIndexes = new ArrayList<>();
+        /* Init the coords array for centroids. */
+        float[][] centroids = new float[k][p.getDim()];
+        /* Create an array to record the sizes of all clusters. */
+        int[] clusterSizes = new int[k];
+        for(int i=0;i<clusterSizes.length;i++){
+            clusterSizes[i] = 0;
+        }
+        /* Init the coordinates of centroids. */
+        for (float[] cen : centroids){
+            for (int j = 0; j<p.getDim(); j++){
+                cen[j] = -1;
+            }
+        }
+        /* Randomly pick up k nodes as the initial k centroids. */
+        for(int i=0;i<input.vertexCount();i++){
+            vtxIndexes.add(i);
+        }
+        vtxIndexes.trimToSize();
+
+        for(int i =0 ;i<k;i++){
+            int idx = (int)(Math.random()*vtxIndexes.size());
+            /* Create the coordinate array, and copy the coordinates*/
+            System.arraycopy(input.getVertices().get(i).getCoords(), 0, 
+                    centroids[i], 0, p.getDim());
+            vtxIndexes.remove(idx);    
+        }
+        
+        boolean isConverged = false;
+        while(!isConverged){
+            isConverged = true;
+            /* Assign the points to closest centroid. */
+            for(Vertex2 vtx:input.getVertices()){
+                if(vtx.getVtxSet() != 0)
+                    continue;
+                float minDist = Float.MAX_VALUE;
+                int closestCentroidIdx = -1;
+                for(int i=0;i<centroids.length;i++){
+                    float dist = euclidDist(vtx,centroids[i],p);
+                    if(dist<minDist){
+                        minDist = dist;
+                        closestCentroidIdx = i;
+                    }
+                }
+                
+                /* Check the validity of closestCentroidIdx, minDist. */
+                if(closestCentroidIdx == -1)
+                    throw new IllegalArgumentException("(BiForceOnGraph4 kmeansClust) "
+                            + "Nearest centroid idx cannot be -1:  "+vtx.getValue());
+               /* Check if any change is made. */ 
+               if(vtx.getClustNum() != closestCentroidIdx)
+                   isConverged = false;
+               vtx.setClustNum(closestCentroidIdx);
+               clusterSizes[closestCentroidIdx]++;
+            }
+            
+            /* After assigning clusters, 
+             * re-compute the coordinates for centroids. */
+            for(int i=0;i<centroids.length;i++){
+                /* Jump over the clusters with no points in it. */
+                if(clusterSizes[i] == 0)
+                    continue;
+                /* For the cluster with point(s), 
+                 * re-initialize the coordinates of centroids. */
+                for(int j=0;j<p.getDim();j++)
+                    centroids[i][j] = 0;
+            }
+            /* Re-compute the coordinates for centroids. */
+            /* First compute addition. */
+            for(Vertex2 vtx:input.getVertices()){
+                if(vtx.getVtxSet() != 0 )
+                    continue; // Added for chain clustering.
+                for(int i=0;i<p.getDim();i++)
+                    centroids[vtx.getClustNum()][i] += vtx.getCoords()[i];
+            }
+            /* Second compute the average. */
+            for(int i=0;i<centroids.length;i++){
+                /*If no points in this cluster then we do nothing. */
+                if(clusterSizes[i] == 0){}
+                else{
+                    for(int j=0;j<p.getDim();j++)
+                        centroids[i][j]/=clusterSizes[i];
+                }
+            }
+        }
+        
+        /* Finally, check if there's any point unassigned. */
+        for(Vertex2 vtx:input.getVertices()){
+            if(vtx.getClustNum() == -1)
+                throw new IllegalArgumentException("Not all points are assigned with clusters");
+        }
+        
+        /* Chain clustering. */
+        // Assign the clust num to the vertices in other sets.
+        for(int i=1;i<input.vertexSetCount();i++){
+            ArrayList<Vertex2> vertices = input.getVertices();
+            for(Vertex2 vtx: vertices){
+                if(vtx.getVtxSet() != i)
+                    continue;
+                vtx.setClustNum(getNearestClustNum(input,vtx));
+            }
+        }
+    }
+    
     
     /**
      * This is the main entrance of the algorithm, it runs Bi-Force on a given 
@@ -632,13 +747,14 @@ public class BiForceOnGraph4 {
 
         //check whether single linkage or kmeans give the better result
         if(minCostKmeans <= minCostSL){
-            //System.out.println("K means is better");
+            System.out.println("K means is better.");
             //System.out.println("Best k is "+minK);
             //restore the cluster assignment of kmeans
             for(int i=0;i<graph.getVertices().size();i++)
                 graph.getVertices().get(i).setClustNum(kmeansClusters[i]);
         }
         else{
+            System.out.println("Sl is better.");
             //restore the cluster assignments of singlelinkage clustering
             for(int i=0;i<graph.getVertices().size();i++)
                 graph.getVertices().get(i).setClustNum(slClusters[i]);
@@ -828,16 +944,17 @@ public class BiForceOnGraph4 {
                     if(vtx.getClustNum() != -1)
                         continue;
 
-                    if( graph.dist(vtx,seed) < distThresh || vtx.getVtxSet() == 0){
+                    if( graph.dist(vtx,seed) < distThresh && vtx.getVtxSet() == 0){
                         vtx.setClustNum(currentClustIdx);
                         verticesToVisit.add(vtx);
                         forTest.add(vtx); // For test.
                     }
                 }
             }
-            currentClustIdx++;
+           
             testWriteSlClusters(forTest,currentClustIdx,"./test_sl_clusters.txt");
             forTest.clear();
+            currentClustIdx++;
         }
             
         // Assign the clust num to the vertices in other sets.
@@ -870,8 +987,10 @@ public class BiForceOnGraph4 {
             if(v.getVtxSet() != vtx.getVtxSet()-1)
                 continue;
             float dist = graph.dist(v, vtx);
-            if(dist < minDist)
+            if(dist < minDist){
                 minDistClustNum = v.getClustNum();
+                minDist = dist;
+            }
         }
         if(minDistClustNum == -1)
             throw new IllegalStateException("(BiForceOnGraph4.getNearestClustNum) Nearest vtx is not found.");
@@ -885,7 +1004,7 @@ public class BiForceOnGraph4 {
      */
     private Vertex2 getFirstUnassignedChain2(Graph2 graph, int currentClustIdx){
         for(Vertex2 vtx: graph.getVertices()){
-            if(vtx.getClustNum() == -1|| vtx.getVtxIdx() == 0){
+            if(vtx.getClustNum() == -1&& vtx.getVtxSet() == 0){
                 vtx.setClustNum(currentClustIdx);
                 return vtx;
             }
