@@ -14,7 +14,8 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.io.IOException;
 import java.util.Collections;
-
+import java.io.FileWriter;
+import java.io.BufferedWriter;
 import biforce.log.Setting;
 /**
  * This biforce is based on Graph2.
@@ -571,7 +572,7 @@ public class BiForceOnGraph4 {
         // Chain sl clustering
         else if(slType ==2){
                 for(float i = p.getLowerth(); i<= p.getUpperth();i+= p.getStep()){
-                singleLinkageClustChain(graph,i);
+                singleLinkageClustChain2(graph,i);
                 costAti = computeCost(graph);
                 if(costAti< minCostSL){
                     minCostSL = costAti;
@@ -642,13 +643,45 @@ public class BiForceOnGraph4 {
             for(int i=0;i<graph.getVertices().size();i++)
                 graph.getVertices().get(i).setClustNum(slClusters[i]);
         }
-        System.out.println("Partitioning completed");
+        System.out.println("Partitioning completed.");
         System.out.println("Assigning clusters and generating the results.");
         //assing the clusters
         assignClusters(graph);
         
         //post-processing
         //Step 1, merge Clusters
+        System.out.println("Start post-processing: 1. Merging Clusters.");
+        postProMerge(graph);
+        
+        // Step 2. Moving vertex.
+        System.out.println("Post-processing: 2. Moving vertex. ");
+        postProMove(graph);
+        
+        System.out.println("Post-processing complete.");
+         //Assign actions based on the current clusters
+        assignActions(graph);
+        //Carry out all actions.
+        graph.takeActions();
+        
+        // Final info output.
+        graph.writeVertexInfo(Setting.VERTEX_LOG+"_final");
+        graph.writeDistanceMatrix(Setting.DIST_LOG+"_final");
+        for(int idx=0;idx<graph.vertexSetCount()-1;idx++){
+            graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+idx+"_final", idx);
+            graph.writerInterEwMatrix(Setting.INTER_EW_LOG+idx+"_final", idx);
+        }
+        graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+(graph.vertexSetCount()-1)+"_final"
+            , graph.vertexSetCount()-1);
+        graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+(graph.vertexSetCount()-1), graph.vertexSetCount()-1);
+        
+        return graph;
+    }
+    
+    /**
+     * This method performs the post-processing step 1 moving vertex.
+     * @param graph 
+     */
+    private void postProMerge(Graph2 graph){
         boolean next;   
         ArrayList<Cluster2> clusters = graph.getClusters();
         do{
@@ -672,7 +705,16 @@ public class BiForceOnGraph4 {
             graph.setClusters(clusters);
             
         }while(next);
-
+    }
+    
+    /**
+     * This method performs the post-processing step 2 moving vertex.
+     * @param graph 
+     */
+    private void postProMove(Graph2 graph){
+        boolean next;   
+        ArrayList<Cluster2> clusters = graph.getClusters();
+        // Step 2. Moving vertex.
         do{
             next = false;
             Collections.sort(clusters);
@@ -695,26 +737,7 @@ public class BiForceOnGraph4 {
                 }
             }
         }while(next);
-         //Assign actions based on the current clusters
-        assignActions(graph);
-        //Carry out all actions.
-        graph.takeActions();
-        
-        // Final info output.
-        graph.writeVertexInfo(Setting.VERTEX_LOG+"_final");
-        graph.writeDistanceMatrix(Setting.DIST_LOG+"_final");
-        for(int idx=0;idx<graph.vertexSetCount()-1;idx++){
-            graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+idx+"_final", idx);
-            graph.writerInterEwMatrix(Setting.INTER_EW_LOG+idx+"_final", idx);
-        }
-        graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+(graph.vertexSetCount()-1)+"_final"
-            , graph.vertexSetCount()-1);
-        graph.writeIntraEwMatrix(Setting.INTRA_EW_LOG+(graph.vertexSetCount()-1), graph.vertexSetCount()-1);
-        
-        return graph;
     }
-    
-    
     /**
      * This method performs single-linkage clustering with certain constraint.
      * Every time we perform single-linkage cluster, we start with a "chain" that
@@ -723,6 +746,18 @@ public class BiForceOnGraph4 {
      * @param distThresh 
      */
     private void singleLinkageClustChain(Graph2 graph, float distThresh){
+        // For test
+        try{
+            FileWriter fw =new FileWriter("./test_sl_clusters.txt",true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write("##############\t"+distThresh+"\n");
+            bw.flush();
+            bw.close();
+            fw.close();
+        }catch(IOException e){
+            System.err.println("(BiForceOnGraph4.singleLinageClust) File writer init error.");
+            return;
+        }
         //init all the clust num to be -1
         for(Vertex2 vtx:graph.getVertices())
             vtx.setClustNum(-1);
@@ -730,7 +765,10 @@ public class BiForceOnGraph4 {
         Vertex2 noClustVtx;
         
         while((noClustVtx = getFirstUnassignedChain(graph,currentClustIdx))!= null){
-            currentClustIdx++;
+            
+            //check if all the vertex are assigned with some cluster number
+            ArrayList<Vertex2> forTest = new ArrayList<>();
+            forTest.add(noClustVtx); // For test.
             //check if all the vertex are assigned with some cluster number
             Stack<Vertex2> verticesToVisit = new Stack<>();
             verticesToVisit.add(noClustVtx);
@@ -744,14 +782,117 @@ public class BiForceOnGraph4 {
                     if( graph.dist(vtx,seed) < distThresh){
                         vtx.setClustNum(currentClustIdx);
                         verticesToVisit.add(vtx);
+                        forTest.add(vtx); // For test.
                     }
                 }
             }
+            testWriteSlClusters(forTest,currentClustIdx,"./test_sl_clusters.txt");
+            forTest.clear();
             /* Increase the cluster number by 1. */
             currentClustIdx++;
         }
     }
     
+    
+    private void singleLinkageClustChain2(Graph2 graph, float distThresh){
+        // For test
+        try{
+            FileWriter fw =new FileWriter("./test_sl_clusters.txt",true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write("##############\t"+distThresh+"\n");
+            bw.flush();
+            bw.close();
+            fw.close();
+        }catch(IOException e){
+            System.err.println("(BiForceOnGraph4.singleLinageClust) File writer init error.");
+            return;
+        }
+        //init all the clust num to be -1
+        for(Vertex2 vtx:graph.getVertices())
+            vtx.setClustNum(-1);
+        int currentClustIdx = 0;
+        Vertex2 noClustVtx;
+        
+        // First cluster the first set. 
+        while((noClustVtx = getFirstUnassignedChain2(graph,currentClustIdx))!= null){
+            //check if all the vertex are assigned with some cluster number
+            ArrayList<Vertex2> forTest = new ArrayList<>();
+            forTest.add(noClustVtx); // For test.
+            //check if all the vertex are assigned with some cluster number
+            Stack<Vertex2> verticesToVisit = new Stack<>();
+            verticesToVisit.add(noClustVtx);
+            while(!verticesToVisit.isEmpty()){
+                Vertex2 seed = verticesToVisit.pop();
+                /* For all the other unassigned vertices in the VertexList. */
+                for(Vertex2 vtx: graph.getVertices()){
+                    if(vtx.getClustNum() != -1)
+                        continue;
+
+                    if( graph.dist(vtx,seed) < distThresh || vtx.getVtxSet() == 0){
+                        vtx.setClustNum(currentClustIdx);
+                        verticesToVisit.add(vtx);
+                        forTest.add(vtx); // For test.
+                    }
+                }
+            }
+            currentClustIdx++;
+            testWriteSlClusters(forTest,currentClustIdx,"./test_sl_clusters.txt");
+            forTest.clear();
+        }
+            
+        // Assign the clust num to the vertices in other sets.
+        for(int i=1;i<graph.vertexSetCount();i++){
+            ArrayList<Vertex2> vertices = graph.getVertices();
+            for(Vertex2 vtx: vertices){
+                if(vtx.getVtxSet() != i)
+                    continue;
+                vtx.setClustNum(getNearestClustNum(graph,vtx));
+            }
+        }
+            
+        
+    }
+    
+    /**
+     * Get the clust number of the nearst vertex in the upper layer.
+     * @param graph
+     * @param vtx
+     * @return 
+     */
+    public int getNearestClustNum(Graph2 graph, Vertex2 vtx){
+        if(vtx.getVtxSet() == 0)
+            throw new IllegalArgumentException("(BiForceOnGraph4.getNearestClustNum) Vtx cannot be in the first vertex set.");
+        
+        ArrayList<Vertex2> vertices = graph.getVertices();
+        float minDist = Float.MAX_VALUE;
+        int minDistClustNum = -1;
+        for(Vertex2 v: vertices){
+            if(v.getVtxSet() != vtx.getVtxSet()-1)
+                continue;
+            float dist = graph.dist(v, vtx);
+            if(dist < minDist)
+                minDistClustNum = v.getClustNum();
+        }
+        if(minDistClustNum == -1)
+            throw new IllegalStateException("(BiForceOnGraph4.getNearestClustNum) Nearest vtx is not found.");
+        return minDistClustNum;
+    }
+    
+    /**
+     * Get the first unassigned vertex in the first vtx set.
+     * @param graph
+     * @param currentClustIdx 
+     */
+    private Vertex2 getFirstUnassignedChain2(Graph2 graph, int currentClustIdx){
+        for(Vertex2 vtx: graph.getVertices()){
+            if(vtx.getClustNum() == -1|| vtx.getVtxIdx() == 0){
+                vtx.setClustNum(currentClustIdx);
+                return vtx;
+            }
+                
+        }
+        return null;
+    }
     /**
      * This method assign a chain of vertex with the currentClustIdx, and return the first
      * unassigned vertex.
@@ -803,7 +944,18 @@ public class BiForceOnGraph4 {
      * @param distThresh 
      */
     private void singleLinkageClust(Graph2 graph, float distThresh){
-
+        // For test
+        try{
+            FileWriter fw =new FileWriter("./test_sl_clusters.txt",true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write("##############\t"+distThresh+"\n");
+            bw.flush();
+            bw.close();
+            fw.close();
+        }catch(IOException e){
+            System.err.println("(BiForceOnGraph4.singleLinageClust) File writer init error.");
+            return;
+        }
         //init all the clust num to be -1
         for(Vertex2 vtx:graph.getVertices())
             vtx.setClustNum(-1);
@@ -813,6 +965,8 @@ public class BiForceOnGraph4 {
         while((noClustVtx = getFirstUnassignedVertex(graph.getVertices()))!= null){
             noClustVtx.setClustNum(currentClustIdx);
             //check if all the vertex are assigned with some cluster number
+            ArrayList<Vertex2> forTest = new ArrayList<>();
+            forTest.add(noClustVtx); // For test.
             
             Stack<Vertex2> verticesToVisit = new Stack<>();
             verticesToVisit.add(noClustVtx);
@@ -826,9 +980,12 @@ public class BiForceOnGraph4 {
                     if( graph.dist(vtx,seed) < distThresh){
                         vtx.setClustNum(currentClustIdx);
                         verticesToVisit.add(vtx);
+                        forTest.add(vtx); // For test.
                     }
                 }
             }
+            testWriteSlClusters(forTest,currentClustIdx,"./test_sl_clusters.txt");
+            forTest.clear();
             /* Increase the cluster number by 1. */
             currentClustIdx++;
         }
@@ -862,5 +1019,21 @@ public class BiForceOnGraph4 {
         
     }
     
+    
+    public void testWriteSlClusters(ArrayList<Vertex2> clusters, int clustIdx, String output){
+        try{
+        FileWriter fw = new FileWriter(output,true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(String.valueOf(clustIdx));
+        for(Vertex2 vtx: clusters)
+            bw.write("\t"+vtx.getValue());
+        bw.write("\n");
+        bw.flush();
+        bw.close();
+        fw.close();
+        }catch(IOException e){
+            System.err.println("(BiForceOnGraph4.testWriterSlClusters) Writer init error.");
+        }
+    }
 
 }

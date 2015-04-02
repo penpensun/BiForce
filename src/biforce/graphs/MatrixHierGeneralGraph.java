@@ -1356,8 +1356,13 @@ public class MatrixHierGeneralGraph extends Graph2{
      */
     public void writeSingleCluster(BufferedWriter bw, Cluster2 cluster){
         ArrayList<Vertex2> clusterVertices = cluster.getVertices();
+        // For test
+        if(clusterVertices.isEmpty()){
+            System.out.println("Empty cluster");
+            return;
+        }
         try{
-        bw.write("<cluster>\n");
+        bw.write("<cluster  "+clusterVertices.get(0).getClustNum()+">\n");
         /* We output the cluster in separated sets. */
         for(int i=0;i<setSizes.length;i++){
             for(int j=0;j<clusterVertices.size();j++)

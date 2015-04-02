@@ -181,7 +181,7 @@ public class BiForceOnGraph4Test {
                 biforce4.run(hierGeneralGraph,p,1);
                 System.out.println(" hierGeneralGraph cost:  "+hierGeneralGraph.getCost());
                 System.out.println(" Standard cost:  "+stdCost);
-                assertEquals(stdCost,hierGeneralGraph.getCost(),5);
+                assertEquals(stdCost,hierGeneralGraph.getCost(),stdCost/20);
             }catch(IOException e){
                 e.printStackTrace();
             }
