@@ -361,7 +361,7 @@ public class PerformanceAnalyzer {
         String inputFolder = "../../data/testdata/performance_profile/inputs/400nodes/";
         String costsOutput = "../../data/testdata/performance_profile/standard_costs.txt";
         String paramFile="./parameters.ini"; /* This is the parameter file for biforce. */
-        String inputPrefix="../../data/testdata/performance_profile/inputs/3200nodes/xml_hier_general_3200nodes";
+        String inputPrefix="../../data/testdata/performance_profile/inputs/400nodes/xml_hier_general_400nodes";
         runAlgorithm(inputPrefix, resultOutput,paramFile,true,null,repeat,true);
     }
     
@@ -377,14 +377,26 @@ public class PerformanceAnalyzer {
     
     public void generateExternNodeNames(){
         String outputFile = "../../data/testdata/performance_profile/inputs/25600nodes/xml_hier_general_25600nodes_names.txt";
+        
         int[] setSizes= {6400,6400,6400,6400};
         SimGraphGen gen = new SimGraphGen();
         gen.writeNodeNames(setSizes, outputFile);
     }
     
+    /**
+     * This method is used to test why sl clusteirng is giving many empty clusters
+     */
+    public void testSlClustering(){
+        String input = "../../data/testdata/performance_profile/inputs/400nodes/xml_hier_general_400nodes_0.txt";
+        String output ="../../data/testdata/performance_profile/standard_costs.txt";
+        String paramFile = "./parameters.ini";
+        runAlgorithmOnSingleFile(input,output,paramFile,true);
+    }
+    
     public static void main(String[] args) throws IOException{
         PerformanceAnalyzer analyzer = new PerformanceAnalyzer();
-        analyzer.run();
+        //analyzer.run();
+        analyzer.testSlClustering();
         //performanceAnalysisOnHierGeneralGraph();
         //performanceAnalysisOnXmlHierGeneralGraph();
         //analyzer.generateSingleGraph();
