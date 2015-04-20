@@ -74,7 +74,7 @@ public class XmlInputParser {
             fr = new FileReader(inputFile);
             br = new BufferedReader(fr);
         }catch(IOException e){
-            System.out.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+inputFile);
+            System.err.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+inputFile);
             return;
         }
         /* Check if setSizes in the inputGraph has been checked.*/
@@ -103,7 +103,7 @@ public class XmlInputParser {
             setIdx++;
         }
         }catch(IOException e){
-            System.out.println("(biforce.graphs.XmlInputParser.parseEntity) readLine() error.");
+            System.err.println("(biforce.graphs.XmlInputParser.parseEntity) readLine() error.");
             return;
         }
         /* Check if all levels are initialized.*/
@@ -174,7 +174,7 @@ public class XmlInputParser {
             fr = new FileReader(matrixFile);
             br = new BufferedReader(fr);
         }catch(IOException e){
-            System.out.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+matrixFile);
+            System.err.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+matrixFile);
             return;
         }
         /* Get the inter matrix in the interEdgeWeights. The index of interMatrix is the min of matrixLevel1 and matrixLevel2. */
@@ -208,7 +208,7 @@ public class XmlInputParser {
             i++;
         }
         }catch(IOException e){
-            System.out.println("(biforce.graphs.XmlInputParser.parseEntity) readLine() error.");
+            System.err.println("(biforce.graphs.XmlInputParser.parseEntity) readLine() error.");
             return;
         }
         /* Here we check the size of the matrix, see if it matches setSizes. */
@@ -292,7 +292,7 @@ public class XmlInputParser {
             fr = new FileReader(matrixFile);
             br = new BufferedReader(fr);
         }catch(IOException e){
-            System.out.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+matrixFile);
+            System.err.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+matrixFile);
             return;
         }
         /* Read the matrix in the file.*/
@@ -345,7 +345,7 @@ public class XmlInputParser {
             i++;
         }
         }catch(IOException e){
-            System.out.println("(biforce.graphs.XmlInputParser.parseEntity) readLine() error.");
+            System.err.println("(biforce.graphs.XmlInputParser.parseEntity) readLine() error.");
             return;
         }
         /* Here we check the size of the matrix, see if it matches setSizes. */
