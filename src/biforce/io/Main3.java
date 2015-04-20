@@ -83,12 +83,10 @@ public class Main3 {
         
         if(graphIn == null)
             throw new IllegalArgumentException("(runGraph) The input graph cannot be null.");
-        if(graphOut== null)
-            throw new IllegalArgumentException("(runGraph) The output graph cannot be null.");
+       
         if(clusterOut==null)
             throw new IllegalArgumentException("(runGraph) The graph output cannotbe null.");
-        if(editingOut==null)
-            throw new IllegalArgumentException("(runGraph) The editing cost output cannot be null.");
+        
         
         if(slType != 1 && slType != 2)
             throw new IllegalArgumentException("(runGraph) The type of single linkage clustering error:  "+slType);
@@ -101,24 +99,32 @@ public class Main3 {
             System.err.println("(runGraph) The input graph cannot be read. ");
             return;
         }
-        try{
-            fw = new FileWriter(graphOut);
-        }catch(IOException e){
-            System.err.println("(runGrpah) The graph output file writing error.");
-        }
         
         try{
-            fw.close();
             fw = new FileWriter(clusterOut);
         }catch(IOException e){
             System.err.println("(runGraph) The cluster output file writing error. ");
         }
-        try{
-            fw.close();
-            fw = new FileWriter(editingOut);
-        }catch(IOException e){
-            System.err.println("(runGraph) The editing details output file writing error.");
+        
+        if(editingOut != null){
+            try{
+                fw.close();
+                fw = new FileWriter(editingOut);
+            }catch(IOException e){
+                System.err.println("(runGraph) The editing details output file writing error.");
+            }
         }
+        if(graphOut != null){
+            try{
+                fw = new FileWriter(graphOut);
+            }catch(IOException e){
+                System.err.println("(runGrpah) The graph output file writing error.");
+            }
+        }
+        
+        
+        
+        
         try{
             fw.close();
         }catch(IOException e){};
@@ -152,13 +158,15 @@ public class Main3 {
         }
         /* Output the graph. */
         System.out.println("Start writing the results.");
-        inputGraph.writeGraphTo(graphOut, isOutXmlFile);
+        if(graphOut != null)
+            inputGraph.writeGraphTo(graphOut, isOutXmlFile);
         System.out.println("The resulted graph is written to:  "+graphOut);
         /* Output the cluster. */
         inputGraph.writeClusterTo(clusterOut,isOutXmlFile);
         System.out.println("The resulted cluster is written to:  "+clusterOut);
         /* Output the editing details. */
-        inputGraph.writeResultInfoTo(editingOut);
+        if(editingOut != null)
+            inputGraph.writeResultInfoTo(editingOut);
         System.out.println("The editing information is written to:  "+editingOut);
     }
     
