@@ -528,7 +528,7 @@ public class MatrixHierNpartiteGraphTest {
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
         Param p = new Param("./parameters.ini");
         try{
-            algorithm.run(graph, p,1);
+            algorithm.run(graph, p,1,false);
         }catch(IOException e){
             System.err.println("(MatrixNpartiteGraphTest.testWriteClusterTo) Algorithm throws IOException.");
         }

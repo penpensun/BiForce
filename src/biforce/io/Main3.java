@@ -26,6 +26,7 @@ public class Main3 {
     
     public static void runGraph(int graphType,
             float thresh,
+            float threshArray[],
             String graphIn,
             String graphOut,
             String clusterOut,
@@ -34,13 +35,13 @@ public class Main3 {
             boolean isInXmlFile,
             boolean isOutXmlFile,
             String paramFile,
-            int slType
+            int slType,
+            boolean isMultipleThresh
             )throws IOException{
         /* Read the parameters. */
         Param p  =new Param(paramFile);
-        p.setThresh(thresh);
-        runGraph(graphType, thresh, graphIn, graphOut, clusterOut, editingOut,
-                isHeader, isInXmlFile, isOutXmlFile, p, slType);
+        runGraph(graphType, thresh, threshArray,graphIn, graphOut, clusterOut, editingOut,
+                isHeader, isInXmlFile, isOutXmlFile, p, slType,isMultipleThresh);
         
     }
     
@@ -48,7 +49,7 @@ public class Main3 {
      * This method runs nforce on different types of graphs.
      * @param graphType The type of the input graph.
      * @param thresh The threshold.
-     * @param threshArray The threshold array for multi-threshold computing.
+     * @param threshArray The threshold array for multiple thresholds.
      * @param graphIn The graph input file.
      * @param graphOut The graph output file.
      * @param clusterOut The cluster output file.
@@ -61,6 +62,8 @@ public class Main3 {
      * @param isMultipleThresh  If a multiple threshold is used in computing.
      */
     public static void runGraph(int graphType,
+            float thresh,
+            float[] threshArray,
             String graphIn,
             String graphOut,
             String clusterOut,
@@ -94,6 +97,9 @@ public class Main3 {
         
         if(slType != 1 && slType != 2)
             throw new IllegalArgumentException("(runGraph) The type of single linkage clustering error:  "+slType);
+        // Set the thresholds
+        p.setThresh(thresh);
+        p.setThreshArray(threshArray);
         /* Check if the file can be openend. */
         FileReader fr = null;
         FileWriter fw = null;
@@ -152,8 +158,7 @@ public class Main3 {
         /* Run the algorithm. */
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
         try{
-            boolean isMultipleThresh = (p.getThreshArray() == null);
-            inputGraph = algorithm.run(inputGraph, p, slType); /* The main entrace. */
+            inputGraph = algorithm.run(inputGraph, p, slType, isMultipleThresh); /* The main entrace. */
         }catch(IOException e){
             System.err.println("(runGraph) The algorithm error.");
             return;
@@ -198,6 +203,7 @@ public class Main3 {
      * @param isInXmlFile  This is the input format: false, plain format; true, xml format.
      * @param isOutXmlFile This is the output format: false, plain foramt; true, xml format.
      * @param slType This is the type of clustering: 1. Classic single-linkage clustering. 2. Single-linkage chain clustering.
+     * @param isMultipleThresh Whether the input uses multiple threshold or not
      */
     public static void runGraph(int graphType,
             float thresh,
@@ -215,13 +221,14 @@ public class Main3 {
             String graphOut,
             String clusterOut,
             String editingOut,
-            int slType
+            int slType,
+            boolean isMultipleThresh
             ){
         
         /* Create the parameter object. */
         Param p = new Param(maxIter,
                 fatt, frep,M0,dim,radius,thresh, threshArray, upperth,lowerth,step);
-        runGraph(graphType, thresh,graphIn,graphOut,clusterOut,editingOut, isHeader, isInXmlFile, isOutXmlFile, p,slType);
+        runGraph(graphType,thresh, threshArray,graphIn,graphOut,clusterOut,editingOut, isHeader, isInXmlFile, isOutXmlFile, p,slType, isMultipleThresh);
     }
     
     

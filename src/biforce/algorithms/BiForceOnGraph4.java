@@ -672,14 +672,18 @@ public class BiForceOnGraph4 {
      * @param graph
      * @param p
      * @param clType The type of single-linkage clustering: 1, normal sl. 2, chain sl.
+     * @param isMultipleThresh If multiple thresholds are inputed.
      * @return
      * @throws IOException 
      */
     public Graph2 run(Graph2 graph, Param p, int clType, boolean isMultipleThresh) throws IOException{
         /* First we have to detract the threshold. */
         System.out.println("Detract the threshold.");
-        if(!graph.isThreshDetracted())
-            graph.detractThresh(p.getThresh());
+        if(!graph.isThreshDetracted()){
+            if(isMultipleThresh) // If in this compute we use multiple threshold.
+                graph.detractThresh(p.getThreshArray());
+            else graph.detractThresh(p.getThresh());
+        }
         System.out.println("Threshold detracted.");
         /* Compute the intial layout. */
         System.out.println("Compute the initial layout.");
