@@ -189,6 +189,11 @@ public class MatrixGraph extends Graph2 {
             setThreshold(thresh);
         detractThresh();
     }
+    
+    @Override
+    public final void detractThresh(float[] thresh){
+        throw new UnsupportedOperationException("(MatrixGraph.detractThresh) Multiple thresholds is not supported in a normal graph.");
+    }
 
     /**
      * This method returns the distances.

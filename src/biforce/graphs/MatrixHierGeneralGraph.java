@@ -273,6 +273,35 @@ public class MatrixHierGeneralGraph extends Graph2{
         detractThresh();
     }
     
+    @Override
+    public final void detractThresh(float[] thresh){
+        if(threshDetracted)
+            throw new IllegalArgumentException("(MatrixHierNpartiteGraph.detractThresh) The threshold is already detracted.");
+        else{
+            // Check the length.
+            if(thresh.length != interEdgeWeights.size()+intraEdgeWeights.size())
+                throw new IllegalArgumentException("(MatrixHierNpartiteGraph.detractThresh) The length of the threshold array does not fit the graph:  "+thresh.length+"  "+interEdgeWeights.size()+intraEdgeWeights.size());
+            
+            for(int i=0;i<thresh.length;i++){
+                if(i%2 == 0){
+                    // The threshold for an intra edge weight matrix.
+                    float[][] weights = intraEdgeWeights.get(i/2);
+                    for(int j=0;j<weights.length;j++)
+                        for(int k=0;k<weights[0].length;k++)
+                            weights[j][k] -=thresh[i];
+                }
+                else{
+                    //The threshold for an inter edge weight matrix.
+                    float[][] weights = interEdgeWeights.get(i/2);
+                    for(int j=0;j<weights.length;j++)
+                        for(int k=0;k<weights[0].length;k++)
+                            weights[j][k] -=thresh[i];
+                }
+            }
+        }
+        this.threshDetracted = true;
+    }
+    
     /**
      * This method gets the distance between two vertices. 
      * @param vtx1

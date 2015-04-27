@@ -19,7 +19,8 @@ public class Param {
     float M0 = -1;
     int dim = -1;
     float radius = -1;
-    float thresh = 0;
+    float thresh = Float.NaN;
+    float[] threshArray = null;
     float upperth = -1;
     float lowerth = -1;
     float step=-1;
@@ -41,6 +42,7 @@ public class Param {
             float fatt, float frep, 
             float M0, int dim, float radius,
             float thresh,
+            float[] threshArray,
             float upperth, float lowerth, float step)
     {
         this.maxIter = maxIter;
@@ -53,6 +55,7 @@ public class Param {
         this.upperth = upperth;
         this.lowerth = lowerth;
         this.step = step;
+        this.threshArray = threshArray;
     }
     
     /**
@@ -66,6 +69,7 @@ public class Param {
         radius = 112.46725298831082f;
         dim = 3;
         thresh = 0;
+        threshArray = null;
         upperth = 200;
         lowerth = 0;
         step = 0.5f;
@@ -105,7 +109,13 @@ public class Param {
                         dim = Integer.parseInt(value);
                         break;
                     case "thresh":
-                        thresh= Float.parseFloat(value);
+                        String[] splits = value.split("\t");
+                        if(splits.length >1){
+                            threshArray = new float[splits.length];
+                            for(int i=0;i<splits.length;i++)
+                                threshArray[i] = Float.parseFloat(splits[i]);
+                        }
+                        else thresh= Float.parseFloat(value);
                         break;
                     case "upperth":
                         upperth = Float.parseFloat(value);
@@ -171,6 +181,10 @@ public class Param {
         return thresh;
     }
     
+    public final float[] getThreshArray(){
+        return threshArray;
+    }
+    
     public final float getLowerth()
     {
         return lowerth;
@@ -190,6 +204,10 @@ public class Param {
     public final void setThresh(float thresh)
     {
         this.thresh = thresh;
+    }
+    
+    public final void setThreshArray(float[] threshArray){
+        this.threshArray = threshArray;
     }
     
     

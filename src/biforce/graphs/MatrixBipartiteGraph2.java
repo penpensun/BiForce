@@ -14,6 +14,7 @@ import java.util.*;
 import biforce.algorithms.Param;
 import biforce.constants.BiForceConstants;
 
+
 /**
  * The 2nd version, MatrixBipartiteGraph2 extends Graph2. Incorporating the function
  * computing distances is the main feature.
@@ -227,6 +228,15 @@ public class MatrixBipartiteGraph2 extends Graph2{
         else
             setThreshold(thresh);
         detractThresh();
+    }
+    
+    /**
+     * To detract difference thresholds is not provided in MatrixBipartiteGraph2.
+     * @param thresh 
+     */
+    @Override
+    public final void detractThresh(float[] thresh){
+        throw new UnsupportedOperationException("(MatrixBipartiteGraph2.detractThresh) Multiple thresholds is not supported in bipartite graph.");
     }
     
      /**

@@ -55,6 +55,9 @@ public abstract class Graph2 {
     /* This method detracts all edge weights with the given threshold, provided
     no threshold-detraction has been performed.*/
     public abstract void detractThresh(float thresh);
+    
+    /* This method detracts all edge weights with the given threshold array. For multiple thresholds. */
+    public abstract void detractThresh(float[] thresh);
        
     /* This method returns the distance between two vertices. */
     public abstract float dist(Vertex2 Vtx1, Vertex2 Vtx2);

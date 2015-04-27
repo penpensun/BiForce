@@ -46,19 +46,21 @@ public class Main3 {
     
     /**
      * This method runs nforce on different types of graphs.
-     * @param graphType
-     * @param thresh
-     * @param graphIn
-     * @param graphOut
-     * @param clusterOut
-     * @param editingOut
-     * @param isHeader
+     * @param graphType The type of the input graph.
+     * @param thresh The threshold.
+     * @param threshArray The threshold array for multi-threshold computing.
+     * @param graphIn The graph input file.
+     * @param graphOut The graph output file.
+     * @param clusterOut The cluster output file.
+     * @param editingOut The editing output file.
+     * @param isHeader Does the input file have a header.
      * @param isInXmlFile
      * @param isOutXmlFile
      * @param p 
+     * @param slType 
+     * @param isMultipleThresh  If a multiple threshold is used in computing.
      */
     public static void runGraph(int graphType,
-            float thresh,
             String graphIn,
             String graphOut,
             String clusterOut,
@@ -67,13 +69,15 @@ public class Main3 {
             boolean isInXmlFile,
             boolean isOutXmlFile,
             Param p,
-            int slType){
-        p.setThresh(thresh);
+            int slType,
+            boolean isMultipleThresh){
         /* Check the parameters. */
         if(graphType <=0 || graphType >=5)
             throw new IllegalArgumentException ("(runGraph) The graph type can only be [1-4]. ");
-        if(p.getThresh() <=0)
-            throw new IllegalArgumentException("(runGraph) The threshold cannot be equal to smaller than 0.");
+        if(isMultipleThresh && p.getThreshArray() == null)
+            throw new IllegalArgumentException("(runGraph) Multiple thresh array is null. ");
+        if(!isMultipleThresh && Float.isNaN(p.getThresh()))
+            throw new IllegalArgumentException("(runGraph) The threshold must be a number.");
         if(p.getLowerth()<0)
             throw new IllegalArgumentException("(runGraph) The lower-bound of the threshold cannot be smaller than 0.");
         if(p.getUpperth() <0)
@@ -122,9 +126,6 @@ public class Main3 {
             }
         }
         
-        
-        
-        
         try{
             fw.close();
         }catch(IOException e){};
@@ -151,6 +152,7 @@ public class Main3 {
         /* Run the algorithm. */
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
         try{
+            boolean isMultipleThresh = (p.getThreshArray() == null);
             inputGraph = algorithm.run(inputGraph, p, slType); /* The main entrace. */
         }catch(IOException e){
             System.err.println("(runGraph) The algorithm error.");
@@ -178,6 +180,7 @@ public class Main3 {
      * 3 hierarchy general graph.
      * 4 general graph
      * @param thresh The threshold for an edge.
+     * @param threshArray The array of thresholds, used only in npartite hierarchy general graph or npartite hierarchy graph.
      * @param fatt The fatt coefficient.
      * @param frep The frep coefficient. 
      * @param maxIter The maximum iteration.
@@ -194,9 +197,11 @@ public class Main3 {
      * @param editingOut The path to output the details of the editing cost.
      * @param isInXmlFile  This is the input format: false, plain format; true, xml format.
      * @param isOutXmlFile This is the output format: false, plain foramt; true, xml format.
+     * @param slType This is the type of clustering: 1. Classic single-linkage clustering. 2. Single-linkage chain clustering.
      */
     public static void runGraph(int graphType,
             float thresh,
+            float[] threshArray,
             float fatt, float frep,
             int maxIter, float M0, int dim,
             float radius, 
@@ -215,7 +220,7 @@ public class Main3 {
         
         /* Create the parameter object. */
         Param p = new Param(maxIter,
-                fatt, frep,M0,dim,radius,thresh, upperth,lowerth,step);
+                fatt, frep,M0,dim,radius,thresh, threshArray, upperth,lowerth,step);
         runGraph(graphType, thresh,graphIn,graphOut,clusterOut,editingOut, isHeader, isInXmlFile, isOutXmlFile, p,slType);
     }
     

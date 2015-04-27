@@ -233,6 +233,24 @@ public final class MatrixHierNpartiteGraph extends Graph2{
             setThreshold(thresh);
         detractThresh();
     }
+    
+    @Override
+    public final void detractThresh(float[] thresh){
+        // Check if already detracted.
+        if(threshDetracted)
+            throw new IllegalArgumentException("(MatrixHierNpariteGraph.detractThresh) The threshold is already detracted.");
+
+        // Check the length
+        if(thresh.length != this.edgeWeights.size())
+            throw new IllegalArgumentException("(MatrixHierNpartiteGraph.detractThresh) The length of the threshold array does not fit the graph:  "+thresh.length+"  "+edgeWeights.size());
+        for(int i=0;i<edgeWeights.size();i++){
+            float[][] weights = edgeWeights.get(i);
+            for(int j=0;j<weights.length;j++)
+                for(int k=0;k<weights[0].length;k++)
+                    weights[j][k] -= thresh[i];
+        }
+        
+    }
 
     /**
      * This method gets the distance between two vertices. 

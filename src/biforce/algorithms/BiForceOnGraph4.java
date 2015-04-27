@@ -675,7 +675,7 @@ public class BiForceOnGraph4 {
      * @return
      * @throws IOException 
      */
-    public Graph2 run(Graph2 graph, Param p, int clType) throws IOException{
+    public Graph2 run(Graph2 graph, Param p, int clType, boolean isMultipleThresh) throws IOException{
         /* First we have to detract the threshold. */
         System.out.println("Detract the threshold.");
         if(!graph.isThreshDetracted())
