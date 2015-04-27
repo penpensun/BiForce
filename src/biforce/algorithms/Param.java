@@ -19,13 +19,8 @@ public class Param {
     float M0 = -1;
     int dim = -1;
     float radius = -1;
-<<<<<<< Updated upstream
     float thresh = Float.NaN;
     float[] threshArray = null;
-=======
-    float thresh = 0;
-    float[] threshArray  = null;
->>>>>>> Stashed changes
     float upperth = -1;
     float lowerth = -1;
     float step=-1;
@@ -47,12 +42,8 @@ public class Param {
     public Param(int maxIter, 
             float fatt, float frep, 
             float M0, int dim, float radius,
-<<<<<<< Updated upstream
             float thresh,
             float[] threshArray,
-=======
-            float thresh, float threshArray[],
->>>>>>> Stashed changes
             float upperth, float lowerth, float step)
     {
         this.maxIter = maxIter;
@@ -65,11 +56,7 @@ public class Param {
         this.upperth = upperth;
         this.lowerth = lowerth;
         this.step = step;
-<<<<<<< Updated upstream
         this.threshArray = threshArray;
-=======
-        this.threshArray  = threshArray;
->>>>>>> Stashed changes
     }
     
     /**
