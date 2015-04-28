@@ -74,6 +74,8 @@ public class Main3 {
             Param p,
             int slType,
             boolean isMultipleThresh){
+        p.setThresh(thresh);
+        p.setThreshArray(threshArray);
         /* Check the parameters. */
         if(graphType <=0 || graphType >=5)
             throw new IllegalArgumentException ("(runGraph) The graph type can only be [1-4]. ");

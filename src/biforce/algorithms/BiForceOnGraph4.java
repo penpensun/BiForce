@@ -318,12 +318,15 @@ public class BiForceOnGraph4 {
                  * the attration force threshold. */
                 float force;
                 
-                if(ew >p.getThresh()){
-                    force = (float)((ew- p.getThresh())*Math.log10(dist+1)*attCoeff/dist); 
+                //if(ew >p.getThresh()){
+                if(ew>0){
+                    //force = (float)((ew- p.getThresh())*Math.log10(dist+1)*attCoeff/dist);
+                    force =(float)(ew*Math.log10(dist+1)*attCoeff/dist);
                 }
                 else{
                     /* Else, we calculate the repulsion force. */
-                    force = (float)(repCoeff*(ew - p.getThresh())/Math.log10(dist+1)/dist);
+                    //force = (float)(repCoeff*(ew - p.getThresh())/Math.log10(dist+1)/dist);
+                    force =(float)(repCoeff*ew /Math.log10(dist+1)/dist);
                 }
                 //for each dim
                 for(int d=0;d<p.getDim();d++){
