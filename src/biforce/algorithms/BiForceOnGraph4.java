@@ -1110,6 +1110,77 @@ public class BiForceOnGraph4 {
     }
     
     /**
+     * This method performs the complete linkage chain clustering.
+     * 
+     * cluster.dist = max(c1,c2);
+     * First assign single-node clusters. then check all pairs. 
+     * If clusters.dist < thresh. Then merge.
+     * @param graph
+     * @param distThresh 
+     */
+    public void completeLinkageClust(Graph2 graph, float distThresh){
+        ArrayList<Vertex2> vertices = graph.getVertices();
+        ArrayList<Cluster2> clusters = new ArrayList<>();
+        for(int i=0;i<vertices.size();i++){
+            vertices.get(i).setClustNum(i);
+            Cluster2 clust = new Cluster2();
+            clust.addVertex(vertices.get(i));
+            clusters.add(clust);
+        }
+        boolean merged = true;
+        while(merged){
+            merged = false;
+            // Check all pairs and merge possible pairs.
+            for(int i=0;i<clusters.size();i++)
+                for(int j=i+1;j<clusters.size();j++){
+                    if(Cluster2.dist(clusters.get(i), clusters.get(j), graph, 2)<distThresh){
+                        clusters.get(i).addCluster(clusters.get(j));
+                        clusters.remove(j);
+                        j--;
+                        merged = true;
+                    }
+                }
+            
+        }
+            
+    }
+    
+    /**
+     * This method computes the complete linkage cluster for chain clustering.
+     * @param graph
+     * @param distThresh 
+     */
+    public void completeLinkageClustChain(Graph2 graph, float distThresh){
+        ArrayList<Vertex2> vertices = new ArrayList<>();
+        for(int i=0;i<graph.vertexCount();i++)
+            if(graph.getVertices().get(i).getVtxSet() == 0)
+                vertices.add(graph.getVertices().get(i));
+        
+        ArrayList<Cluster2> clusters = new ArrayList<>();
+        for(int i=0;i<vertices.size();i++){
+            vertices.get(i).setClustNum(i);
+            Cluster2 clust = new Cluster2();
+            clust.addVertex(vertices.get(i));
+            clusters.add(clust);
+        }
+        boolean merged = true;
+        while(merged){
+            merged = false;
+            // Check all pairs and merge possible pairs.
+            for(int i=0;i<clusters.size();i++)
+                for(int j=i+1;j<clusters.size();j++){
+                    if(Cluster2.dist(clusters.get(i), clusters.get(j), graph, 2)<distThresh){
+                        clusters.get(i).addCluster(clusters.get(j));
+                        clusters.remove(j);
+                        j--;
+                        merged = true;
+                    }
+                }
+            
+        }
+    }
+    
+    /**
      * Get the clust number of the nearst vertex in the upper layer.
      * @param graph
      * @param vtx

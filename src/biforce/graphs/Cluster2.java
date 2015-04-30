@@ -23,7 +23,7 @@ public class Cluster2 implements Comparable<Cluster2>{
     
     public Cluster2(){}
     
-    public int getSize()
+    public int size()
     {
         return vertices.size();
     }
@@ -69,9 +69,9 @@ public class Cluster2 implements Comparable<Cluster2>{
     @Override
     public int compareTo(Cluster2 c)
     {
-        if(this.getSize() >c.getSize())
+        if(this.size() >c.size())
             return 1;
-        else if( this.getSize() == c.getSize())
+        else if( this.size() == c.size())
             return 0;
         else return -1;
     }
@@ -88,4 +88,49 @@ public class Cluster2 implements Comparable<Cluster2>{
         Target.addVertex(vtx);
         vtx.setClustNum(Target.getClustIdx());
     }
+    
+    /**
+     * Compute the cluster distance according to the given cluster type.
+     * @param clust1
+     * @param clust2
+     * @param graph
+     * @param type 1: Single-linkage, 2: Complete-linkage 3: Average-linkage
+     */
+    public static float dist(Cluster2 clust1, Cluster2 clust2, Graph2 graph, int type){
+        if(type<=0 || type >3)
+            throw new IllegalArgumentException("(Cluster.dist) Type can only be 1,2 or 3. Yours is:  "+type);
+        float dist;
+          
+        switch(type){
+            case 1:// Single linkage.
+                dist = Float.MAX_VALUE;
+                for(int i=0;i<clust1.size();i++)
+                    for(int j=0;j<clust2.size();j++){
+                        float vertexDist = graph.dist(clust1.getVertex(i),clust2.getVertex(j));
+                        if(dist> vertexDist)
+                            dist = vertexDist;
+                    }
+                return dist;
+             
+            case 2:
+                dist = Float.MIN_VALUE;
+                for(int i=0;i<clust1.size();i++)
+                    for(int j=0;j<clust2.size();j++){
+                        float vertexDist = graph.dist(clust1.getVertex(i), clust2.getVertex(j));
+                        if(dist<vertexDist)
+                            dist = vertexDist;
+                    }
+                return dist;
+                
+            case 3:
+                dist = 0;
+                for(int i=0;i<clust1.size();i++)
+                    for(int j=0;j<clust2.size();j++){
+                        dist+= graph.dist(clust1.getVertex(i),clust2.getVertex(j));
+                    }
+                return dist/(clust1.size()*clust2.size());
+        }
+        return -1;
+    }
+    
 }
