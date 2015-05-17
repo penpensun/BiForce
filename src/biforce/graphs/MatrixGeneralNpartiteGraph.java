@@ -65,7 +65,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
                 readXmlGraph(filePath);
             }catch(IOException e){
                 System.out.println("(MatrixGeneralNpartiteGraph.constructor) "
-                        + " MatrixHierGeneralGraph readGraphWithHeader failed:"
+                        + " MatrixGeneralNpartiteGraph readGraph in xml failed:"
                         + " "+filePath);
                 return;
             }
@@ -75,7 +75,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
                 readGraphWithHeader(filePath);
             }catch(IOException e){
                 System.out.println("(MatrixGeneralNpartiteGraph.constructor)"
-                        + " MatrixHierGeneralGraph readGraphWithHeader failed:"
+                        + " MatrixGeneralNpartiteGraph readGraphWithHeader failed:"
                         + " "+filePath);
             }
         
@@ -84,7 +84,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
                 readGraph(filePath);
             }catch(IOException e){
                 System.out.println("(MatrixGeneralNpartiteGraph.constructor)"
-                        + " MatrixHierGeneralGraph readGraphWithHeader failed:"
+                        + " MatrixGeneralNpartiteGraph readGraph no header failed:"
                         + " "+filePath);
             } 
         /* 2nd version of the distance matrix. Now the first version of MatrixHierGeneraGraph */
@@ -291,14 +291,20 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
                     [vtx1.getVtxIdx()][vtx2.getVtxIdx()];
         /* Check if it  is an inter-edge.  */
         if(vtx1.getVtxSet() - vtx2.getVtxSet() == 1 ||
-                vtx1.getVtxSet() - vtx2.getVtxSet() == -1 || 
-                (vtx1.getVtxSet() ==0 && vtx2.getVtxSet() == setSizes.length-1)||
-                (vtx2.getVtxSet() ==0 && vtx1.getVtxSet() == setSizes.length-1)){
+                vtx1.getVtxSet() - vtx2.getVtxSet() == -1){
             int minVtxLvl = Math.min(vtx1.getVtxSet(),vtx2.getVtxSet());
             if(minVtxLvl == vtx1.getVtxSet())
                 return interEdgeWeights.get(minVtxLvl)[vtx1.getVtxIdx()][vtx2.getVtxIdx()];
             else
                 return interEdgeWeights.get(minVtxLvl)[vtx2.getVtxIdx()][vtx1.getVtxIdx()];
+        }
+        else if((vtx1.getVtxSet() ==0 && vtx2.getVtxSet() == setSizes.length-1)||
+                (vtx2.getVtxSet() ==0 && vtx1.getVtxSet() == setSizes.length-1)){
+            int maxVtxLvl = Math.max(vtx1.getVtxSet(), vtx2.getVtxSet());
+            if(maxVtxLvl == vtx1.getVtxSet())
+                return interEdgeWeights.get(maxVtxLvl)[vtx2.getVtxIdx()][vtx1.getVtxIdx()];
+            else
+                return interEdgeWeights.get(maxVtxLvl)[vtx1.getVtxIdx()][vtx2.getVtxIdx()];
         }
         /* If it is not an intra-edge nor is it an inter-edge, then we return NaN for cross edges. */
         return Float.NaN;

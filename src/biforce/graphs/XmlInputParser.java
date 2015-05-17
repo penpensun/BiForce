@@ -471,7 +471,7 @@ public class XmlInputParser {
             fr = new FileReader(matrixFile);
             br = new BufferedReader(fr);
         }catch(IOException e){
-            System.err.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+matrixFile);
+            System.err.println("(biforce.graphs.XmlInputParser.parseInterMatrixFile) Invalid inputFile:  "+matrixFile);
             return;
         }
         /* Get the inter matrix in the interEdgeWeights. The index of interMatrix is the min of matrixLevel1 and matrixLevel2. */
@@ -536,7 +536,7 @@ public class XmlInputParser {
             fr = new FileReader(matrixFile);
             br = new BufferedReader(fr);
         }catch(IOException e){
-            System.err.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+matrixFile);
+            System.err.println("(biforce.graphs.XmlInputParser.parseInterMatrixFile) Invalid inputFile:  "+matrixFile);
             return;
         }
         /* Get the inter matrix in the interEdgeWeights. The index of interMatrix is the min of matrixLevel1 and matrixLevel2. */
@@ -600,7 +600,7 @@ public class XmlInputParser {
             fr = new FileReader(matrixFile);
             br = new BufferedReader(fr);
         }catch(IOException e){
-            System.err.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+matrixFile);
+            System.err.println("(biforce.graphs.XmlInputParser.parseInterMatrixFile) Invalid inputFile:  "+matrixFile);
             return;
         }
         /* Get the inter matrix in the interEdgeWeights. The index of interMatrix is the min of matrixLevel1 and matrixLevel2. */
@@ -674,7 +674,7 @@ public class XmlInputParser {
             fr = new FileReader(matrixFile);
             br = new BufferedReader(fr);
         }catch(IOException e){
-            System.err.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+matrixFile);
+            System.err.println("(biforce.graphs.XmlInputParser.parseIntraMatrixFile) Invalid inputFile:  "+matrixFile);
             return;
         }
         /* Get the inter matrix in the interEdgeWeights. The index of interMatrix is the min of matrixLevel1 and matrixLevel2. */
@@ -803,7 +803,7 @@ public class XmlInputParser {
             fr = new FileReader(matrixFile);
             br = new BufferedReader(fr);
         }catch(IOException e){
-            System.err.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+matrixFile);
+            System.err.println("(biforce.graphs.XmlInputParser.parseIntraMatrixFile) Invalid inputFile:  "+matrixFile);
             return;
         }
         /* Read the matrix in the file.*/
@@ -882,7 +882,7 @@ public class XmlInputParser {
             fr = new FileReader(matrixFile);
             br = new BufferedReader(fr);
         }catch(IOException e){
-            System.err.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+matrixFile);
+            System.err.println("(biforce.graphs.XmlInputParser.parseIntraMatrixFile) Invalid inputFile:  "+matrixFile);
             return;
         }
         /* Read the matrix in the file.*/
