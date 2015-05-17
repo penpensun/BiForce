@@ -77,8 +77,8 @@ public class Main3 {
         p.setThresh(thresh);
         p.setThreshArray(threshArray);
         /* Check the parameters. */
-        if(graphType <=0 || graphType >=5)
-            throw new IllegalArgumentException ("(runGraph) The graph type can only be [1-4]. ");
+        if(graphType <=0 || graphType >=6)
+            throw new IllegalArgumentException ("(runGraph) The graph type can only be [1-5]. ");
         if(isMultipleThresh && p.getThreshArray() == null)
             throw new IllegalArgumentException("(runGraph) Multiple thresh array is null. ");
         if(!isMultipleThresh && Float.isNaN(p.getThresh()))
@@ -153,6 +153,9 @@ public class Main3 {
             case 4: /* General graph. */
                 inputGraph = new MatrixGraph(graphIn,isHeader);
                 break;
+            case 5: /* General npartite graph. */
+                inputGraph = new MatrixGeneralNpartiteGraph(graphIn, isHeader, isInXmlFile);
+                break;
             default: 
                 throw new IllegalArgumentException("(runGraph) The given graph type is illegal.");
                 
@@ -181,11 +184,12 @@ public class Main3 {
     
     /**
      * This method runs the algorithm on different types of graphs. 
-     * @param graphType The type of the graphs: from 1 to 4.
+     * @param graphType The type of the graphs: from 1 to 5.
      * 1 bipartite graph
      * 2 hierarchy npartite graph.
      * 3 hierarchy general graph.
      * 4 general graph
+     * 5 general npartite graph.
      * @param thresh The threshold for an edge.
      * @param threshArray The array of thresholds, used only in npartite hierarchy general graph or npartite hierarchy graph.
      * @param fatt The fatt coefficient.
@@ -231,6 +235,112 @@ public class Main3 {
         Param p = new Param(maxIter,
                 fatt, frep,M0,dim,radius,thresh, threshArray, upperth,lowerth,step);
         runGraph(graphType,thresh, threshArray,graphIn,graphOut,clusterOut,editingOut, isHeader, isInXmlFile, isOutXmlFile, p,slType, isMultipleThresh);
+    }
+    
+    /**
+     * This method runs the algorithm on a given Graph2 object.
+     * @param thresh
+     * @param threshArray
+     * @param inputGraph
+     * @param graphOut
+     * @param clusterOut
+     * @param editingOut
+     * @param isHeader
+     * @param isInXmlFile
+     * @param isOutXmlFile
+     * @param p
+     * @param slType
+     * @param isMultipleThresh 
+     */
+    public static void runGraph(
+            float thresh,
+            float[] threshArray,
+            Graph2 inputGraph,
+            String graphOut,
+            String clusterOut,
+            String editingOut,
+            boolean isHeader,
+            boolean isInXmlFile,
+            boolean isOutXmlFile,
+            String paramFile,
+            int slType,
+            boolean isMultipleThresh
+            ){
+        Param p = new Param(paramFile);
+        p.setThresh(thresh);
+        p.setThreshArray(threshArray);
+        /* Check the parameters. */
+        if(isMultipleThresh && p.getThreshArray() == null)
+            throw new IllegalArgumentException("(runGraph) Multiple thresh array is null. ");
+        if(!isMultipleThresh && Float.isNaN(p.getThresh()))
+            throw new IllegalArgumentException("(runGraph) The threshold must be a number.");
+        if(p.getLowerth()<0)
+            throw new IllegalArgumentException("(runGraph) The lower-bound of the threshold cannot be smaller than 0.");
+        if(p.getUpperth() <0)
+            throw new IllegalArgumentException("(runGraph) The upper-bound of the threshold cannot be smaller than 0.");
+        if(p.getStep()<0)
+            throw new IllegalArgumentException("(runGraph) The step of the threshold cannot be smaller than 0.");
+        
+        if(inputGraph == null)
+            throw new IllegalArgumentException("(runGraph) The input graph cannot be null.");
+        if(clusterOut==null)
+            throw new IllegalArgumentException("(runGraph) The graph output cannotbe null.");
+        
+        
+        if(slType != 1 && slType != 2)
+            throw new IllegalArgumentException("(runGraph) The type of single linkage clustering error:  "+slType);
+        // Set the thresholds
+        p.setThresh(thresh);
+        p.setThreshArray(threshArray);
+        /* Check if the file can be openend. */
+        FileWriter fw = null;
+        
+        try{
+            fw = new FileWriter(clusterOut);
+        }catch(IOException e){
+            System.err.println("(runGraph) The cluster output file writing error. ");
+        }
+        
+        if(editingOut != null){
+            try{
+                fw.close();
+                fw = new FileWriter(editingOut);
+            }catch(IOException e){
+                System.err.println("(runGraph) The editing details output file writing error.");
+            }
+        }
+        if(graphOut != null){
+            try{
+                fw = new FileWriter(graphOut);
+            }catch(IOException e){
+                System.err.println("(runGrpah) The graph output file writing error.");
+            }
+        }
+        
+        try{
+            fw.close();
+        }catch(IOException e){};
+        
+        /* Run the algorithm. */
+        BiForceOnGraph4 algorithm = new BiForceOnGraph4();
+        try{
+            inputGraph = algorithm.run(inputGraph, p, slType, isMultipleThresh); /* The main entrace. */
+        }catch(IOException e){
+            System.err.println("(runGraph) The algorithm error.");
+            return;
+        }
+        /* Output the graph. */
+        System.out.println("Start writing the results.");
+        if(graphOut != null)
+            inputGraph.writeGraphTo(graphOut, isOutXmlFile);
+        System.out.println("The resulted graph is written to:  "+graphOut);
+        /* Output the cluster. */
+        inputGraph.writeClusterTo(clusterOut,isOutXmlFile);
+        System.out.println("The resulted cluster is written to:  "+clusterOut);
+        /* Output the editing details. */
+        if(editingOut != null)
+            inputGraph.writeResultInfoTo(editingOut);
+        System.out.println("The editing information is written to:  "+editingOut);
     }
     
     

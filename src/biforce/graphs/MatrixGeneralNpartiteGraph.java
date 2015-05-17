@@ -1,5 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package biforce.graphs;
@@ -7,24 +8,27 @@ package biforce.graphs;
 import biforce.constants.BiForceConstants;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Arrays;
-import org.jdom2.*;
-import org.jdom2.input.*;
-import java.io.File;
-import java.io.FileWriter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 /**
- * This graph is an upgraded version of MatrixHierNpartiteGraph, allowing edges within the 
- * same vertex subset.
+ * This is a graph class describing the "MatrixGeneralNpartiteGraph". 
+ * A "MatrixGeneralNpartiteGraph" is a "ring-like" npartite-graph with edges between neighbours sets and 
+ * the between the first and the last sets. (A "ring-like" npartite graph).
+ * Intra-edges are also allowed.
  * @author penpen926
  */
-public class MatrixHierGeneralGraph extends Graph2{
+public class MatrixGeneralNpartiteGraph extends Graph2{
     protected float cost = 0; /* This stores the editing cost.*/
     protected int[] setSizes = null;
     /* Here since we have different sets of edges between different vertex sets,
@@ -43,12 +47,12 @@ public class MatrixHierGeneralGraph extends Graph2{
     protected float[][] distMatrix = null;
     
     /**
-     * Constructor.
-     * @param filePath 
-     * @param isHeader 
+     * The constructor.
+     * @param filePath
+     * @param isHeader
      * @param isXmlFile 
      */
-    public MatrixHierGeneralGraph(String filePath, boolean isHeader, boolean isXmlFile){
+    public MatrixGeneralNpartiteGraph(String filePath, boolean isHeader, boolean isXmlFile){
         /* Init the vertices arrayList. */
         vertices = new ArrayList<>();
         /* Init the distance arrayList. */
@@ -60,7 +64,7 @@ public class MatrixHierGeneralGraph extends Graph2{
             try{
                 readXmlGraph(filePath);
             }catch(IOException e){
-                System.out.println("(biforce.graphs.MatrixHierGeneralGraph.constructor) "
+                System.out.println("(MatrixGeneralNpartiteGraph.constructor) "
                         + " MatrixHierGeneralGraph readGraphWithHeader failed:"
                         + " "+filePath);
                 return;
@@ -70,7 +74,7 @@ public class MatrixHierGeneralGraph extends Graph2{
             try{
                 readGraphWithHeader(filePath);
             }catch(IOException e){
-                System.out.println("(MatrixHierGeneralGraph.constructor)"
+                System.out.println("(MatrixGeneralNpartiteGraph.constructor)"
                         + " MatrixHierGeneralGraph readGraphWithHeader failed:"
                         + " "+filePath);
             }
@@ -79,7 +83,7 @@ public class MatrixHierGeneralGraph extends Graph2{
            try{
                 readGraph(filePath);
             }catch(IOException e){
-                System.out.println("(MatrixHierGeneralGraph.constructor)"
+                System.out.println("(MatrixGeneralNpartiteGraph.constructor)"
                         + " MatrixHierGeneralGraph readGraphWithHeader failed:"
                         + " "+filePath);
             } 
@@ -88,63 +92,10 @@ public class MatrixHierGeneralGraph extends Graph2{
         for(int i=0;i<distMatrix.length;i++)
             for(int j=0;j<distMatrix[0].length;j++)
                 distMatrix[i][j] = Float.NaN;
-                
     }
     
     /**
-     * Constructor.
-     * @param filePath
-     * @param isHeader
-     * @param isXmlFile
-     * @param thresh 
-     */
-    public MatrixHierGeneralGraph(String filePath, boolean isHeader, boolean isXmlFile,float thresh){
-        /* Init the vertices arrayList. */
-        vertices = new ArrayList<>();
-        /* Init the distance arrayList. */
-        //distances = new ArrayList<>();
-        /* Init the action arrayList. */
-        actions = new ArrayList<>();
-       /* If the input is in xml format. */
-        if(isXmlFile)
-            try{
-                readXmlGraph(filePath);
-            }catch(IOException e){
-                System.out.println("(biforce.graphs.MatrixHierGeneralGraph.constructor) "
-                        + " MatrixHierGeneralGraph readGraphWithHeader failed:"
-                        + " "+filePath);
-                return;
-            }
-        /* If the input file is with header.*/
-        else if(isHeader)
-            try{
-                readGraphWithHeader(filePath);
-            }catch(IOException e){
-                System.out.println("(MatrixHierGeneralGraph.constructor)"
-                        + " MatrixHierGeneralGraph readGraphWithHeader failed:"
-                        + " "+filePath);
-            }
-        
-        else
-           try{
-                readGraph(filePath);
-            }catch(IOException e){
-                System.out.println("(MatrixHierGeneralGraph.constructor)"
-                        + " MatrixHierGeneralGraph readGraphWithHeader failed:"
-                        + " "+filePath);
-            } 
-        setThreshold(thresh);
-        detractThresh();
-        
-        /* 2nd version of the distance matrix. Now the first version of MatrixHierGeneralGraph.*/
-        distMatrix = new float[vertices.size()][vertices.size()];
-        for(int i=0;i<distMatrix.length;i++)
-            for(int j=0;j<distMatrix[0].length;j++)
-                distMatrix[i][j] = Float.NaN;
-    }
-    
-    /**
-     * This constructor assigns the variables with given parameters.
+     * Constructor
      * @param vertices
      * @param actions
      * @param clusters
@@ -152,7 +103,7 @@ public class MatrixHierGeneralGraph extends Graph2{
      * @param intraEdgeWeights
      * @param interEdgeWeights 
      */
-    public MatrixHierGeneralGraph(ArrayList<Vertex2> vertices, ArrayList<Action2> actions, 
+    public MatrixGeneralNpartiteGraph(ArrayList<Vertex2> vertices, ArrayList<Action2> actions, 
             ArrayList<Cluster2> clusters, 
             int[] setSizes,
             ArrayList<float[][]> intraEdgeWeights, 
@@ -165,12 +116,12 @@ public class MatrixHierGeneralGraph extends Graph2{
     }
     
     /**
-     * This method performs breadth-first search in MatrixHierNpartiteGraph.
-     * @param Vtx
+     * This method performs breadth-first search.
+     * @param Vtx The start vertex.
      * @return 
      */
     @Override
-    public MatrixHierGeneralSubgraph bfs(Vertex2 Vtx) {
+    public MatrixGeneralNpartiteSubgraph bfs(Vertex2 Vtx){
         LinkedList<Vertex2> queue = new LinkedList<>();
         //create a marker
         HashMap<String, Boolean> marker = new HashMap<>();
@@ -208,7 +159,7 @@ public class MatrixHierGeneralGraph extends Graph2{
 
          }
          /* Create a new subkpartitegraph. */
-         MatrixHierGeneralSubgraph sub = new MatrixHierGeneralSubgraph(result,this);
+         MatrixGeneralNpartiteSubgraph sub = new MatrixGeneralNpartiteSubgraph(result,this);
          return sub;
     }
     
@@ -217,8 +168,8 @@ public class MatrixHierGeneralGraph extends Graph2{
      * @return 
      */
     @Override
-    public ArrayList<MatrixHierGeneralSubgraph> connectedComponents() {
-        ArrayList<MatrixHierGeneralSubgraph> connectecComps = new ArrayList<>();
+    public ArrayList<MatrixGeneralNpartiteSubgraph> connectedComponents() {
+        ArrayList<MatrixGeneralNpartiteSubgraph> connectecComps = new ArrayList<>();
         //create a indicator LinkedList of vertices, when a vertex is included in one of the subgraphs, then it is 
         //removed from the indicator LinkedList
         LinkedList<Vertex2> indicatorList = new LinkedList<>();
@@ -229,7 +180,7 @@ public class MatrixHierGeneralGraph extends Graph2{
         //While there is still unvisited vertex, we use it as the seed to search for subgraphs.
         while(!indicatorList.isEmpty()){
             Vertex2 Seed = indicatorList.pollFirst();
-            MatrixHierGeneralSubgraph comp = bfs(Seed);
+            MatrixGeneralNpartiteSubgraph comp = bfs(Seed);
             connectecComps.add(comp);
             //remove all the vertex in the comp from indicatorList
             for(Vertex2 vtx: comp.getSubvertices()){
@@ -261,7 +212,7 @@ public class MatrixHierGeneralGraph extends Graph2{
         }
         this.threshDetracted = true;
     }
-
+    
     @Override
     public final void detractThresh(float thresh) {
         /* Check if the threshold has already detracted */
@@ -324,7 +275,13 @@ public class MatrixHierGeneralGraph extends Graph2{
         /* 2nd version of distances. */
         return distMatrix[vtx1.getDistIdx()][vtx2.getDistIdx()];
     }
-
+    
+    /**
+     * Get the edge weight.
+     * @param vtx1
+     * @param vtx2
+     * @return 
+     */
     @Override
     public float edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
         /* Check if it is an intra-edge. */
@@ -334,7 +291,9 @@ public class MatrixHierGeneralGraph extends Graph2{
                     [vtx1.getVtxIdx()][vtx2.getVtxIdx()];
         /* Check if it  is an inter-edge.  */
         if(vtx1.getVtxSet() - vtx2.getVtxSet() == 1 ||
-                vtx1.getVtxSet() - vtx2.getVtxSet() == -1){
+                vtx1.getVtxSet() - vtx2.getVtxSet() == -1 || 
+                (vtx1.getVtxSet() ==0 && vtx2.getVtxSet() == setSizes.length-1)||
+                (vtx2.getVtxSet() ==0 && vtx1.getVtxSet() == setSizes.length-1)){
             int minVtxLvl = Math.min(vtx1.getVtxSet(),vtx2.getVtxSet());
             if(minVtxLvl == vtx1.getVtxSet())
                 return interEdgeWeights.get(minVtxLvl)[vtx1.getVtxIdx()][vtx2.getVtxIdx()];
@@ -344,10 +303,10 @@ public class MatrixHierGeneralGraph extends Graph2{
         /* If it is not an intra-edge nor is it an inter-edge, then we return NaN for cross edges. */
         return Float.NaN;
     }
-
+    
     @Override
     public float edgeWeight(int vtxIdx1, int vtxIdx2) {
-        throw new UnsupportedOperationException("This edgeWeight(int, int) is not supported in MatrixHierNpartiteGraph.");
+        throw new UnsupportedOperationException("This edgeWeight(int, int) is not supported in MatrixGeneralNpartiteGraph.");
     }
     
     /**
@@ -360,25 +319,21 @@ public class MatrixHierGeneralGraph extends Graph2{
     public float[][] interEdgeWeightMatrix(int i){
         /* First check the index. */
         if( i<0 || i>= interEdgeWeights.size()){
-            throw new IllegalArgumentException("(MatrixHierGeneralGraph.interEdgeWeighMatrix) Index out of bound:  "+
+            throw new IllegalArgumentException("(MatrixGeneralNpartiteGraph.interEdgeWeighMatrix) Index out of bound:  "+
                     i);
         }
         return interEdgeWeights.get(i);   
     }
     
-    /**
-     * This method extracts the intraEdgeWeightMatrix with the given i.
-     * @param i
-     * @return 
-     */
+    
     public float[][] intraEdgeWeightMatrix(int i){
-        /* First check the index. */
-        if( i<0 || i>= intraEdgeWeights.size()){
-            throw new IllegalArgumentException("(MatrixHierGeneralGraph.intraEdgeWeighMatrix) Index out of bound:  "+
+        if( i<0 || i>= interEdgeWeights.size()){
+            throw new IllegalArgumentException("(MatrixGeneralNpartiteGraph.interEdgeWeighMatrix) Index out of bound:  "+
                     i);
         }
-        return intraEdgeWeights.get(i);   
+        return interEdgeWeights.get(i);   
     }
+    
     /**
      * This method computes the euclidean distances between two vertices.
      * @param vtx1
@@ -492,7 +447,7 @@ public class MatrixHierGeneralGraph extends Graph2{
             /* If they are from the same set, then it's impossible there's an edge
              * between them.*/
             float ew  = edgeWeight(currentVtx, vtx);
-            if(!Double.isNaN(ew) && ew>0)
+            if(!Float.isNaN(ew) && ew>0)
                 neighbours.add(vtx);       
         }
         //neighbours.trimToSize();
@@ -501,7 +456,7 @@ public class MatrixHierGeneralGraph extends Graph2{
             return null;
         return neighbours;
     }
-
+    
     @Override
     public boolean pushAction(Vertex2 vtx1, Vertex2 vtx2) {
         /* First check if thresh is already detracted, if not we have 
@@ -553,7 +508,7 @@ public class MatrixHierGeneralGraph extends Graph2{
             return ((ArrayList<Vertex2>)vertices).get(idx).getVtxIdx();
         
     }
-
+    
     /**
      * Read the graph from the input file.
      * @param filePath
@@ -709,7 +664,9 @@ public class MatrixHierGeneralGraph extends Graph2{
                     System.exit(0);
                 }
                 /* Check if it is a inter-edge. */
-                if(vtx1Lvl - vtx2Lvl == 1 || vtx1Lvl - vtx2Lvl == -1){
+                if(vtx1Lvl - vtx2Lvl == 1 || vtx1Lvl - vtx2Lvl == -1 || 
+                        vtx1Lvl - vtx2Lvl == setSizes.length-1 ||
+                        vtx1Lvl - vtx2Lvl == -setSizes.length+1){
                     /* The vertices are pushed into the graph and the edge weight is read. */
                     int idx1 = pushVertex(vtx1Name,vtx1Lvl);
                     int idx2 = pushVertex(vtx2Name,vtx2Lvl);
@@ -742,7 +699,7 @@ public class MatrixHierGeneralGraph extends Graph2{
         /* Init the cluster object. */
         clusters = new ArrayList<>();
     }
-
+    
     /**
      * The rule for header:
      * NumberOfSets Set1Size Set2Size ... SetNSize
@@ -839,7 +796,9 @@ public class MatrixHierGeneralGraph extends Graph2{
                 }
 
                 /* Check if it is a inter-edge. */
-                if(vtx1Lvl - vtx2Lvl == 1 || vtx1Lvl - vtx2Lvl == -1){
+                if(vtx1Lvl - vtx2Lvl == 1 || vtx1Lvl - vtx2Lvl == -1||
+                        vtx1Lvl - vtx2Lvl == setSizes.length-1 ||
+                        vtx1Lvl - vtx2Lvl == -setSizes.length+1){
                     /* The vertices are pushed into the graph and the edge weight is read. */
                     int idx1 = pushVertex(vtx1Name,vtx1Lvl);
                     int idx2 = pushVertex(vtx2Name,vtx2Lvl);
@@ -959,10 +918,18 @@ public class MatrixHierGeneralGraph extends Graph2{
             /* Push this interMatrix into interEdgeWeights. */
             interEdgeWeights.add(interMatrix);
         }
+        //Init the top-rear matrix.
+        float[][] interMatrix = new float[setSizes[0]][setSizes[setSizes.length-1]];
+        for(int i=0;i<interMatrix.length;i++)
+            for(int j=0;j<interMatrix[0].length;j++)
+                interMatrix[i][j] = Float.NaN;
+        interEdgeWeights.add(interMatrix);
+        
         /* Read the edge weights from the xml input file. */
         ArrayList<Element> matrixElementList = new ArrayList<>(docRoot.getChildren("matrix"));
         /* First check the number of elements in matrixElementList, if not equal to 2*setSizes.length-1. */
-        if(matrixElementList.size() != 2*setSizes.length-1)
+        // There are 2*setSizes.length matrix, half intra-matrices, half inter-matrices.
+        if(matrixElementList.size() != 2*setSizes.length) 
             throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The number of matrices is wrong:  "+matrixElementList.size());
         
         /* 2. Assign the edge weights. */
@@ -1053,7 +1020,7 @@ public class MatrixHierGeneralGraph extends Graph2{
         }
         threshDetracted = false;
     }
-
+    
     /**
      * This method removes the action with the given index from the arraylist actions.
      * @param Index
@@ -1098,12 +1065,25 @@ public class MatrixHierGeneralGraph extends Graph2{
                 interEdgeWeights.get(minVtxSet)
                         [vtx2.getVtxIdx()][vtx1.getVtxIdx()]= edgeWeight;
         }
+        // Check if it is an edge between top set and rear set.
+        if(vtx1.getVtxSet() - vtx2.getVtxSet() == setSizes.length-1 ||
+                vtx1.getVtxSet() - vtx2.getVtxSet() == -1+ setSizes.length){
+            int minVtxSet = Math.min(vtx1.getVtxSet(),vtx2.getVtxSet());
+            if(minVtxSet == vtx1.getVtxSet())
+                interEdgeWeights.get(minVtxSet)
+                        [vtx1.getVtxIdx()][vtx2.getVtxIdx()]= edgeWeight;
+            else
+                interEdgeWeights.get(minVtxSet)
+                        [vtx2.getVtxIdx()][vtx1.getVtxIdx()]= edgeWeight;
+        }
+            
         /* Check if it is an intra-edgeweight. */
-        if(vtx1.getVtxSet() == vtx2.getVtxSet())
+        else if(vtx1.getVtxSet() == vtx2.getVtxSet())
             intraEdgeWeights.get(vtx1.getVtxSet())[vtx1.getVtxIdx()][vtx2.getVtxIdx()]= edgeWeight;
     }
 
-    @Override
+    
+     @Override
     public boolean takeAction(int idx) {
         /* First the check the index. */
         if(idx <0 || idx >= actions.size())
@@ -1443,5 +1423,6 @@ public class MatrixHierGeneralGraph extends Graph2{
     }
     
 
+    
     
 }

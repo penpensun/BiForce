@@ -12,9 +12,13 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import org.jdom2.*;
+import org.jdom2.input.*;
+import java.io.File;
 
 /**
  *
@@ -637,6 +641,127 @@ public final class MatrixHierNpartiteGraph extends Graph2{
     }
 
     /**
+     * This method reads the graph from the xml input.
+     * @param filePath 
+     */
+    public final void readXmlGraph(String filePath) throws IOException{
+        /* Read the input file. */
+        SAXBuilder builder = new SAXBuilder();
+        Document graphInput = null;
+        try{
+            graphInput = builder.build(new File(filePath));
+        }catch(JDOMException e){
+            System.out.println("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) Document init error:  "+filePath);
+            return;
+        }
+        /* Get the root element. */
+        Element docRoot, entity;
+        try{
+            docRoot = graphInput.getRootElement();
+        }catch(IllegalStateException e){
+            System.out.println("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The input document does not have a root element.");
+            e.printStackTrace();
+            return;
+        }
+        /* 1. Anaylze the element "entity", get the name of the nodes.*/
+        /* Get the child element of "entity", throw an IllegalStateException.*/
+        entity = docRoot.getChild("entity");
+        if(entity == null) /* If no such "entity" child element is found, then throw the exception.*/
+            throw new IllegalStateException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The input document does not have an \"entity\" child element.");
+        
+        /* Get how many levels are there in this graph.*/
+        String levelStr = entity.getAttributeValue("levels"); /* Get how many sets are there in the graph. */
+        /* levelStr is required. */
+        if(levelStr == null){
+            /* If no "levels" attribute is defined, then an exception is thrown. */
+            throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) Attribute \"levels\" must be given.");
+        }
+        try{
+            setSizes = new int[Integer.parseInt(levelStr)];/* Init setSizes. */
+        }catch(NumberFormatException e){
+            throw new NumberFormatException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) Attribute \"levels\" number format error:  "+levelStr);
+        }
+        /* Check if there is an external file for the node names.*/
+        String hasExternEntityFile = entity.getAttributeValue("externalFile");
+        /* Get the content in entity. */
+        String entityContent = entity.getContent(0).getValue().trim();
+        /* Check entityContent. It cannot be null.*/
+        if(entityContent == null)
+            throw new IllegalStateException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The content of the element entity is null.");
+        /* If there is an external file for the nodes' names, then the content of the element should be the path
+        of the external file. Otherwise, it should be the nodes' names themselves. */
+        if(hasExternEntityFile == null || hasExternEntityFile.equalsIgnoreCase("false")){
+            XmlInputParser parser = new XmlInputParser();
+            parser.parseEntityString(entityContent,this);
+        }
+        /* If the node names are stored in an external file.*/
+        else if(hasExternEntityFile.equalsIgnoreCase("true")){
+            XmlInputParser parser = new XmlInputParser();
+            parser.parseEntityFile(entityContent,this);
+        }
+        else 
+            throw new IllegalStateException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) Illegal attribute of \"externalFile\": "+hasExternEntityFile);
+        /* Init all matrices. */
+        
+        /* Init the inter matrices. */
+        edgeWeights = new ArrayList<>();
+        for(int i=0;i<setSizes.length-1;i++){
+            float[][] interMatrix = new float[setSizes[i]][setSizes[i+1]];
+            /* Give matrix the init values. */
+            for(int j=0;j<setSizes[i];j++)
+                for(int k=0;k<setSizes[i+1];k++)
+                    interMatrix[j][k] = Float.NaN;
+            /* Push this interMatrix into interEdgeWeights. */
+            edgeWeights.add(interMatrix);
+        }
+        /* Read the edge weights from the xml input file. */
+        ArrayList<Element> matrixElementList = new ArrayList<>(docRoot.getChildren("matrix"));
+        /* First check the number of elements in matrixElementList, if not equal to setSizes.length-1. */
+        if(matrixElementList.size() != setSizes.length-1)
+            throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The number of matrices is wrong:  "+matrixElementList.size());
+        /* 2. Assign the edge weights. */
+        for(Element matrix: matrixElementList){
+            /* First check where is this matrix. */
+            String matrixLevel = matrix.getAttributeValue("matrixLevel");
+            if(matrixLevel == null) /* The matrixLevel attribute is required. */
+                throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The matrixLevel attribute is required.");
+            String[] matrixLevelSplits = matrixLevel.split("\\s+");
+            /* If string matrixLevel cannot be splitted into two splits, then it must be wrong. */
+            if(matrixLevelSplits.length !=2)
+                throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The attribute matrixLevel error:  "+matrixLevel);
+            /* Get the two levels. */
+            int matrixLevel1=-1,matrixLevel2=-1;
+            try{
+                matrixLevel1= Integer.parseInt(String.copyValueOf(matrixLevelSplits[0].toCharArray()));
+                matrixLevel2= Integer.parseInt(String.copyValueOf(matrixLevelSplits[1].toCharArray()));
+            }catch(NumberFormatException e){
+                throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The attribute matrixLevel error:  "+matrixLevel);
+            }
+            /* Check if the matrix is a intra- or inter edge weight matrix. */
+            if(matrixLevel1 == matrixLevel2) /* Intra matrix. */
+                throw new IllegalArgumentException("(biforce.graphs.MatrixHierNpartiteGraph.readGraphInXml) There is no intra-matrix in a MatrixHierNpartiteGraph.");
+            
+            else{ 
+                /* For inter-matrix. */
+                String matrixContent = matrix.getContent(0).getValue().trim();
+                /* Check if the matrix is stored in an external file.*/
+                String hasExternMatrixFile=matrix.getAttributeValue("externalFile");
+                if(hasExternMatrixFile == null|| hasExternMatrixFile.equalsIgnoreCase("false")){
+                    XmlInputParser parser = new XmlInputParser();
+                    parser.parseInterMatrixString(matrixContent, matrixLevel1, matrixLevel2, this);
+                }
+                else if(hasExternMatrixFile.equalsIgnoreCase("true")){
+                    XmlInputParser parser = new XmlInputParser();
+                    parser.parseInterMatrixFile(matrixContent, matrixLevel1, matrixLevel2, this);
+                }
+                else
+                    throw new IllegalStateException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml))Illegal attribute of \"externalFile\": "+hasExternMatrixFile);
+                        
+            }
+        }
+        clusters = new ArrayList<>();
+    }
+    /**
      * The rule for header:
      * NumberOfSets Set1Size Set2Size ... SetNSize
      * @param filePath
@@ -954,7 +1079,6 @@ public final class MatrixHierNpartiteGraph extends Graph2{
      * @param filePath 
      */
     public void writePlainGraphTo(String filePath){
-        
         FileWriter fw = null;
         BufferedWriter bw = null;
         try{
