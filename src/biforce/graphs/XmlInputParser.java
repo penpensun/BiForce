@@ -154,6 +154,27 @@ public class XmlInputParser {
             throw new IllegalStateException("(biforce.graphs.XmlInputParser.parseEntity) Not enough node sets given by element \"entity\": "+
                     setIdx+"  length of setSizes:  "+inputGraph.setSizes.length);
     }
+    
+    
+    /**
+     * This method parses the node content for MatrixGraph
+     * @param entityContent
+     * @param inputGraph 
+     */
+    public void parseEntityString(String entityContent, MatrixGraph inputGraph){
+         /* Check if setSizes in the inputGraph has been checked.*/
+        if(inputGraph == null)
+            throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) The setSizes array is not initialized in the graph.");
+        String[] splits = entityContent.split("\t");
+        for(int i=0;i<splits.length;i++){
+            String value = String.copyValueOf(splits[i].toCharArray());
+            Vertex2 vtx = new Vertex2(value,0,i);
+            inputGraph.vertices.add(vtx);
+        }
+        
+    }
+    
+    
     /**
      * This method reads the names of the nodes from the given inupt file.
      * @param inputFile
@@ -305,6 +326,37 @@ public class XmlInputParser {
         if(setIdx < inputGraph.setSizes.length)
             throw new IllegalStateException("(biforce.graphs.XmlInputParser.parseEntity) Not enough node sets given by element \"entity\": "+
                     setIdx+"  length of setSizes:  "+inputGraph.setSizes.length);
+    }
+    
+    
+    /**
+     * This method parses the entity in a given file for MatrixGraph
+     * @param inputFile
+     * @param inputGraph 
+     */
+    public final void parseEntityFile(String inputFile, MatrixGraph inputGraph){
+        /* Init the FileReader.*/
+        FileReader fr = null;
+        BufferedReader br = null;
+        try{
+            fr = new FileReader(inputFile);
+            br = new BufferedReader(fr);
+        }catch(FileNotFoundException e){
+            System.err.println("(biforce.graphs.XmlInputParser.parseEntityFile) Invalid inputFile:  "+inputFile);
+            return;
+        }
+        String line;
+        try{
+        int idx=0;
+        while((line = br.readLine())!= null){
+            Vertex2 vtx = new Vertex2(line.trim(), 0,idx);
+            idx++;
+            inputGraph.vertices.add(vtx);
+        }
+        }catch(IOException e){
+            System.err.println("(XmlInputParser.parseEntityFile) Reading error:  "+inputFile);
+            return;
+        }
     }
     /**
      * This parser parses the matrix string for inter-matrix for MatrixHierGeneralGraph.
@@ -630,8 +682,8 @@ public class XmlInputParser {
                     throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Number format error:  "+cols[j]);
                 }
                 /* In the inter matrix, value cannot be NaN. */
-                if(Float.isNaN(value))
-                    throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) NaN in the xml for inter matrix. ");
+                //if(Float.isNaN(value))
+                  //  throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) NaN in the xml for inter matrix. ");
                  /* Check the if the value in the interMatrix is duplicated initialized. */
                 if(!Float.isNaN(interMatrix[i][j]))
                     throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Duplicated initialization,"+
@@ -944,6 +996,133 @@ public class XmlInputParser {
             throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) The size of the intra-matrix does not match setSizes, setSize:  "+
                     inputGraph.setSizes[matrixLevel]+", row:"+i+", cols:"+intraMatrix[0].length);
         inputGraph.intraEdgeWeights.set(matrixLevel, intraMatrix);
+    }
+    
+    
+    
+    /**
+     * This method parses the matrix string for MatrixGraph.
+     * @param matrixContent
+     * @param inputGraph 
+     */
+    public final void parseMatrixString(String matrixContent, MatrixGraph inputGraph){
+        float[][] matrix = inputGraph.edgeWeights;
+        String[] rowsStr = matrixContent.split("\n");
+        for(int i=0;i<rowsStr.length;i++){
+            String row = rowsStr[i];
+            /* Split the row into columns.*/
+            String[] cols = row.split("\\s+");
+            /* Here we check the size of the matrix, see if it matches setSizes. */
+            if(rowsStr.length != inputGraph.vertexCount() || 
+                    cols.length != inputGraph.vertexCount())
+                throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) The size of the intra-matrix does not match setSizes, setSize:  "+
+                        inputGraph.vertexCount()+", row:"+rowsStr.length+", cols:"+cols.length);
+            for(int j=0;j<cols.length;j++){
+                /* If this is a self-edge, then we just check if the value in the matrix is also NaN. */
+                if(i==j && !Double.isNaN(matrix[i][j]) )
+                    throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Self-edge error, matrixLevel: matrixLevel row/col is:  "+i);
+                else if(i==j)
+                {}
+                else{/* If i!= j.*/
+                    /* First check the number format of the value in the matrix. */
+                    float value = Float.NaN;
+                    try{
+                        value = Float.parseFloat(String.copyValueOf(cols[j].toCharArray()));
+                    }catch(NumberFormatException e){
+                        e.printStackTrace();
+                        throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Number format error:  "+cols[j]);
+                    }
+                    /* Here the value cannot be NaN, since it's not a self-edge.*/
+                    if(Double.isNaN(value))
+                        throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Non-self edge weight cannot be NaN:  "+value+"  "+i+","+j);
+                    /* Check if the value in the matrix is already initialized. */
+                    if(!Double.isNaN(matrix[i][j]))
+                        throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Duplicated initialization,"+
+                                " value in the matrix:  "+matrix[i][j]+"  value in the xml file:  "+value);
+                    /* We then assign the value in the intraMatrix. */
+                    matrix[i][j] = value;
+                    /* Here we have to check if the intraMatrix is symmetric. */
+                    if(i>j && matrix[i][j] != matrix[j][i])
+                        throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Intra-matrix is not symmetric: "+
+                                i+","+j+":  "+matrix[i][j]+";  "+i+","+j+":  "+matrix[j][i]);
+                }
+            }
+        }
+        
+    }
+    
+    /**
+     * This method parses the matrix file for MatrixGraph
+     * @param matrixFile
+     * @param inputGraph 
+     */
+    public final void parseMatrixFile(String matrixFile, MatrixGraph inputGraph){
+        FileReader fr = null;
+        BufferedReader br = null;
+        try{
+            fr = new FileReader(matrixFile);
+            br = new BufferedReader(fr);
+        }catch(IOException e){
+            System.err.println("(biforce.graphs.XmlInputParser.parseIntraMatrixFile) Invalid inputFile:  "+matrixFile);
+            return;
+        }
+        /* Read the matrix in the file.*/
+        float[][] matrix = inputGraph.edgeWeights;
+        /* Split the matrixContent. */
+        String row = null;
+        int i = 0; /* This is the row index.*/
+        try{
+        while((row = br.readLine())!= null){
+            row = row.trim();
+            if(row.isEmpty())
+                continue;
+            /* Split the row into columns.*/
+            String[] cols = row.split("\\s+");
+            
+            for(int j=0;j<cols.length;j++){
+                /* If this is a self-edge, then we just check if the value in the matrix is also NaN. */
+                if(i==j && !Double.isNaN(matrix[i][j]) )
+                    throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Self-edge error, matrixLevel: row/col is:  "+i);
+                else if(i==j) {} 
+                else{/* If i!= j.*/
+                    /* First check the number format of the value in the matrix. */
+                    float value = Float.NaN;
+                    try{
+                        value = Float.parseFloat(String.copyValueOf(cols[j].toCharArray()));
+                    }catch(NumberFormatException e){
+                        e.printStackTrace();
+                        throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Number format error:  "+cols[j]);
+                    }
+                    /* Here the value cannot be NaN, since it's not a self-edge. 
+                    Rule changed, because pathway-pathway sims are all NaNs. 2015.03.08*/
+                    //if(Double.isNaN(value))
+                      //  throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Non-self edge weight cannot be NaN:  "+matrixFile+"\n"+value+"  "+i+","+j);
+                    /* Check if the value in the matrix is already initialized. */
+                    if(!Double.isNaN(matrix[i][j]))
+                        throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Duplicated initialization,"+
+                                " value in the matrix:  "+matrix[i][j]+"  value in the xml file:  "+value);
+                    /* We then assign the value in the intraMatrix. */
+                    matrix[i][j] = value;
+                    /* Here we have to check if the intraMatrix is symmetric. */
+                    /* This if is added because pathway-pathway sims are all NaNs. 2015.03.08 */
+                    if(i >j && Double.isNaN(matrix[i][j]) && Double.isNaN(matrix[j][i]))
+                        continue;
+                    if(i>j && matrix[i][j] != matrix[j][i])
+                        throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) Intra-matrix is not symmetric: "+matrixFile+"\n"+
+                                i+","+j+":  "+matrix[i][j]+";  "+i+","+j+":  "+matrix[j][i]);
+                }
+            }
+            i++;
+        }
+        }catch(IOException e){
+            System.err.println("(biforce.graphs.XmlInputParser.parseEntity) readLine() error.");
+            return;
+        }
+        /* Here we check the size of the matrix, see if it matches setSizes. */
+        if(i != inputGraph.vertexCount() || 
+                matrix[0].length != inputGraph.vertexCount())
+            throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) The size of the intra-matrix does not match setSizes, setSize:  "+
+                    inputGraph.vertexCount()+", row:"+i+", cols:"+matrix[0].length);
     }
     
 }

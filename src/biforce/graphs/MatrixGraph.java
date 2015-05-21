@@ -12,7 +12,12 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.*;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 /**
  * This class is the object for normal class.
@@ -34,8 +39,17 @@ public class MatrixGraph extends Graph2 {
      * @param filePath
      * @param isHeader 
      */
-    public MatrixGraph(String filePath, boolean isHeader){
-        if(isHeader)
+    public MatrixGraph(String filePath, boolean isHeader, boolean isXmlFile){
+        if(isXmlFile)
+            try{
+                readXmlGraph(filePath);
+            }catch(IOException e){
+                System.out.println("(MatrixGraph.constructor) "
+                        + " MatrixGraph readGraph in xml failed:"
+                        + " "+filePath);
+                return;
+            }
+        else if(isHeader)
             try{
                 readGraphWithHeader(filePath);
             }catch(IOException e){
@@ -51,6 +65,7 @@ public class MatrixGraph extends Graph2 {
                         + " MatrixBipartiteGraph readGraph failed:"
                         +" "+filePath);
             }
+        
         /* Init the distance matrix. */
         distances = new float[vertices.size()][vertices.size()];
         for(int i=0;i<vertices.size();i++)
@@ -503,14 +518,80 @@ public class MatrixGraph extends Graph2 {
     }
     
     
+    
+    public final void readXmlGraph(String filePath) throws IOException{
+        /* Read the input file. */
+        SAXBuilder builder = new SAXBuilder();
+        Document graphInput = null;
+        try{
+            graphInput = builder.build(new File(filePath));
+        }catch(JDOMException e){
+            System.out.println("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) Document init error:  "+filePath);
+            return;
+        }
+        /* Get the root element. */
+        Element docRoot, entity;
+        try{
+            docRoot = graphInput.getRootElement();
+        }catch(IllegalStateException e){
+            System.out.println("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The input document does not have a root element.");
+            e.printStackTrace();
+            return;
+        }
+        /* 1. Anaylze the element "entity", get the name of the nodes.*/
+        /* Get the child element of "entity", throw an IllegalStateException.*/
+        entity = docRoot.getChild("entity");
+        if(entity == null) /* If no such "entity" child element is found, then throw the exception.*/
+            throw new IllegalStateException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The input document does not have an \"entity\" child element.");
+         String hasExternEntityFile = entity.getAttributeValue("externalFile");
+        /* Get the content in entity. */
+        String entityContent = entity.getContent(0).getValue().trim();
+        /* Check entityContent. It cannot be null.*/
+        if(entityContent == null)
+            throw new IllegalStateException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The content of the element entity is null.");
+        /* If there is an external file for the nodes' names, then the content of the element should be the path
+        of the external file. Otherwise, it should be the nodes' names themselves. */
+        if(hasExternEntityFile == null || hasExternEntityFile.equalsIgnoreCase("false")){
+            XmlInputParser parser = new XmlInputParser();
+            parser.parseEntityString(entityContent,this);
+        }
+        /* If the node names are stored in an external file.*/
+        else if(hasExternEntityFile.equalsIgnoreCase("true")){
+            XmlInputParser parser = new XmlInputParser();
+            parser.parseEntityFile(entityContent,this);
+        }
+        else 
+            throw new IllegalStateException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) Illegal attribute of \"externalFile\": "+hasExternEntityFile);
+        
+        //Init the matrix
+        edgeWeights = new float[vertices.size()][vertices.size()];
+        for(int i=0;i<edgeWeights.length;i++)
+            for(int j=0;j<edgeWeights[0].length;j++)
+                edgeWeights[i][j] = Float.NaN;
+        
+         /* Read the edge weights from the xml input file. */
+        ArrayList<Element> matrixElementList = new ArrayList<>(docRoot.getChildren("matrix"));
+        /* First check the number of elements in matrixElementList, if not equal to 2*setSizes.length-1. */
+        // There are 2*setSizes.length matrix, half intra-matrices, half inter-matrices.
+        if(matrixElementList.size() != 1) 
+            throw new IllegalArgumentException("(biforce.graphs.MatrixGraph.readGraphInXml) The number of matrices is wrong:  "+matrixElementList.size());
+        Element matrix = matrixElementList.get(0);
+    }
+    
+    
+    
+    
+    
     /**
      * This method reads the graph in a matrix format.
      * @param filePath
      * @throws IOException 
      */
-   
-    
-    
+
+    /**
+     * This method reads the graph in a matrix format.
+     * @throws IOException
+     */
     @Override
     public void restoreThresh() {
         /* First check if the thresh is detracted, if not then throw an exception. */
@@ -694,6 +775,33 @@ public class MatrixGraph extends Graph2 {
         }
     }
 
+     /**
+     * This method writes the resulted clusters into the filePath.
+     * @param filePath 
+     */
+    public void writeXmlClusterTo(String filePath){
+        try{
+            FileWriter fw = new FileWriter(filePath);
+            BufferedWriter bw = new BufferedWriter(fw);
+            
+            for(int i=0;i<clusters.size();i++){
+                writeSingleCluster(bw, clusters.get(i));
+            }
+            bw.flush();
+            bw.close();
+            fw.close();
+            
+        }catch(IOException e){
+            System.err.println("(MatrixGraph.writeXmlClusterTo) Cluster writing error.");
+            e.printStackTrace();
+            return;
+        }
+    }
+    
+    /**
+     * This method writes a single cluster to the given path.
+     * @param filePath 
+     */
     @Override
     public void writeResultInfoTo(String filePath) {
         FileWriter fw = null;
@@ -712,10 +820,41 @@ public class MatrixGraph extends Graph2 {
                     actions.get(i).getOriginalWeight()+"\n");
         }
         }catch(IOException e){
-            System.err.println("(MatrixBiPartiteGraph2.writeResultInfoTo) Writing error.");
+            System.err.println("(MatrixGraph.writeResultInfoTo) Writing error.");
             return;
         }
     }
+    
+    
+    /**
+     * This method writes a single cluster using the given BufferedWriter
+     * @param bw 
+     * @param cluster 
+     */
+    public void writeSingleCluster(BufferedWriter bw, Cluster2 cluster){
+        ArrayList<Vertex2> clusterVertices = cluster.getVertices();
+        // For test
+        if(clusterVertices.isEmpty()){
+            System.out.println("Empty cluster");
+            return;
+        }
+        try{
+        bw.write("<cluster  "+clusterVertices.get(0).getClustNum()+">\n");
+        /* We output the cluster in separated sets. */
+        
+        for(int j=0;j<clusterVertices.size();j++)
+                bw.write(clusterVertices.get(j).getValue()+"\t");
+            
+        bw.write("\n");
+        bw.flush();
+        bw.write("</cluster>\n");
+        }catch(IOException e){
+            System.err.println("(MatrixHierGeneralGraph.writeSingleCluster) Single cluster output error.");
+            e.printStackTrace();
+            return;
+        }
+    }
+    
     
     public void writerInterEwMatrix(String outFile, int idx){
         
