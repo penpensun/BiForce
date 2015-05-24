@@ -151,7 +151,7 @@ public class Main3 {
                 inputGraph = new MatrixHierGeneralGraph(graphIn,isHeader,isInXmlFile);
                 break;
             case 4: /* General graph. */
-                inputGraph = new MatrixGraph(graphIn,isHeader);
+                inputGraph = new MatrixGraph(graphIn,isHeader, isInXmlFile);
                 break;
             case 5: /* General npartite graph. */
                 inputGraph = new MatrixGeneralNpartiteGraph(graphIn, isHeader, isInXmlFile);
