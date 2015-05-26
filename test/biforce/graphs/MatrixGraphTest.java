@@ -212,7 +212,7 @@ public class MatrixGraphTest {
     public void testReadGraph() throws Exception {
         System.out.println("(MatrixGraph.testReadGraph) Test starts.");
         
-        MatrixGraph instance = new MatrixGraph(testReadGraphInput,false);
+        MatrixGraph instance = new MatrixGraph(testReadGraphInput,false,false);
         /* Check the number of vertices. */
         assertEquals(5,instance.vertexCount());
         /* Create reference vertices. */
@@ -262,7 +262,7 @@ public class MatrixGraphTest {
     public void testReadGraphWtihHeader(){
         System.out.println("(MatrixGraph.testReadGraphWithHeader) Test starts.");
         
-        MatrixGraph instance = new MatrixGraph(testReadGraphInput,false);
+        MatrixGraph instance = new MatrixGraph(testReadGraphInput,false,false);
         /* Check the number of vertices. */
         assertEquals(5,instance.vertexCount());
         /* Create reference vertices. */

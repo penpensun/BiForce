@@ -38,8 +38,12 @@ public class MatrixGraph extends Graph2 {
      * Constructor.
      * @param filePath
      * @param isHeader 
+     * @param isXmlFile 
      */
     public MatrixGraph(String filePath, boolean isHeader, boolean isXmlFile){
+        vertices= new ArrayList<>();
+        actions =new ArrayList<>();
+        clusters = new ArrayList<>();
         if(isXmlFile)
             try{
                 readXmlGraph(filePath);
@@ -576,11 +580,20 @@ public class MatrixGraph extends Graph2 {
         if(matrixElementList.size() != 1) 
             throw new IllegalArgumentException("(biforce.graphs.MatrixGraph.readGraphInXml) The number of matrices is wrong:  "+matrixElementList.size());
         Element matrix = matrixElementList.get(0);
+        String matrixContent = matrix.getContent(0).getValue().trim();
+        String hasExternMatrixFile = matrix.getAttributeValue("externalFile");
+                if(hasExternMatrixFile == null || hasExternMatrixFile.equalsIgnoreCase("false")){
+                    XmlInputParser parser = new XmlInputParser();
+                    parser.parseMatrixString(matrixContent, this);
+                }
+                /* If the node names are stored in an external file.*/
+                else if(hasExternMatrixFile.equalsIgnoreCase("true")){
+                    XmlInputParser parser = new XmlInputParser();
+                    parser.parseMatrixFile(matrixContent,this);
+                }
+                else
+                    throw new IllegalStateException("(biforce.graphs.MatrixGraph.readGraphInXml) Illegal attribute of \"externalFile\": "+hasExternMatrixFile);
     }
-    
-    
-    
-    
     
     /**
      * This method reads the graph in a matrix format.
@@ -749,6 +762,15 @@ public class MatrixGraph extends Graph2 {
 
     @Override
     public void writeClusterTo(String filePath, boolean isXmlFile) {
+        if(isXmlFile){
+            writeXmlClusterTo(filePath);
+        }
+        else
+            writePlainClusterTo(filePath);
+    }
+    
+    
+    public void writePlainClusterTo(String filePath){
         FileWriter fw =null;
         BufferedWriter bw = null;
         try{
