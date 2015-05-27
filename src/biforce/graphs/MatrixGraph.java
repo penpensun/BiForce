@@ -820,6 +820,60 @@ public class MatrixGraph extends Graph2 {
         }
     }
     
+    
+    /**
+     * This method writes the indices of the vertices in each cluster to the given filePath.
+     * @param filePath 
+     */
+    public void writeXmlClusterWithIndexTo(String filePath){
+        try{
+            FileWriter fw = new FileWriter(filePath);
+            BufferedWriter bw = new BufferedWriter(fw);
+            
+            for(int i=0;i<clusters.size();i++){
+                writeSingleClusterWithIndexTo(bw, clusters.get(i));
+            }
+            bw.flush();
+            bw.close();
+            fw.close();
+            
+        }catch(IOException e){
+            System.err.println("(MatrixGraph.writeXmlClusterTo) Cluster writing error.");
+            e.printStackTrace();
+            return;
+        }
+    }
+    
+    
+    /**
+     * This method write 
+     * @param bw
+     * @param cluster 
+     */
+    public void writeSingleClusterWithIndexTo(BufferedWriter bw, Cluster2 cluster){
+         ArrayList<Vertex2> clusterVertices = cluster.getVertices();
+        // For test
+        if(clusterVertices.isEmpty()){
+            System.out.println("Empty cluster");
+            return;
+        }
+        try{
+        bw.write("<cluster  "+clusterVertices.get(0).getClustNum()+">\n");
+        /* We output the cluster in separated sets. */
+        
+        for(int j=0;j<clusterVertices.size();j++)
+                bw.write(clusterVertices.get(j).getVtxIdx()+"\t");
+            
+        bw.write("\n");
+        bw.flush();
+        bw.write("</cluster>\n");
+        }catch(IOException e){
+            System.err.println("(MatrixHierGeneralGraph.writeSingleCluster) Single cluster output error.");
+            e.printStackTrace();
+            return;
+        }
+    }
+    
     /**
      * This method writes a single cluster to the given path.
      * @param filePath 

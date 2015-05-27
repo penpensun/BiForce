@@ -180,6 +180,7 @@ public class Main3 {
         if(editingOut != null)
             inputGraph.writeResultInfoTo(editingOut);
         System.out.println("The editing information is written to:  "+editingOut);
+        ((MatrixGraph)inputGraph).writeXmlClusterWithIndexTo("../../nforce_output/ver7/disease/disease_index.txt");
     }
     
     /**
@@ -248,7 +249,7 @@ public class Main3 {
      * @param isHeader
      * @param isInXmlFile
      * @param isOutXmlFile
-     * @param p
+     * @param paramFile
      * @param slType
      * @param isMultipleThresh 
      */
@@ -341,8 +342,8 @@ public class Main3 {
         if(editingOut != null)
             inputGraph.writeResultInfoTo(editingOut);
         System.out.println("The editing information is written to:  "+editingOut);
+        
+        System.out.println("The index information output.");
+        
     }
-    
-    
-    
 }
