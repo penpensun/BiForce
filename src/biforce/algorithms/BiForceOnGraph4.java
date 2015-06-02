@@ -724,7 +724,7 @@ public class BiForceOnGraph4 {
                 
             graph.updatePos(displace(graph,p,i));
             graph.updateDist();
-            if(i % 5==0)
+            if(i % 20==0)
                 System.out.println("Iteration: "+i);
         }
         System.out.println("Displacement completed.");

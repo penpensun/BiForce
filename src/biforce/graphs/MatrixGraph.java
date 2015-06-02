@@ -823,15 +823,16 @@ public class MatrixGraph extends Graph2 {
     
     /**
      * This method writes the indices of the vertices in each cluster to the given filePath.
+     * This method is designed for drug-repositioning project.
      * @param filePath 
      */
-    public void writeXmlClusterWithIndexTo(String filePath){
+    public void writeXmlPreClusterIndexMapping(String filePath){
         try{
             FileWriter fw = new FileWriter(filePath);
             BufferedWriter bw = new BufferedWriter(fw);
             
             for(int i=0;i<clusters.size();i++){
-                writeSingleClusterWithIndexTo(bw, clusters.get(i));
+                writeSingleClusterIndexMapping(bw, clusters.get(i));
             }
             bw.flush();
             bw.close();
@@ -844,13 +845,30 @@ public class MatrixGraph extends Graph2 {
         }
     }
     
+    /**
+     * This method writes the vertex -- precluster mapping to the given file path.
+     * This method is designe d for drug repositioning.
+     * @param filePath 
+     */
+    public final void writeVertexPreClusterMapping(String filePath, String clusterPrefix){
+        try{
+            FileWriter fw = new FileWriter(filePath);
+            BufferedWriter bw = new BufferedWriter(fw);
+            for(int i=0;i<clusters.size();i++){
+                writeVertexSingleClusterMapping(bw,clusters.get(i),clusterPrefix);
+            }
+        }catch(IOException e){
+            System.err.println("(MatrixGraph.writeVertexPreClusterMapping) vertex -- precluster mapping output error.");
+        }
+    }
+    
     
     /**
      * This method write 
      * @param bw
      * @param cluster 
      */
-    public void writeSingleClusterWithIndexTo(BufferedWriter bw, Cluster2 cluster){
+    public void writeSingleClusterIndexMapping(BufferedWriter bw, Cluster2 cluster){
          ArrayList<Vertex2> clusterVertices = cluster.getVertices();
         // For test
         if(clusterVertices.isEmpty()){
@@ -868,12 +886,38 @@ public class MatrixGraph extends Graph2 {
         bw.flush();
         bw.write("</cluster>\n");
         }catch(IOException e){
-            System.err.println("(MatrixHierGeneralGraph.writeSingleCluster) Single cluster output error.");
+            System.err.println("(MatrixGraph.writeSingleClusterIndexMapping) Single cluster output error.");
             e.printStackTrace();
             return;
         }
     }
     
+    
+    /**
+     * This method writes the mapping from vertex to a single cluster for the given cluster,
+     * using the given BufferedWriter.
+     * @param bw
+     * @param cluster
+     * @param clusterPrefix 
+     */
+    public void writeVertexSingleClusterMapping(BufferedWriter bw, Cluster2 cluster, String clusterPrefix){
+        ArrayList<Vertex2> clusterVertices = cluster.getVertices();
+        if(clusterVertices.isEmpty()){
+            System.out.println("Empty cluster");
+            return;
+        }
+        try{
+            for(Vertex2 vtx: clusterVertices){
+                bw.write(vtx.getValue()+"\t"+new StringBuilder(clusterPrefix).append(cluster.getClustIdx())+"\n");
+            }
+            bw.flush();
+        }catch(IOException e){
+            System.err.println("(MatrixGraph.writeVertexSingleClusterMapping) Output error.");
+            e.printStackTrace();
+            return;
+        }
+            
+    }
     /**
      * This method writes a single cluster to the given path.
      * @param filePath 

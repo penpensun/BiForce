@@ -935,8 +935,9 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
         ArrayList<Element> matrixElementList = new ArrayList<>(docRoot.getChildren("matrix"));
         /* First check the number of elements in matrixElementList, if not equal to 2*setSizes.length-1. */
         // There are 2*setSizes.length matrix, half intra-matrices, half inter-matrices.
-        if(matrixElementList.size() != 2*setSizes.length) 
-            throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The number of matrices is wrong:  "+matrixElementList.size());
+        // No check of the number of the matrices anymore 2015.06.01
+        //if(matrixElementList.size() != 2*setSizes.length) 
+          //  throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The number of matrices is wrong:  "+matrixElementList.size());
         
         /* 2. Assign the edge weights. */
         for(Element matrix: matrixElementList){
