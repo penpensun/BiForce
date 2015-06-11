@@ -82,8 +82,17 @@ public class MatrixGraph extends Graph2 {
      * @param isHeader
      * @param thresh 
      */
-    public MatrixGraph(String filePath, boolean isHeader, float thresh){
-        if(isHeader)
+    public MatrixGraph(String filePath, boolean isHeader, boolean isXmlFile, float thresh){
+        if(isXmlFile)
+            try{
+                readXmlGraph(filePath);
+            }catch(IOException e){
+                System.out.println("(MatrixGraph.constructor) "
+                        + " MatrixGraph readGraph in xml failed:"
+                        + " "+filePath);
+                return;
+            }
+        else if(isHeader)
             try{
                 readGraphWithHeader(filePath);
             }catch(IOException e){
@@ -863,6 +872,8 @@ public class MatrixGraph extends Graph2 {
     }
     
     
+    
+    
     /**
      * This method write 
      * @param bw
@@ -908,7 +919,7 @@ public class MatrixGraph extends Graph2 {
         }
         try{
             for(Vertex2 vtx: clusterVertices){
-                bw.write(vtx.getValue()+"\t"+new StringBuilder(clusterPrefix).append(cluster.getClustIdx())+"\n");
+                bw.write(vtx.getValue()+"\t"+new StringBuilder(clusterPrefix).append("_").append(cluster.getClustIdx())+"\n");
             }
             bw.flush();
         }catch(IOException e){

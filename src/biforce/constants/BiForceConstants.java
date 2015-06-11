@@ -12,10 +12,10 @@ package biforce.constants;
  */
 public class BiForceConstants {
     //The constants of a permenant and a forbidden edge.
-    public static final float PERMENANT = Float.MAX_VALUE;
-    public static final float FORBIDDEN = -Float.MAX_VALUE; 
+    public static final float PERMENANT = Float.POSITIVE_INFINITY;
+    public static final float FORBIDDEN = Float.NEGATIVE_INFINITY; 
     /* The edge weights of all non-defined edges. */
-    public static final float NON_DEF_EDGE = -Float.NaN;
+    public static final float NON_DEF_EDGE = Float.NaN;
     
     
    

@@ -175,6 +175,49 @@ public class Main3 {
         System.out.println("The editing information is written to:  "+editingOut);
     }
     
+    public static MatrixGeneralNpartiteGraph runDrugRepos(float thresh,
+            float[] threshArray,
+            String graphIn,
+            String paramFile,
+            String editingOutput,
+            boolean isMultipleThresh
+            ){
+        Param p = new Param(paramFile);
+        p.setThresh(thresh);
+        p.setThreshArray(threshArray);
+        if(isMultipleThresh && p.getThreshArray() == null)
+            throw new IllegalArgumentException("(runGraph) Multiple thresh array is null. ");
+        if(!isMultipleThresh && Float.isNaN(p.getThresh()))
+            throw new IllegalArgumentException("(runGraph) The threshold must be a number.");
+        if(p.getLowerth()<0)
+            throw new IllegalArgumentException("(runGraph) The lower-bound of the threshold cannot be smaller than 0.");
+        if(p.getUpperth() <0)
+            throw new IllegalArgumentException("(runGraph) The upper-bound of the threshold cannot be smaller than 0.");
+        if(p.getStep()<0)
+            throw new IllegalArgumentException("(runGraph) The step of the threshold cannot be smaller than 0.");
+        if(graphIn == null)
+            throw new IllegalArgumentException("(runGraph) The input graph cannot be null.");
+        /* Check if the file can be openend. */
+        FileReader fr = null;
+        FileWriter fw = null;
+        try{
+        fr = new FileReader(graphIn);
+        }catch(IOException e){
+            System.err.println("(runGraph) The input graph cannot be read. ");
+            return null;
+        }
+        
+        Graph2 inputGraph = new MatrixGeneralNpartiteGraph(graphIn,false, true); // With no header, with xml input.
+        // Run nforce
+        BiForceOnGraph4 algorithm = new BiForceOnGraph4();
+        try{
+            inputGraph = algorithm.run(inputGraph, p, 1, isMultipleThresh);
+        }catch(IOException e){
+            System.err.println("(runGraphDrugReposPreClust) Algorithm running error.");
+        }
+        inputGraph.writeResultInfoTo(editingOutput);
+        return (MatrixGeneralNpartiteGraph)inputGraph;
+    }
     
     
     /**
@@ -189,9 +232,12 @@ public class Main3 {
      * @param slType
      * @param indexMappingOut
      * @param vertexMappingOut
+     * @param assocOut
+     * @param clusterPrefix
      * @param isMultipleThresh 
+     * @return  
      */
-    public static void runGraphDrugReposPreClust(float thresh,
+    public static MatrixGraph runGraphDrugReposPreClust(float thresh,
             float[] threshArray,
             String graphIn,
             String clusterOut,
@@ -220,6 +266,12 @@ public class Main3 {
             throw new IllegalArgumentException("(runGraph) The graph output cannotbe null.");
         if(slType != 1 && slType != 2)
             throw new IllegalArgumentException("(runGraph) The type of single linkage clustering error:  "+slType);
+        
+        if(vertexMappingOut == null)
+            throw new IllegalArgumentException("(runGraphDrugReposPreCluster) Vertex mapping output is null.");
+        if(indexMappingOut == null)
+            throw new IllegalArgumentException("(runGraphDrugReposPreCluster) Index mapping output is null.");
+        
         /* Check if the file can be openend. */
         FileReader fr = null;
         FileWriter fw = null;
@@ -227,13 +279,27 @@ public class Main3 {
         fr = new FileReader(graphIn);
         }catch(IOException e){
             System.err.println("(runGraph) The input graph cannot be read. ");
-            return;
+            return null;
         }
         try{
             fw = new FileWriter(clusterOut);
         }catch(IOException e){
             System.err.println("(runGraph) The cluster output file writing error. ");
         }
+        
+        try{
+            fw = new FileWriter(vertexMappingOut);
+        }catch(IOException e){
+            System.err.println("(runGraph) The ver mapping output file writing error:  "+vertexMappingOut);
+        }
+        
+        try{
+            fw = new FileWriter(indexMappingOut);
+        }catch(IOException e){
+            System.err.println("(runGraphDrugReposPreClust) Index mapping output file error:  "+indexMappingOut);
+        }
+        
+        
         Graph2 inputGraph = new MatrixGraph(graphIn,false, true); // With no header, with xml input.
         // Run nforce
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
@@ -252,7 +318,7 @@ public class Main3 {
         mg.writeVertexPreClusterMapping(vertexMappingOut,clusterPrefix);
         System.out.println("The vertex -- precluster mapping is written to:  "+vertexMappingOut);
         
-        
+        return mg;
     }
     /**
      * This method runs the algorithm on different types of graphs. 

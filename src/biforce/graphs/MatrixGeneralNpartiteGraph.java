@@ -1097,10 +1097,14 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             throw new IllegalArgumentException("(MatrixBipartitGraph2.takeAction) Wrong action index: "+
                     idx);
         Action2 act = actions.get(idx);
-        if(act.getOriginalWeight()>0)
+        if(act.getOriginalWeight()>0){
             setEdgeWeight(act.getVtx1(),act.getVtx2(),BiForceConstants.FORBIDDEN);
-        else
+            //System.out.println("Forbidden");
+        }
+        else{
             setEdgeWeight(act.getVtx1(),act.getVtx2(),BiForceConstants.PERMENANT);
+            //System.out.println("Permenant");
+        }
         return true;
     }
 

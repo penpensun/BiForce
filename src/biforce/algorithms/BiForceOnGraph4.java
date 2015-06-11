@@ -551,123 +551,6 @@ public class BiForceOnGraph4 {
         }
     }
     
-    /**
-     * Kmeans for chain clustering.
-     * @param input
-     * @param k
-     * @param p 
-     */
-    private void kmeansClustChain(Graph2 input, int k, Param p){
-        /* Init the cluster number of the vertices. */
-        for(Vertex2 vtx: input.getVertices())
-            vtx.setClustNum(-1);
-        /* Randomly choose k points as k centroids. */
-        ArrayList<Integer> vtxIndexes = new ArrayList<>();
-        /* Init the coords array for centroids. */
-        float[][] centroids = new float[k][p.getDim()];
-        /* Create an array to record the sizes of all clusters. */
-        int[] clusterSizes = new int[k];
-        for(int i=0;i<clusterSizes.length;i++){
-            clusterSizes[i] = 0;
-        }
-        /* Init the coordinates of centroids. */
-        for (float[] cen : centroids){
-            for (int j = 0; j<p.getDim(); j++){
-                cen[j] = -1;
-            }
-        }
-        /* Randomly pick up k nodes as the initial k centroids. */
-        for(int i=0;i<input.vertexCount();i++){
-            vtxIndexes.add(i);
-        }
-        vtxIndexes.trimToSize();
-
-        for(int i =0 ;i<k;i++){
-            int idx = (int)(Math.random()*vtxIndexes.size());
-            /* Create the coordinate array, and copy the coordinates*/
-            System.arraycopy(input.getVertices().get(i).getCoords(), 0, 
-                    centroids[i], 0, p.getDim());
-            vtxIndexes.remove(idx);    
-        }
-        
-        boolean isConverged = false;
-        while(!isConverged){
-            isConverged = true;
-            /* Assign the points to closest centroid. */
-            for(Vertex2 vtx:input.getVertices()){
-                if(vtx.getVtxSet() != 0)
-                    continue;
-                float minDist = Float.MAX_VALUE;
-                int closestCentroidIdx = -1;
-                for(int i=0;i<centroids.length;i++){
-                    float dist = euclidDist(vtx,centroids[i],p);
-                    if(dist<minDist){
-                        minDist = dist;
-                        closestCentroidIdx = i;
-                    }
-                }
-                
-                /* Check the validity of closestCentroidIdx, minDist. */
-                if(closestCentroidIdx == -1)
-                    throw new IllegalArgumentException("(BiForceOnGraph4 kmeansClust) "
-                            + "Nearest centroid idx cannot be -1:  "+vtx.getValue());
-               /* Check if any change is made. */ 
-               if(vtx.getClustNum() != closestCentroidIdx)
-                   isConverged = false;
-               vtx.setClustNum(closestCentroidIdx);
-               clusterSizes[closestCentroidIdx]++;
-            }
-            
-            /* After assigning clusters, 
-             * re-compute the coordinates for centroids. */
-            for(int i=0;i<centroids.length;i++){
-                /* Jump over the clusters with no points in it. */
-                if(clusterSizes[i] == 0)
-                    continue;
-                /* For the cluster with point(s), 
-                 * re-initialize the coordinates of centroids. */
-                for(int j=0;j<p.getDim();j++)
-                    centroids[i][j] = 0;
-            }
-            /* Re-compute the coordinates for centroids. */
-            /* First compute addition. */
-            for(Vertex2 vtx:input.getVertices()){
-                if(vtx.getVtxSet() != 0 )
-                    continue; // Added for chain clustering.
-                for(int i=0;i<p.getDim();i++)
-                    centroids[vtx.getClustNum()][i] += vtx.getCoords()[i];
-            }
-            /* Second compute the average. */
-            for(int i=0;i<centroids.length;i++){
-                /*If no points in this cluster then we do nothing. */
-                if(clusterSizes[i] == 0){}
-                else{
-                    for(int j=0;j<p.getDim();j++)
-                        centroids[i][j]/=clusterSizes[i];
-                }
-            }
-        }
-        
-        /* Finally, check if there's any point unassigned. */
-        for(Vertex2 vtx:input.getVertices()){
-            if(vtx.getVtxSet() != 0) // For vertices only in set 0.
-                continue;
-            if(vtx.getClustNum() == -1)
-                throw new IllegalArgumentException("Not all points are assigned with clusters");
-        }
-        
-        /* Chain clustering. */
-        // Assign the clust num to the vertices in other sets.
-        for(int i=1;i<input.vertexSetCount();i++){
-            ArrayList<Vertex2> vertices = input.getVertices();
-            for(Vertex2 vtx: vertices){
-                if(vtx.getVtxSet() != i)
-                    continue;
-                vtx.setClustNum(getNearestClustNum(input,vtx));
-            }
-        }
-    }
-    
     
     /**
      * This is the main entrance of the algorithm, it runs Bi-Force on a given 
@@ -741,33 +624,20 @@ public class BiForceOnGraph4 {
         System.out.println("Start single-linkage partitioning.");
         int[] slClusters = new int[graph.getVertices().size()];
         // Normal sl clustering
-        if(clType == 1){
-                for(float i = p.getLowerth(); i<= p.getUpperth();i+= p.getStep()){
-                singleLinkageClust(graph,i);
-                costAti = computeCost(graph);
-                if(costAti< minCostSL){
-                    minCostSL = costAti;
-                    minCostThresh = i;
-                    //record the cluster assignment
-                    for(int j=0;j<graph.getVertices().size();j++)
-                        slClusters[j] = graph.getVertices().get(j).getClustNum(); 
-                }
+        
+        for(float i = p.getLowerth(); i<= p.getUpperth();i+= p.getStep()){
+        singleLinkageClust(graph,i);
+        costAti = computeCost(graph);
+        if(costAti< minCostSL){
+            minCostSL = costAti;
+            minCostThresh = i;
+            //record the cluster assignment
+            for(int j=0;j<graph.getVertices().size();j++)
+                slClusters[j] = graph.getVertices().get(j).getClustNum(); 
             }
         }
-        // Chain sl clustering
-        else if(clType ==2){
-                for(float i = p.getLowerth(); i<= p.getUpperth();i+= p.getStep()){
-                singleLinkageClustChain2(graph,i);
-                costAti = computeCostChain(graph);
-                if(costAti< minCostSL){
-                    minCostSL = costAti;
-                    minCostThresh = i;
-                    //record the cluster assignment
-                    for(int j=0;j<graph.getVertices().size();j++)
-                        slClusters[j] = graph.getVertices().get(j).getClustNum(); 
-                }
-            }
-        }
+        
+        
         
         float minCostKmeans = Float.MAX_VALUE;
         int minK = 0;
@@ -775,89 +645,48 @@ public class BiForceOnGraph4 {
         int[] kmeansClusters = new int[graph.getVertices().size()];
         System.out.println("Start k-mean partitioning.");
         //in case the initial k=2 is larger than or equal to VertexList.size()/3
-        if(clType ==1 ){ // Non-chain clusteirng
-            if(graph.getVertices().size() < 9){
-                for(int k=2;k<=4;k++){
-                    kmeansClust(graph,k,p);
-                    costAtk = computeCost(graph);
-                    if(minCostKmeans == -1 || costAtk < minCostKmeans){
-                        minCostKmeans = costAtk;
-                        minK = k;
-                        //record the cluster assignment 
-                        for(int i=0;i<graph.getVertices().size();i++)
-                            kmeansClusters[i] = graph.getVertices().get(i).getClustNum();
-                    }
-                }
-            }
-            else if(graph.getVertices().size()<200){
-                for(int k=2;k<graph.getVertices().size()/4;k++){
-                    kmeansClust(graph,k,p);
-                    costAtk = computeCost(graph);
-                    if(minCostKmeans == -1 || costAtk < minCostKmeans){
-                        minCostKmeans = costAtk;
-                        minK = k;
-                        //record the cluster assignment 
-                        for(int i=0;i<graph.getVertices().size();i++)
-                            kmeansClusters[i] = graph.getVertices().get(i).getClustNum();
-                    }
-                }
-            }
-            else{
-                 for(int k=2;k<20;k++){
-                    kmeansClust(graph,k,p);
-                    costAtk = computeCost(graph);
-                    if(minCostKmeans == -1 || costAtk < minCostKmeans){
-                        minCostKmeans = costAtk;
-                        minK = k;
-                        //record the cluster assignment 
-                        for(int i=0;i<graph.getVertices().size();i++)
-                            kmeansClusters[i] = graph.getVertices().get(i).getClustNum();
-                    }
-                }
-            }
-        }
-        /* If the clType ==2, we do kmeans chain clusteirng. */
-        else if(clType == 2){
-            if(graph.getVertices().size() < 9){
+
+        if(graph.getVertices().size() < 9){
             for(int k=2;k<=4;k++){
-                kmeansClustChain(graph,k,p);
-                costAtk = computeCostChain(graph);
+                kmeansClust(graph,k,p);
+                costAtk = computeCost(graph);
                 if(minCostKmeans == -1 || costAtk < minCostKmeans){
                     minCostKmeans = costAtk;
                     minK = k;
                     //record the cluster assignment 
                     for(int i=0;i<graph.getVertices().size();i++)
                         kmeansClusters[i] = graph.getVertices().get(i).getClustNum();
-                    }
-                }
-            }
-            else if(graph.getVertices().size()<200){
-                for(int k=2;k<graph.getVertices().size()/4;k++){
-                    kmeansClustChain(graph,k,p);
-                    costAtk = computeCostChain(graph);
-                    if(minCostKmeans == -1 || costAtk < minCostKmeans){
-                        minCostKmeans = costAtk;
-                        minK = k;
-                        //record the cluster assignment 
-                        for(int i=0;i<graph.getVertices().size();i++)
-                            kmeansClusters[i] = graph.getVertices().get(i).getClustNum();
-                    }
-                }
-            }
-            else{
-                 for(int k=2;k<20;k++){
-                    kmeansClustChain(graph,k,p);
-                    costAtk = computeCostChain(graph);
-                    if(minCostKmeans == -1 || costAtk < minCostKmeans){
-                        minCostKmeans = costAtk;
-                        minK = k;
-                        //record the cluster assignment 
-                        for(int i=0;i<graph.getVertices().size();i++)
-                            kmeansClusters[i] = graph.getVertices().get(i).getClustNum();
-                    }
                 }
             }
         }
+        else if(graph.getVertices().size()<200){
+            for(int k=2;k<graph.getVertices().size()/4;k++){
+                kmeansClust(graph,k,p);
+                costAtk = computeCost(graph);
+                if(minCostKmeans == -1 || costAtk < minCostKmeans){
+                    minCostKmeans = costAtk;
+                    minK = k;
+                    //record the cluster assignment 
+                    for(int i=0;i<graph.getVertices().size();i++)
+                        kmeansClusters[i] = graph.getVertices().get(i).getClustNum();
+                }
+            }
+        }
+        else{
+             for(int k=2;k<20;k++){
+                kmeansClust(graph,k,p);
+                costAtk = computeCost(graph);
+                if(minCostKmeans == -1 || costAtk < minCostKmeans){
+                    minCostKmeans = costAtk;
+                    minK = k;
+                    //record the cluster assignment 
+                    for(int i=0;i<graph.getVertices().size();i++)
+                        kmeansClusters[i] = graph.getVertices().get(i).getClustNum();
+                }
+            }
+        }
+
+        
         // Check whether single linkage or kmeans give the better result
         if(minCostKmeans <= minCostSL){
             System.out.println("K means is better.");
@@ -872,11 +701,9 @@ public class BiForceOnGraph4 {
             for(int i=0;i<graph.getVertices().size();i++)
                 graph.getVertices().get(i).setClustNum(slClusters[i]);
         }
-        // If chain-clustering, then we need to assign clusters before chainClustering and chain assigning
-        if(clType == 1)
-            assignClusters(graph);
-        else if(clType ==2 )
-            assignClustersChainBeforePostPro(graph);
+        //Assign the clusters
+        assignClusters(graph);
+        
         // For test.
         graph.writeClusterTo("./clusters_before_post.txt", true);
         System.out.println("Partitioning completed.");
@@ -891,12 +718,7 @@ public class BiForceOnGraph4 {
         // For test
         graph.writeClusterTo("./clusters_after_post.txt", true);
         
-        // If we are doing a chain clustering, then we do chain assigning. 
-        if(clType ==2){
-            chainClust(graph);
-            // Assign the clusters
-            assignClusters(graph);
-        }
+        
         System.out.println("Assigning actions.");
         // Assign actions based on the current clusters
         assignActions(graph);
@@ -977,136 +799,6 @@ public class BiForceOnGraph4 {
                 }
             }
         }while(next);
-    }
-    /**
-     * This method performs single-linkage clustering with certain constraint.
-     * Every time we perform single-linkage cluster, we start with a "chain" that
-     * contains one node from each level, if any unassigned node left.
-     * @param graph
-     * @param distThresh 
-     */
-    private void singleLinkageClustChain(Graph2 graph, float distThresh){
-        // For test
-        try{
-            FileWriter fw =new FileWriter("./test_sl_clusters.txt",true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write("##############\t"+distThresh+"\n");
-            bw.flush();
-            bw.close();
-            fw.close();
-        }catch(IOException e){
-            System.err.println("(BiForceOnGraph4.singleLinageClust) File writer init error.");
-            return;
-        }
-        //init all the clust num to be -1
-        for(Vertex2 vtx:graph.getVertices())
-            vtx.setClustNum(-1);
-        int currentClustIdx = 0;
-        Vertex2 noClustVtx;
-        
-        while((noClustVtx = getFirstUnassignedChain(graph,currentClustIdx))!= null){
-            
-            //check if all the vertex are assigned with some cluster number
-            ArrayList<Vertex2> forTest = new ArrayList<>();
-            forTest.add(noClustVtx); // For test.
-            //check if all the vertex are assigned with some cluster number
-            Stack<Vertex2> verticesToVisit = new Stack<>();
-            verticesToVisit.add(noClustVtx);
-            while(!verticesToVisit.isEmpty()){
-                Vertex2 seed = verticesToVisit.pop();
-                /* For all the other unassigned vertices in the VertexList. */
-                for(Vertex2 vtx: graph.getVertices()){
-                    if(vtx.getClustNum() != -1)
-                        continue;
-
-                    if( graph.dist(vtx,seed) < distThresh){
-                        vtx.setClustNum(currentClustIdx);
-                        verticesToVisit.add(vtx);
-                        forTest.add(vtx); // For test.
-                    }
-                }
-            }
-            testWriteSlClusters(forTest,currentClustIdx,"./test_sl_clusters.txt");
-            forTest.clear();
-            /* Increase the cluster number by 1. */
-            currentClustIdx++;
-        }
-    }
-    
-    /**
-     * This is the "chain" version of single linkage clustering.
-     * Step 1. Cluster set 0 
-     * Step 2. post-processing
-     * Step 3. knn assigning to other vertices.
-     * @param graph
-     * @param distThresh 
-     */
-    private void singleLinkageClustChain2(Graph2 graph, float distThresh){
-        // For test
-        try{
-            FileWriter fw =new FileWriter("./test_sl_clusters.txt",true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write("##############\t"+distThresh+"\n");
-            bw.flush();
-            bw.close();
-            fw.close();
-        }catch(IOException e){
-            System.err.println("(BiForceOnGraph4.singleLinageClust) File writer init error.");
-            return;
-        }
-        //init all the clust num to be -1
-        for(Vertex2 vtx:graph.getVertices())
-            vtx.setClustNum(-1);
-        int currentClustIdx = 0;
-        Vertex2 noClustVtx;
-        
-        // First cluster the first set. 
-        while((noClustVtx = getFirstUnassignedChain2(graph,currentClustIdx))!= null){
-            //check if all the vertex are assigned with some cluster number
-            ArrayList<Vertex2> forTest = new ArrayList<>();
-            forTest.add(noClustVtx); // For test.
-            //check if all the vertex are assigned with some cluster number
-            Stack<Vertex2> verticesToVisit = new Stack<>();
-            verticesToVisit.add(noClustVtx);
-            while(!verticesToVisit.isEmpty()){
-                Vertex2 seed = verticesToVisit.pop();
-                /* For all the other unassigned vertices in the VertexList. */
-                for(Vertex2 vtx: graph.getVertices()){
-                    if(vtx.getClustNum() != -1)
-                        continue;
-
-                    if( graph.dist(vtx,seed) < distThresh && vtx.getVtxSet() == 0){
-                        vtx.setClustNum(currentClustIdx);
-                        verticesToVisit.add(vtx);
-                        forTest.add(vtx); // For test.
-                    }
-                }
-            }
-           
-            testWriteSlClusters(forTest,currentClustIdx,"./test_sl_clusters.txt");
-            forTest.clear();
-            currentClustIdx++;
-        }
-        
-    }
-    
-    
-    /**
-     * This method is used after singleLinkageClustChain2() to assing clusters to 
-     * the vertices other than the vertices in set 0.
-     * @param graph 
-     */
-    public void chainClust(Graph2 graph){
-            
-        // Assign the clust num to the vertices in other sets.
-        for(int i=1;i<graph.vertexSetCount();i++){
-            ArrayList<Vertex2> vertices = graph.getVertices();
-            for(Vertex2 vtx: vertices){
-                if(vtx.getVtxSet() != i)
-                    continue;
-                vtx.setClustNum(getNearestClustNum(graph,vtx));
-            }
-        }
     }
     
     /**
