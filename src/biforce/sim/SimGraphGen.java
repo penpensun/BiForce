@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.File;
+import java.io.*;
 /**
  * This class generates the simulated (artificial) graphs for study.
  * @author penpen926
@@ -488,9 +489,163 @@ public class SimGraphGen {
     }
     
     
-    public float generateGeneralNpartiteGraphXml(int[] setSizes,
-            String outputFile, String matrixPrefix, float mean, float stdev){
-        return 0f;
+    /**
+     * This method generates an artificial graphs for nforce algorithm on general npartite graph.
+     * The input file is formatted in the following way:
+     * Cluster1Set1Size \t Cluster2Set2Size \t Cluster3Set3Size\n
+     * Cluster2Set1Size \t Cluster2Set2Size \t Cluster3Set3Size\n
+     * ...
+     * Since we are writing the sim file for drug repos, we only need to 3 sets.
+     * @param inputFile
+     * @param xmlFile
+     * @param entityFile
+     * @param outputFile
+     * @param matrixPrefix
+     * @param mean
+     * @param stdev
+     * @return 
+     */
+    public float generateDrugReposSimXml(String inputFile,
+            String xmlFile, String entityFile, String matrixPrefix, float mean, float stdev){
+        // Read the input file.
+        FileReader fr = null;
+        BufferedReader br = null;
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        float cost = 0;
+        ArrayList<String> values0 = new ArrayList<>();
+        ArrayList<String> values1 = new ArrayList<>();
+        ArrayList<String> values2 = new ArrayList<>();
+        
+        try{
+            fr = new FileReader(inputFile);
+            br = new BufferedReader(fr);
+            String line = null;
+            
+            int clusterIdx = 0;
+            while((line = br.readLine())!= null){
+                line = line.trim();
+                if(line.isEmpty())
+                    continue;
+                String[] splits = line.split("\t");
+                int set0Size = Integer.parseInt(splits[0]);
+                int set1Size = Integer.parseInt(splits[1]);
+                int set2Size = Integer.parseInt(splits[2]);
+                
+                // Create vertices.
+                for(int i=0;i<set0Size;i++){
+                    StringBuilder builder = new StringBuilder(clusterIdx).append("_").append(0).append("_").append(values0.size());
+                    values0.add(builder.toString());
+                }
+                for(int i=0;i<set1Size;i++){
+                    StringBuilder builder = new StringBuilder(clusterIdx).append("_").append(1).append("_").append(values1.size());
+                    values1.add(builder.toString());
+                }
+                for(int i=0;i<set2Size;i++){
+                    StringBuilder builder = new StringBuilder(clusterIdx).append("_").append(2).append("_").append(values2.size());
+                    values2.add(builder.toString());
+                }
+                
+                clusterIdx++;
+            }
+            br.close();
+            fr.close();
+        }catch(IOException e){
+            System.err.println("File Reader error.");
+        }
+        
+        //Output the entity file.
+        try{
+           fw = new FileWriter(entityFile);
+           bw = new BufferedWriter(fw);
+           for(String v: values0)
+               bw.write(v+"\t");
+           bw.write("\n");
+           for(String v: values1)
+               bw.write(v+"\t");
+           bw.write("\n");
+           for(String v: values2)
+               bw.write(v+"\t");
+           bw.write("\n");
+           bw.flush();
+           fw.close();
+           bw.close();
+        }catch(IOException e){
+            System.err.println("File writing error.");
+        }
+        
+        //Generate the matrix between set1 and set2
+        float[][] matrix01 = new float[values0.size()][values1.size()];
+        float[][] matrix12 = new float[values1.size()][values2.size()];
+        float[][] matrix02 = new float[values0.size()][values2.size()];
+        
+        //Generate the values for matrix
+        cost+=createMatrix(values0,values1,matrix01, mean, stdev);
+        cost+=createMatrix(values1,values2,matrix12, mean, stdev);
+        cost+=createMatrix(values0,values2,matrix02, mean, stdev);
+        // Output the matrix.
+        writeMatrix(matrix01,matrixPrefix+"_1.txt");
+        writeMatrix(matrix12,matrixPrefix+"_2.txt");
+        writeMatrix(matrix02,matrixPrefix+"_3.txt");
+        
+        //Write xml file
+        try{
+            fw = new FileWriter(xmlFile);
+            bw = new BufferedWriter(fw);
+            bw.write("<document>\n");
+            /* Output the entity.*/
+            bw.write("<entity levels=\"3\" externalFile=\"true\">\n");
+            bw.write(entityFile+"\n");
+            bw.write("</entity>\n");
+            // Write matrix01
+            bw.write(" <matrix matrixLevel=\"0 1\" externalFile=\"true\">\n");
+            bw.write(matrixPrefix+"_1.txt\n");
+            bw.write("</matrix>\n");
+            
+            //Write matrix12
+            bw.write(" <matrix matrixLevel=\"1 2\" externalFile=\"true\">\n");
+            bw.write(matrixPrefix+"_2.txt\n");
+            bw.write("</matrix>\n");
+            
+            //Write matrix02
+            bw.write(" <matrix matrixLevel=\"0 2\" externalFile=\"true\">\n");
+            bw.write(matrixPrefix+"_3.txt\n");
+            bw.write("</matrix>\n");
+            bw.write("</document>");
+            bw.flush();
+            bw.close();
+            fw.close();
+        }catch(IOException e){
+            System.err.println("File writing error.");
+        }
+        return cost;
+    }
+    
+    public float createMatrix(ArrayList<String> values1, ArrayList<String> values2, float[][] matrix,float mean, float dev){
+        Random r = new Random();
+        float cost = 0;
+        for(int i=0;i<values1.size();i++)
+            for(int j=0;j<values2.size();j++){
+                String[] v1Info = values1.get(i).split("_");
+                String[] v2Info = values2.get(j).split("_");
+                int idx1 = Integer.parseInt(v1Info[2]);
+                int idx2 = Integer.parseInt(v2Info[2]);
+                //Check if in the same cluster
+                float ew;
+                if(v1Info[0].equals(v2Info[0])){
+                    ew = (float)r.nextGaussian()*dev+mean;
+                    if(ew<0)
+                        cost-=ew;
+                }
+                else{
+                    ew = (float)r.nextGaussian()*dev-mean;
+                    if(ew>0)
+                        cost+=ew;
+                }
+                matrix[idx1][idx2] = ew;
+            }
+        return cost;
+        
     }
     /**
      * This method generates a random matrix and writes into the given outputfile.
@@ -524,6 +679,24 @@ public class SimGraphGen {
         bw.close();
         fw.close();
         }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+    
+    
+    public void writeMatrix(float[][] matrix, String outFile){
+        try{
+            FileWriter fw= new FileWriter(outFile);
+            BufferedWriter bw = new BufferedWriter(fw);
+            for(int i=0;i<matrix.length;i++){
+                for(int j=0;j<matrix[0].length-1;j++)
+                    bw.write(matrix[i][j]+"\t");
+                bw.write(matrix[i][matrix[i].length-1]+"\n");
+            }
+            bw.close();
+            fw.close();
+        }
+        catch(IOException e){
             e.printStackTrace();
         }
     }

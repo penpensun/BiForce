@@ -8,6 +8,7 @@ import biforce.graphs.MatrixBipartiteGraph;
 import biforce.graphs.MatrixBipartiteGraph2;
 import biforce.graphs.MatrixHierNpartiteGraph;
 import biforce.graphs.MatrixHierGeneralGraph;
+import biforce.graphs.MatrixGeneralNpartiteGraph;
 import biforce.graphs.MatrixGraph;
 import biforce.sim.SimGraphGen;
 import org.junit.*;
@@ -23,6 +24,11 @@ public class BiForceOnGraph4Test {
     String testMatrixGraphInput = "../../data/testdata/unit_test/MatrixGraph/sim_run_input.txt";
     String testMatrixHierNpartiteGraphInput = "../../data/testdata/unit_test/MatrixHierNpartiteGraph/run_input.txt";
     String testMatrixHierGeneralGraphInput = "../../data/testdata/unit_test/MatrixHierGeneralGraph/run_input.txt";
+    
+    String testMatrixGeneralNpartiteGraphInput = "../../data/testdata/unit_test/MatrixGeneralNpartiteGraph/input.txt";
+    String testMatrixGeneralNpartiteGraphXml = "../../data/testdata/unit_test/MatrixGeneralNpartiteGraph/input.xml";
+    String testMatrixGeneralNpartiteGraphEntity = "../../data/testdata/unit_test/MatrixGeneralNpartiteGraph/entity.txt";
+    String testMatrixGeneralNpartiteGraphMatrixPrefix = "../../data/testdata/unit_test/MatrixGeneralNpartiteGraph/matrix";
     String paramFile = "./parameters.ini";
     SimGraphGen gen = null;
     public BiForceOnGraph4Test() {
@@ -79,7 +85,7 @@ public class BiForceOnGraph4Test {
             try{
                 Param p = Param.readParams(paramFile);
                 /* Generate a random npartiteInstance. */
-                double stdCost = gen.generatorGeneralGraph1(500, testMatrixGraphInput, 20, 10);
+                double stdCost = gen.generatorGeneralGraph1(2000, testMatrixGraphInput, 20, 10);
                 MatrixGraph graph = new MatrixGraph(testMatrixGraphInput,true,false,0);
                 BiForceOnGraph4 biforce4  =new BiForceOnGraph4();
                 biforce4.run(graph, p,1,false);
@@ -113,6 +119,7 @@ public class BiForceOnGraph4Test {
                 //assertEquals(stdCost,npartiteInstance.getCost(), stdCost*0.05);
                 MatrixBipartiteGraph2 bipartiteInstance = new MatrixBipartiteGraph2(
                         testMatrixHierNpartiteGraphInput,false,0);
+                
                 biforce4.run(bipartiteInstance,p,1,false);
                 System.out.println(" BipartiteGraph:  "+bipartiteInstance.getCost());
                 assertEquals(bipartiteInstance.getCost(),npartiteInstance.getCost(),0.5);
@@ -121,6 +128,29 @@ public class BiForceOnGraph4Test {
             }
         }
         System.out.println("(testRunOnMatrixHierNpartiteGraph) Test ends");
+    }
+    
+    
+    @Test
+    public void testRunOnMatrixGeneralNpartiteGraph(){
+        System.out.println("(testRunOnMatrixGeneralNpartiteGraph) Test starts. ");
+        try{
+            Param p = Param.readParams(paramFile);
+            float stdCost =gen.generateDrugReposSimXml(testMatrixGeneralNpartiteGraphInput, testMatrixGeneralNpartiteGraphXml, 
+                    testMatrixGeneralNpartiteGraphEntity, testMatrixGeneralNpartiteGraphMatrixPrefix, 20, 15);
+            MatrixGeneralNpartiteGraph input = new MatrixGeneralNpartiteGraph(testMatrixGeneralNpartiteGraphXml, false, true);
+            input.setThreshold(0);
+            BiForceOnGraph4 biforce4 = new BiForceOnGraph4();
+            biforce4.run(input, p, 1, false);
+            System.out.println("MatrixGeneralNpartiteGraph: "+ input.getCost());
+            System.out.println("Standard cost:  "+stdCost);
+            assertEquals(stdCost,input.getCost(),stdCost/20);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        
+        
+        System.out.println("(testRunOnMatrixGeneralNpartiteGraph) Test ends. ");
     }
     
     
