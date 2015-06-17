@@ -425,7 +425,7 @@ public class Main3 {
             throw new IllegalArgumentException("(runGraph) The graph output cannotbe null.");
         
         
-        if(slType != 1 && slType != 2)
+        if(slType != 1 && slType != 2 && slType != 3)
             throw new IllegalArgumentException("(runGraph) The type of single linkage clustering error:  "+slType);
         // Set the thresholds
         p.setThresh(thresh);
