@@ -79,8 +79,8 @@ public class BiForceOnGraph4Test {
             try{
                 Param p = Param.readParams(paramFile);
                 /* Generate a random npartiteInstance. */
-                double stdCost = gen.generatorGeneralGraph1(50, testMatrixGraphInput, 20, 15);
-                MatrixGraph graph = new MatrixGraph(testMatrixGraphInput,true,0);
+                double stdCost = gen.generatorGeneralGraph1(500, testMatrixGraphInput, 20, 10);
+                MatrixGraph graph = new MatrixGraph(testMatrixGraphInput,true,false,0);
                 BiForceOnGraph4 biforce4  =new BiForceOnGraph4();
                 biforce4.run(graph, p,1,false);
                 System.out.println(graph.getCost());
@@ -111,8 +111,6 @@ public class BiForceOnGraph4Test {
                 biforce4.run(npartiteInstance, p,1,false);
                 System.out.print("NpartiteGraph: "+ npartiteInstance.getCost());
                 //assertEquals(stdCost,npartiteInstance.getCost(), stdCost*0.05);
-                
-                
                 MatrixBipartiteGraph2 bipartiteInstance = new MatrixBipartiteGraph2(
                         testMatrixHierNpartiteGraphInput,false,0);
                 biforce4.run(bipartiteInstance,p,1,false);

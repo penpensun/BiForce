@@ -487,6 +487,11 @@ public class SimGraphGen {
         return cost;
     }
     
+    
+    public float generateGeneralNpartiteGraphXml(int[] setSizes,
+            String outputFile, String matrixPrefix, float mean, float stdev){
+        return 0f;
+    }
     /**
      * This method generates a random matrix and writes into the given outputfile.
      * @param outputFile

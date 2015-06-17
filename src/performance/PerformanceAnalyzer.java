@@ -44,6 +44,7 @@ public class PerformanceAnalyzer {
      * @param mean
      * @param dev 
      * @param outputPrefix 
+     * @param costsOutput 
      * @return  
      */
     public ArrayList<Float> graphGenerator(String type, 

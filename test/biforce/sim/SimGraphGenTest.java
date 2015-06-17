@@ -54,7 +54,7 @@ public class SimGraphGenTest {
         /* Create the graph. */
         float cost = gen.generatorGeneralGraph1(vtxNum, outputFile, mean, stdev);
         /* Read the graph. */
-        MatrixGraph testGraph = new MatrixGraph(outputFile,true,0);
+        MatrixGraph testGraph = new MatrixGraph(outputFile,true,false,0);
         /* Test the inputted graph. */
         assertEquals(20,testGraph.vertexCount());
         ArrayList<MatrixSubgraph>  connComps = new ArrayList<MatrixSubgraph>(

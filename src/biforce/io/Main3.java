@@ -24,6 +24,7 @@ public class Main3 {
         }
     }
     
+    
     public static void runGraph(int graphType,
             float thresh,
             float threshArray[],
@@ -89,14 +90,10 @@ public class Main3 {
             throw new IllegalArgumentException("(runGraph) The upper-bound of the threshold cannot be smaller than 0.");
         if(p.getStep()<0)
             throw new IllegalArgumentException("(runGraph) The step of the threshold cannot be smaller than 0.");
-        
         if(graphIn == null)
             throw new IllegalArgumentException("(runGraph) The input graph cannot be null.");
-       
         if(clusterOut==null)
             throw new IllegalArgumentException("(runGraph) The graph output cannotbe null.");
-        
-        
         if(slType != 1 && slType != 2)
             throw new IllegalArgumentException("(runGraph) The type of single linkage clustering error:  "+slType);
         // Set the thresholds
@@ -111,13 +108,11 @@ public class Main3 {
             System.err.println("(runGraph) The input graph cannot be read. ");
             return;
         }
-        
         try{
             fw = new FileWriter(clusterOut);
         }catch(IOException e){
             System.err.println("(runGraph) The cluster output file writing error. ");
         }
-        
         if(editingOut != null){
             try{
                 fw.close();
@@ -133,11 +128,9 @@ public class Main3 {
                 System.err.println("(runGrpah) The graph output file writing error.");
             }
         }
-        
         try{
             fw.close();
         }catch(IOException e){};
-        
         /* Create the graph according to different graph type. */
         Graph2 inputGraph = null;
         switch(graphType){
@@ -157,8 +150,7 @@ public class Main3 {
                 inputGraph = new MatrixGeneralNpartiteGraph(graphIn, isHeader, isInXmlFile);
                 break;
             default: 
-                throw new IllegalArgumentException("(runGraph) The given graph type is illegal.");
-                
+                throw new IllegalArgumentException("(runGraph) The given graph type is illegal.");   
         }
         /* Run the algorithm. */
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
@@ -174,7 +166,8 @@ public class Main3 {
             inputGraph.writeGraphTo(graphOut, isOutXmlFile);
         System.out.println("The resulted graph is written to:  "+graphOut);
         /* Output the cluster. */
-        inputGraph.writeClusterTo(clusterOut,isOutXmlFile);
+        if(clusterOut != null)
+            inputGraph.writeClusterTo(clusterOut,isOutXmlFile);
         System.out.println("The resulted cluster is written to:  "+clusterOut);
         /* Output the editing details. */
         if(editingOut != null)
@@ -182,6 +175,151 @@ public class Main3 {
         System.out.println("The editing information is written to:  "+editingOut);
     }
     
+    public static MatrixGeneralNpartiteGraph runDrugRepos(float thresh,
+            float[] threshArray,
+            String graphIn,
+            String paramFile,
+            String editingOutput,
+            boolean isMultipleThresh
+            ){
+        Param p = new Param(paramFile);
+        p.setThresh(thresh);
+        p.setThreshArray(threshArray);
+        if(isMultipleThresh && p.getThreshArray() == null)
+            throw new IllegalArgumentException("(runGraph) Multiple thresh array is null. ");
+        if(!isMultipleThresh && Float.isNaN(p.getThresh()))
+            throw new IllegalArgumentException("(runGraph) The threshold must be a number.");
+        if(p.getLowerth()<0)
+            throw new IllegalArgumentException("(runGraph) The lower-bound of the threshold cannot be smaller than 0.");
+        if(p.getUpperth() <0)
+            throw new IllegalArgumentException("(runGraph) The upper-bound of the threshold cannot be smaller than 0.");
+        if(p.getStep()<0)
+            throw new IllegalArgumentException("(runGraph) The step of the threshold cannot be smaller than 0.");
+        if(graphIn == null)
+            throw new IllegalArgumentException("(runGraph) The input graph cannot be null.");
+        /* Check if the file can be openend. */
+        FileReader fr = null;
+        FileWriter fw = null;
+        try{
+        fr = new FileReader(graphIn);
+        }catch(IOException e){
+            System.err.println("(runGraph) The input graph cannot be read. ");
+            return null;
+        }
+        
+        Graph2 inputGraph = new MatrixGeneralNpartiteGraph(graphIn,false, true); // With no header, with xml input.
+        // Run nforce
+        BiForceOnGraph4 algorithm = new BiForceOnGraph4();
+        try{
+            inputGraph = algorithm.run(inputGraph, p, 1, isMultipleThresh);
+        }catch(IOException e){
+            System.err.println("(runGraphDrugReposPreClust) Algorithm running error.");
+        }
+        inputGraph.writeResultInfoTo(editingOutput);
+        return (MatrixGeneralNpartiteGraph)inputGraph;
+    }
+    
+    
+    /**
+     * This method is designed for drug repositiong preclustering.
+     * In this method the vertex-- preclusters mapping, 
+     * the preclusters -- index mapping will be outputted.
+     * @param thresh
+     * @param threshArray
+     * @param graphIn
+     * @param clusterOut
+     * @param paramFile
+     * @param slType
+     * @param indexMappingOut
+     * @param vertexMappingOut
+     * @param assocOut
+     * @param clusterPrefix
+     * @param isMultipleThresh 
+     * @return  
+     */
+    public static MatrixGraph runGraphDrugReposPreClust(float thresh,
+            float[] threshArray,
+            String graphIn,
+            String clusterOut,
+            String paramFile,
+            int slType,
+            String indexMappingOut,
+            String vertexMappingOut,
+            String clusterPrefix,
+            boolean isMultipleThresh){
+        Param p = new Param(paramFile);
+        p.setThresh(thresh);
+        p.setThreshArray(threshArray);
+        if(isMultipleThresh && p.getThreshArray() == null)
+            throw new IllegalArgumentException("(runGraph) Multiple thresh array is null. ");
+        if(!isMultipleThresh && Float.isNaN(p.getThresh()))
+            throw new IllegalArgumentException("(runGraph) The threshold must be a number.");
+        if(p.getLowerth()<0)
+            throw new IllegalArgumentException("(runGraph) The lower-bound of the threshold cannot be smaller than 0.");
+        if(p.getUpperth() <0)
+            throw new IllegalArgumentException("(runGraph) The upper-bound of the threshold cannot be smaller than 0.");
+        if(p.getStep()<0)
+            throw new IllegalArgumentException("(runGraph) The step of the threshold cannot be smaller than 0.");
+        if(graphIn == null)
+            throw new IllegalArgumentException("(runGraph) The input graph cannot be null.");
+        if(clusterOut==null)
+            throw new IllegalArgumentException("(runGraph) The graph output cannotbe null.");
+        if(slType != 1 && slType != 2)
+            throw new IllegalArgumentException("(runGraph) The type of single linkage clustering error:  "+slType);
+        
+        if(vertexMappingOut == null)
+            throw new IllegalArgumentException("(runGraphDrugReposPreCluster) Vertex mapping output is null.");
+        if(indexMappingOut == null)
+            throw new IllegalArgumentException("(runGraphDrugReposPreCluster) Index mapping output is null.");
+        
+        /* Check if the file can be openend. */
+        FileReader fr = null;
+        FileWriter fw = null;
+        try{
+        fr = new FileReader(graphIn);
+        }catch(IOException e){
+            System.err.println("(runGraph) The input graph cannot be read. ");
+            return null;
+        }
+        try{
+            fw = new FileWriter(clusterOut);
+        }catch(IOException e){
+            System.err.println("(runGraph) The cluster output file writing error. ");
+        }
+        
+        try{
+            fw = new FileWriter(vertexMappingOut);
+        }catch(IOException e){
+            System.err.println("(runGraph) The ver mapping output file writing error:  "+vertexMappingOut);
+        }
+        
+        try{
+            fw = new FileWriter(indexMappingOut);
+        }catch(IOException e){
+            System.err.println("(runGraphDrugReposPreClust) Index mapping output file error:  "+indexMappingOut);
+        }
+        
+        
+        Graph2 inputGraph = new MatrixGraph(graphIn,false, true); // With no header, with xml input.
+        // Run nforce
+        BiForceOnGraph4 algorithm = new BiForceOnGraph4();
+        try{
+            inputGraph = algorithm.run(inputGraph, p, slType, isMultipleThresh);
+        }catch(IOException e){
+            System.err.println("(runGraphDrugReposPreClust) Algorithm running error.");
+        }
+        // Output the cluster
+        inputGraph.writeClusterTo(clusterOut, true);
+        System.out.println("The resulted cluster is written to:  "+clusterOut);
+        // Output the precluster -- index mapping.
+        MatrixGraph mg   = (MatrixGraph)inputGraph;
+        mg.writeXmlPreClusterIndexMapping(indexMappingOut);
+        System.out.println("The preclusters -- index mapping is written to :  "+indexMappingOut);
+        mg.writeVertexPreClusterMapping(vertexMappingOut,clusterPrefix);
+        System.out.println("The vertex -- precluster mapping is written to:  "+vertexMappingOut);
+        
+        return mg;
+    }
     /**
      * This method runs the algorithm on different types of graphs. 
      * @param graphType The type of the graphs: from 1 to 5.
@@ -248,7 +386,7 @@ public class Main3 {
      * @param isHeader
      * @param isInXmlFile
      * @param isOutXmlFile
-     * @param p
+     * @param paramFile
      * @param slType
      * @param isMultipleThresh 
      */
@@ -287,7 +425,7 @@ public class Main3 {
             throw new IllegalArgumentException("(runGraph) The graph output cannotbe null.");
         
         
-        if(slType != 1 && slType != 2)
+        if(slType != 1 && slType != 2 && slType != 3)
             throw new IllegalArgumentException("(runGraph) The type of single linkage clustering error:  "+slType);
         // Set the thresholds
         p.setThresh(thresh);
@@ -341,8 +479,7 @@ public class Main3 {
         if(editingOut != null)
             inputGraph.writeResultInfoTo(editingOut);
         System.out.println("The editing information is written to:  "+editingOut);
+        
+        
     }
-    
-    
-    
 }
