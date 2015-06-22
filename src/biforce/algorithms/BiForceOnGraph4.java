@@ -42,14 +42,18 @@ public class BiForceOnGraph4 {
             for(int j=i+1;j<graph.getVertices().size();j++){
                 Vertex2 vtx1 = graph.getVertices().get(i);
                 Vertex2 vtx2 = graph.getVertices().get(j);
-                
+                 if(vtx1.getValue().equals("drug_118") && vtx2.getValue().equals("disease_916"))
+                    System.out.println();
+                if(vtx2.getValue().equals("drug_118") && vtx1.getValue().equals("disease_916"))
+                    System.out.println();
                 float ew = graph.edgeWeight(vtx1, vtx2);
                 //if there is no edge between them, then continue;
-                if(ew == 0 || Float.isNaN(ew))
+                //if(ew == 0 || Float.isNaN(ew))
+                if(Float.isNaN(ew))
                     continue;
                 //case 1, in the same cluster with negative edge: then we need an addition
                 if(vtx1.getClustNum() ==vtx2.getClustNum() &&
-                        ew <0 ){
+                        ew <=0 ){
                    graph.pushAction(vtx1, vtx2);
                 }
                 
@@ -755,6 +759,7 @@ public class BiForceOnGraph4 {
         System.out.println("Post-processing complete.");
         // For test
         graph.writeClusterTo("./clusters_after_post.txt", true);
+        
         
     }
     
