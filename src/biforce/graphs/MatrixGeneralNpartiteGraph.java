@@ -471,8 +471,8 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             detractThresh();
         
         float ew = edgeWeight(vtx1, vtx2);
-        if(ew == 0)
-            throw new IllegalArgumentException("There is a null-edge between vtx1 and vtx2");
+        //if(ew == 0)
+          //  throw new IllegalArgumentException("There is a null-edge between vtx1 and vtx2");
         Action2 act = null;
         act = new Action2(vtx1,vtx2,ew);
         actions.add(act);
@@ -1074,13 +1074,13 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
         }
         // Check if it is an edge between top set and rear set.
         if(vtx1.getVtxSet() - vtx2.getVtxSet() == setSizes.length-1 ||
-                vtx1.getVtxSet() - vtx2.getVtxSet() == -1+ setSizes.length){
+                vtx1.getVtxSet() - vtx2.getVtxSet() == 1- setSizes.length){
             int minVtxSet = Math.min(vtx1.getVtxSet(),vtx2.getVtxSet());
             if(minVtxSet == vtx1.getVtxSet())
-                interEdgeWeights.get(minVtxSet)
+                interEdgeWeights.get(vtx2.getVtxSet())
                         [vtx1.getVtxIdx()][vtx2.getVtxIdx()]= edgeWeight;
             else
-                interEdgeWeights.get(minVtxSet)
+                interEdgeWeights.get(vtx2.getVtxSet())
                         [vtx2.getVtxIdx()][vtx1.getVtxIdx()]= edgeWeight;
         }
             
@@ -1097,6 +1097,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             throw new IllegalArgumentException("(MatrixBipartitGraph2.takeAction) Wrong action index: "+
                     idx);
         Action2 act = actions.get(idx);
+        
         if(act.getOriginalWeight()>0){
             setEdgeWeight(act.getVtx1(),act.getVtx2(),BiForceConstants.FORBIDDEN);
             //System.out.println("Forbidden");

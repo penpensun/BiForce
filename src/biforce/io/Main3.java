@@ -178,7 +178,9 @@ public class Main3 {
     public static MatrixGeneralNpartiteGraph runDrugRepos(float thresh,
             float[] threshArray,
             String graphIn,
+            String graphOut,
             String paramFile,
+            String clusterOut,
             String editingOutput,
             boolean isMultipleThresh
             ){
@@ -216,6 +218,8 @@ public class Main3 {
             System.err.println("(runGraphDrugReposPreClust) Algorithm running error.");
         }
         inputGraph.writeResultInfoTo(editingOutput);
+        inputGraph.writeClusterTo(clusterOut, true);
+        inputGraph.writeGraphTo(graphOut, true);
         return (MatrixGeneralNpartiteGraph)inputGraph;
     }
     
