@@ -1287,7 +1287,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
            
             bw.write("</entity>\n");
             /* Output the interEdgeWeight matrix. */
-            for(int l=0;l<setSizes.length-1;l++){
+            for(int l=0;l<setSizes.length;l++){
                 bw.write("<matrix matrixLevel=\""+l+"  "+(l+1)+"\">\n");
                 float[][] matrix = interEdgeWeights.get(l);
                 for(int j=0;j<matrix.length;j++){

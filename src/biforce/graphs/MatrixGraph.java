@@ -352,8 +352,8 @@ public class MatrixGraph extends Graph2 {
             detractThresh();
         
         float ew = edgeWeight(vtx1, vtx2);
-        if(ew == 0)
-            throw new IllegalArgumentException("There is a null-edge between vtx1 and vtx2");
+       // if(ew == 0)
+         //   throw new IllegalArgumentException("There is a null-edge between vtx1 and vtx2");
         Action2 act = null;
         act = new Action2(vtx1,vtx2,ew);
         actions.add(act);
