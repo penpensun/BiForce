@@ -2,6 +2,44 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+<<<<<<< HEAD
         <group/>
+=======
+<<<<<<< Updated upstream
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> FETCH_HEAD
+        <group>
+            <file>file:/Users/mac-97-41/work/projects/BiForce/application/BiForce/src/biforce/graphs/Graph2.java</file>
+            <file>file:/Users/mac-97-41/work/projects/BiForce/application/BiForce/src/biforce/algorithms/BiForceOnGraph4.java</file>
+            <file>file:/Users/mac-97-41/work/projects/BiForce/application/BiForce/src/biforce/graphs/MatrixGeneralNpartiteGraph.java</file>
+            <file>file:/Users/mac-97-41/work/projects/BiForce/application/BiForce/src/biforce/io/Main3.java</file>
+        </group>
+<<<<<<< HEAD
+=======
+=======
+<<<<<<< Updated upstream
+        <group/>
+=======
+>>>>>>> origin/master
+=======
+>>>>>>> Stashed changes
+        <group>
+            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/biforce/sim/SimGraphGen.java</file>
+            <file>file:/Users/penpen926/work/projects/BiForce/application/BiForce/src/performance/PerformanceAnalyzer.java</file>
+        </group>
+<<<<<<< Updated upstream
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> FETCH_HEAD
+>>>>>>> origin/master
+>>>>>>> FETCH_HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> FETCH_HEAD
     </open-files>
 </project-private>
