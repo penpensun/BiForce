@@ -105,7 +105,7 @@ public class Main3 {
         try{
         fr = new FileReader(graphIn);
         }catch(IOException e){
-            System.err.println("(runGraph) The input graph cannot be read. ");
+            System.err.println("(runGraph) The input graph cannot be read: "+graphIn);
             return;
         }
         try{
@@ -205,7 +205,7 @@ public class Main3 {
         try{
         fr = new FileReader(graphIn);
         }catch(IOException e){
-            System.err.println("(runGraph) The input graph cannot be read. ");
+            System.err.println("(runGraph) The input graph cannot be read: "+graphIn);
             return null;
         }
         
@@ -282,7 +282,7 @@ public class Main3 {
         try{
         fr = new FileReader(graphIn);
         }catch(IOException e){
-            System.err.println("(runGraph) The input graph cannot be read. ");
+            System.err.println("(runGraph) The input graph cannot be read: "+graphIn);
             return null;
         }
         try{

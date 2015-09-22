@@ -752,10 +752,10 @@ public class BiForceOnGraph4 {
         // Post-processing
         // Step 1, merge Clusters
         System.out.println("Start post-processing: 1. Merging Clusters.");
-        postProMerge(graph);
+        //postProMerge(graph);
         // Step 2. Moving vertex.
         System.out.println("Post-processing: 2. Moving vertex. ");
-        postProMove(graph);
+        //postProMove(graph);
         System.out.println("Post-processing complete.");
         // For test
         graph.writeClusterTo("./clusters_after_post.txt", true);
