@@ -48,7 +48,7 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testBfs() {
         System.out.println("(MatrixHierGeneralGraphTest.testBfs) Test starts.");
-        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(testBfsInput,true,false,0);
+        HierGraphWIE graph = new HierGraphWIE(testBfsInput,true,false,0);
         /* Get the vertices in the graph. */
         Vertex2 a1 = graph.getVertex("a1");
         Vertex2 a2 = graph.getVertex("a2");
@@ -83,18 +83,18 @@ public class MatrixHierGeneralGraphTest {
         ArrayList<Vertex2> verticesSub3 = new ArrayList<>();
         verticesSub3.add(a6);
         
-        MatrixHierGeneralSubgraph sub1 = 
-                new MatrixHierGeneralSubgraph(verticesSub1,graph);
-        MatrixHierGeneralSubgraph sub2 = 
-                new MatrixHierGeneralSubgraph(verticesSub2,graph);
-        MatrixHierGeneralSubgraph sub3 = 
-                new MatrixHierGeneralSubgraph(verticesSub3,graph);
+        HierSubgraphWIE sub1 = 
+                new HierSubgraphWIE(verticesSub1,graph);
+        HierSubgraphWIE sub2 = 
+                new HierSubgraphWIE(verticesSub2,graph);
+        HierSubgraphWIE sub3 = 
+                new HierSubgraphWIE(verticesSub3,graph);
         /* Get the bfs subgraphs. */
-        MatrixHierGeneralSubgraph bfs1 = graph.bfs(a1);
-        MatrixHierGeneralSubgraph bfs2 = graph.bfs(b1);
-        MatrixHierGeneralSubgraph bfs3 = graph.bfs(a5);
-        MatrixHierGeneralSubgraph bfs4 = graph.bfs(d1);
-        MatrixHierGeneralSubgraph bfs5 = graph.bfs(a6);
+        HierSubgraphWIE bfs1 = graph.bfs(a1);
+        HierSubgraphWIE bfs2 = graph.bfs(b1);
+        HierSubgraphWIE bfs3 = graph.bfs(a5);
+        HierSubgraphWIE bfs4 = graph.bfs(d1);
+        HierSubgraphWIE bfs5 = graph.bfs(a6);
         
         assertEquals(true, sub1.equals(bfs1));
         assertEquals(true, sub1.equals(bfs2));
@@ -112,7 +112,7 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testConnectedComponents() {
         System.out.println("connectedComponents");
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         ArrayList expResult = null;
         ArrayList result = instance.connectedComponents();
         assertEquals(expResult, result);
@@ -126,7 +126,7 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testDetractThresh_0args() {
         System.out.println("detractThresh");
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         instance.detractThresh();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -139,7 +139,7 @@ public class MatrixHierGeneralGraphTest {
     public void testDetractThresh_float() {
         System.out.println("detractThresh");
         float thresh = 0.0f;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         instance.detractThresh(thresh);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -153,7 +153,7 @@ public class MatrixHierGeneralGraphTest {
         System.out.println("dist");
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         float expResult = 0.0f;
         float result = instance.dist(vtx1, vtx2);
         assertEquals(expResult, result, 0.0f);
@@ -169,7 +169,7 @@ public class MatrixHierGeneralGraphTest {
         System.out.println("edgeWeight");
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         float expResult = 0.0f;
         float result = instance.edgeWeight(vtx1, vtx2);
         assertEquals(expResult, result, 0.0f);
@@ -185,7 +185,7 @@ public class MatrixHierGeneralGraphTest {
         System.out.println("edgeWeight");
         int vtxIdx1 = 0;
         int vtxIdx2 = 0;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         float expResult = 0.0f;
         float result = instance.edgeWeight(vtxIdx1, vtxIdx2);
         assertEquals(expResult, result, 0.0f);
@@ -200,7 +200,7 @@ public class MatrixHierGeneralGraphTest {
     public void testInterEdgeWeightMatrix() {
         System.out.println("interEdgeWeightMatrix");
         int i = 0;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         float[][] expResult = null;
         float[][] result = instance.interEdgeWeightMatrix(i);
         assertEquals(expResult, result);
@@ -215,7 +215,7 @@ public class MatrixHierGeneralGraphTest {
     public void testIntraEdgeWeightMatrix() {
         System.out.println("intraEdgeWeightMatrix");
         int i = 0;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         float[][] expResult = null;
         float[][] result = instance.intraEdgeWeightMatrix(i);
         assertEquals(expResult, result);
@@ -229,7 +229,7 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testGetCost() {
         System.out.println("getCost");
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         float expResult = 0.0f;
         float result = instance.getCost();
         assertEquals(expResult, result, 0.0f);
@@ -243,7 +243,7 @@ public class MatrixHierGeneralGraphTest {
     public void testIsActionTaken() {
         System.out.println("isActionTaken");
         int actIdx = 0;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         boolean expResult = false;
         boolean result = instance.isActionTaken(actIdx);
         assertEquals(expResult, result);
@@ -257,7 +257,7 @@ public class MatrixHierGeneralGraphTest {
     public void testNeighbours() {
         System.out.println("neighbours");
         Vertex2 currentVtx = null;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         ArrayList expResult = null;
         ArrayList result = instance.neighbours(currentVtx);
         assertEquals(expResult, result);
@@ -272,7 +272,7 @@ public class MatrixHierGeneralGraphTest {
         System.out.println("pushAction");
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         boolean expResult = false;
         boolean result = instance.pushAction(vtx1, vtx2);
         assertEquals(expResult, result);
@@ -286,8 +286,8 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testReadGraph() throws Exception {
         System.out.println("(MatrixHierGeneralGraphTest.testReadGraph) Test starts.");
-        MatrixHierGeneralGraph graph = 
-                new MatrixHierGeneralGraph(testReadGraphNoheaderInput,false,false,0);
+        HierGraphWIE graph = 
+                new HierGraphWIE(testReadGraphNoheaderInput,false,false,0);
         /* Check if the threshold is detracted. */
         assertEquals(true,graph.isThreshDetracted());
         /* Check the number of vertex sets. */
@@ -338,8 +338,8 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testReadGraphWithHeader() throws Exception {
         System.out.println("(MatrixHierGeneralGraphTest.testReadGraphWithHeader) Test starts.");
-        MatrixHierGeneralGraph graph = 
-                new MatrixHierGeneralGraph(testReadGraphHeaderInput,true,false,0);
+        HierGraphWIE graph = 
+                new HierGraphWIE(testReadGraphHeaderInput,true,false,0);
         /* Check if the threshold is detracted. */
         assertEquals(true,graph.isThreshDetracted());
         /* Check the number of vertex sets. */
@@ -388,7 +388,7 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testReadGraphInXML(){
         System.out.println("(biforce.graph.MatrixHierGeneralGraphTest.testReadGraphInXML) Test starts. ");
-        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(testReadXml,false, true,0);
+        HierGraphWIE graph = new HierGraphWIE(testReadXml,false, true,0);
         /* Check the nodes. */
         /* Init nodes. */
         Vertex2 a1 = new Vertex2("a1",0,0);
@@ -535,7 +535,7 @@ public class MatrixHierGeneralGraphTest {
      */
     public void testReadGraphInXmlExternFile(){
         System.out.println("(biforce.graph.MatrixHierGeneralGraphTest.testReadGraphInXMLExternFile) Test starts. ");
-        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(testReadXmlExternFile,false, true,0);
+        HierGraphWIE graph = new HierGraphWIE(testReadXmlExternFile,false, true,0);
         /* Check the nodes. */
         /* Init nodes. */
         Vertex2 a1 = new Vertex2("a1",0,0);
@@ -681,7 +681,7 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testRestoreThresh() {
         System.out.println("restoreThresh");
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         instance.restoreThresh();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -694,7 +694,7 @@ public class MatrixHierGeneralGraphTest {
     public void testRemoveAction() {
         System.out.println("removeAction");
         int Index = 0;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         boolean expResult = false;
         boolean result = instance.removeAction(Index);
         assertEquals(expResult, result);
@@ -709,7 +709,7 @@ public class MatrixHierGeneralGraphTest {
         System.out.println("setDist");
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         instance.setDist(vtx1, vtx2);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -724,7 +724,7 @@ public class MatrixHierGeneralGraphTest {
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
         float edgeWeight = 0.0f;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         instance.setEdgeWeight(vtx1, vtx2, edgeWeight);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -736,7 +736,7 @@ public class MatrixHierGeneralGraphTest {
     public void testTakeAction() {
         System.out.println("takeAction");
         int idx = 0;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         boolean expResult = false;
         boolean result = instance.takeAction(idx);
         assertEquals(expResult, result);
@@ -749,7 +749,7 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testTakeActions() {
         System.out.println("takeActions");
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         boolean expResult = false;
         boolean result = instance.takeActions();
         assertEquals(expResult, result);
@@ -762,7 +762,7 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testUpdateDist() {
         System.out.println("updateDist");
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         instance.updateDist();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -774,7 +774,7 @@ public class MatrixHierGeneralGraphTest {
     public void testUpdatePos() {
         System.out.println("updatePos");
         float[][] dispVector = null;
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         instance.updatePos(dispVector);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -786,7 +786,7 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testVertexSetCount() {
         System.out.println("vertexSetCount");
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         int expResult = 0;
         int result = instance.vertexSetCount();
         assertEquals(expResult, result);
@@ -801,9 +801,9 @@ public class MatrixHierGeneralGraphTest {
     public void testWriteGraphTo() {
         System.out.println("(MatrixHierGeneralGraphTest.testWriteGraphTo) Test starts.");
         /* Test writig the graph in xml format. */
-        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(testReadXml,false,true);
+        HierGraphWIE graph = new HierGraphWIE(testReadXml,false,true);
         graph.writeGraphTo(testWriteXml, true); /* Output the graph.*/
-        MatrixHierGeneralGraph test = new MatrixHierGeneralGraph(testWriteXml,false, true);
+        HierGraphWIE test = new HierGraphWIE(testWriteXml,false, true);
         //assertTrue(graph.isSame(test));
         /* Test writing the graph in plain format. */
         graph.writeGraphTo(testWritePlain, false);
@@ -816,12 +816,12 @@ public class MatrixHierGeneralGraphTest {
     @Test
     public void testWriteClusterTo() {
         System.out.println("(MatrixHierGeneralGraphTest.testWriteClusterTo) Test starts. ");
-        MatrixHierGeneralGraph graph = new
-                MatrixHierGeneralGraph(testReadXml,false,true);
+        HierGraphWIE graph = new
+                HierGraphWIE(testReadXml,false,true);
         Param p =new Param("./parameters.ini");
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
         try{
-            graph = (MatrixHierGeneralGraph)algorithm.run(graph, p,1,false);
+            graph = (HierGraphWIE)algorithm.run(graph, p,1,false);
         }catch(IOException e){
             System.err.println("(MatrixHierGeneralGraphTest.testWriteClusterTo) Algorithm error.");
             return;
@@ -837,7 +837,7 @@ public class MatrixHierGeneralGraphTest {
     public void testWriteResultInfoTo() {
         System.out.println("writeResultInfoTo");
         String FilePath = "";
-        MatrixHierGeneralGraph instance = null;
+        HierGraphWIE instance = null;
         instance.writeResultInfoTo(FilePath);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

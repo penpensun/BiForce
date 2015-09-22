@@ -16,8 +16,5 @@ public class BiForceConstants {
     public static final float FORBIDDEN = Float.NEGATIVE_INFINITY; 
     /* The edge weights of all non-defined edges. */
     public static final float NON_DEF_EDGE = Float.NaN;
-    
-    
-   
 }
 

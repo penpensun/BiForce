@@ -5,7 +5,7 @@
  */
 
 package biforce.algorithms;
-import biforce.graphs.BipartiteGraph;
+import biforce.graphs.BipartiteGraph_deprecated;
 import biforce.graphs.Vertex;
 import biforce.graphs.Cluster;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.Stack;
 public class BiForceOnGraph2 {
     
     
-   public static BipartiteGraph run(BipartiteGraph graph, Param p) throws IOException
+   public static BipartiteGraph_deprecated run(BipartiteGraph_deprecated graph, Param p) throws IOException
     {
         InitialLayout(graph, p);
         //Get the list of vertices in the input graph
@@ -216,16 +216,16 @@ public class BiForceOnGraph2 {
      * @return
      * @throws IOException 
      */
-    public static BipartiteGraph run(String inputfile, Param p) throws IOException
+    public static BipartiteGraph_deprecated run(String inputfile, Param p) throws IOException
     {
-        BipartiteGraph graph = new BipartiteGraph(inputfile);
+        BipartiteGraph_deprecated graph = new BipartiteGraph_deprecated(inputfile);
         return run(graph,p);
     }
     
     
     
     //Peng: this method should return an ArrayList<Point> object.
-    private static ArrayList<Vertex> InitialLayout(BipartiteGraph graph, Param p){
+    private static ArrayList<Vertex> InitialLayout(BipartiteGraph_deprecated graph, Param p){
         
         int dim = p.getDim();
         double radius = p.getRadius();
@@ -295,7 +295,7 @@ public class BiForceOnGraph2 {
      * @param p
      * @return 
      */
-    private static double[][] getDisplacement(BipartiteGraph graph, Param p)
+    private static double[][] getDisplacement(BipartiteGraph_deprecated graph, Param p)
     {
         ArrayList<Vertex> Vertices = new ArrayList(graph.getVertices());
         double[][] DispVectors = new double[graph.getVertexCount()][p.getDim()];
@@ -383,7 +383,7 @@ public class BiForceOnGraph2 {
     }
     
     //this method performs the updating of the coords of all the points
-    private static void update(BipartiteGraph input, 
+    private static void update(BipartiteGraph_deprecated input, 
             ArrayList<double[]> DispVectors, int iter, Param p)
     {
         ArrayList<Vertex> VertexList = new ArrayList(input.getVertices());
@@ -412,7 +412,7 @@ public class BiForceOnGraph2 {
     }
     
     
-    private static void update(BipartiteGraph input,
+    private static void update(BipartiteGraph_deprecated input,
             double[][] DispVectors, int iter,Param p)
     {
         ArrayList<Vertex> VertexList = new ArrayList(input.getVertices());
@@ -469,7 +469,7 @@ public class BiForceOnGraph2 {
      * @param Points
      * @param k 
      */
-    private static void Kmeans(BipartiteGraph input, int k, Param p)
+    private static void Kmeans(BipartiteGraph_deprecated input, int k, Param p)
     {
         ArrayList<Vertex> VertexList = new ArrayList<>(input.getVertices());
         for(Vertex vtx: VertexList)
@@ -572,7 +572,7 @@ public class BiForceOnGraph2 {
      * @param VertexList
      * @param DistThresh 
      */
-    private static void SingleLinkage(BipartiteGraph graph, double[][] distances, double DistThresh)
+    private static void SingleLinkage(BipartiteGraph_deprecated graph, double[][] distances, double DistThresh)
     {
         ArrayList<Vertex> VertexList = new ArrayList(graph.getVertices());
         //init all the clust num to be -1
@@ -632,7 +632,7 @@ public class BiForceOnGraph2 {
      * @return 
      * @throws IllegalArgumentException. When there is point without a cluster assignment.
      */
-    private static void assignActions(BipartiteGraph graph, Param p) throws IllegalArgumentException
+    private static void assignActions(BipartiteGraph_deprecated graph, Param p) throws IllegalArgumentException
     {
         ArrayList<Vertex> VertexList = new ArrayList(graph.getVertices());
         //first check if there is no unassigned vertex
@@ -669,7 +669,7 @@ public class BiForceOnGraph2 {
     
     
     
-    private static void assignClusters(BipartiteGraph graph)
+    private static void assignClusters(BipartiteGraph_deprecated graph)
     {
         ArrayList<Vertex> vertices = new ArrayList(graph.getVertices());
         int maxClusterIdx = 0;
@@ -750,7 +750,7 @@ public class BiForceOnGraph2 {
      * @param p
      * @return 
      */
-    public static double computeCost(BipartiteGraph graph, Param p)
+    public static double computeCost(BipartiteGraph_deprecated graph, Param p)
     {
         ArrayList<Vertex> VertexList = new ArrayList(graph.getVertices());
         double cost = 0;
@@ -795,7 +795,7 @@ public class BiForceOnGraph2 {
      * @param c2
      * @return 
      */
-    private static double computeMergeCost(BipartiteGraph graph, Cluster c1, Cluster c2, Param p )
+    private static double computeMergeCost(BipartiteGraph_deprecated graph, Cluster c1, Cluster c2, Param p )
     {
         double CostDiff = 0;
         for(Vertex pt1: c1.getVertices())
@@ -822,7 +822,7 @@ public class BiForceOnGraph2 {
      * @param clt
      * @return 
      */
-    private static double computeMoveCost(BipartiteGraph graph, Vertex toMove, Cluster SourceCls, Cluster TargetCls, Param p)
+    private static double computeMoveCost(BipartiteGraph_deprecated graph, Vertex toMove, Cluster SourceCls, Cluster TargetCls, Param p)
     {
         //check if the point toMove belongs to the cluster SourceCls
         if(toMove.ClustNum != SourceCls.getClustIdx())
@@ -879,7 +879,7 @@ public class BiForceOnGraph2 {
     }
     
     
-    public static void putDist(double[][] Distances, BipartiteGraph graph,
+    public static void putDist(double[][] Distances, BipartiteGraph_deprecated graph,
             Vertex vtx1, Vertex vtx2, double dist)
     {
         Distances[vtx1.getIdx()+vtx1.vtxSet*graph.getSet1Size()]
@@ -889,7 +889,7 @@ public class BiForceOnGraph2 {
     }
     
     
-    public static double getDist( BipartiteGraph graph,double[][] Distances, Vertex vtx1, Vertex vtx2)
+    public static double getDist( BipartiteGraph_deprecated graph,double[][] Distances, Vertex vtx1, Vertex vtx2)
     {
         return Distances[vtx1.getIdx()+vtx1.vtxSet*graph.getSet1Size()][vtx2.getIdx()+vtx2.vtxSet*graph.getSet1Size()];
     }

@@ -7,12 +7,12 @@ import java.util.ArrayList;
 
 import org.junit.*;
 import static org.junit.Assert.*;
-import biforce.graphs.MatrixGraph;
-import biforce.graphs.MatrixSubgraph;
-import biforce.graphs.MatrixHierNpartiteGraph;
-import biforce.graphs.MatrixHierNpartiteSubgraph;
-import biforce.graphs.MatrixHierGeneralGraph;
-import biforce.graphs.MatrixHierGeneralSubgraph;
+import biforce.graphs.GeneralGraph;
+import biforce.graphs.GeneralSubgraph;
+import biforce.graphs.HierGraph;
+import biforce.graphs.HierSubgraph;
+import biforce.graphs.HierGraphWIE;
+import biforce.graphs.HierSubgraphWIE;
 
 /**
  *
@@ -54,10 +54,10 @@ public class SimGraphGenTest {
         /* Create the graph. */
         float cost = gen.generatorGeneralGraph1(vtxNum, outputFile, mean, stdev);
         /* Read the graph. */
-        MatrixGraph testGraph = new MatrixGraph(outputFile,true,false,0);
+        GeneralGraph testGraph = new GeneralGraph(outputFile,true,false,0);
         /* Test the inputted graph. */
         assertEquals(20,testGraph.vertexCount());
-        ArrayList<MatrixSubgraph>  connComps = new ArrayList<MatrixSubgraph>(
+        ArrayList<GeneralSubgraph>  connComps = new ArrayList<GeneralSubgraph>(
                 testGraph.connectedComponents());
         assertEquals(true, testGraph.connectedComponents().size()>0);
         System.out.println("The number of connected components: "+connComps.size());
@@ -134,12 +134,12 @@ public class SimGraphGenTest {
         float stdev = 0.0f;
         float result = gen.generatorHierNpartiteGraph(setSizes, outputFile, mean, stdev);
         /* Read the graph. */
-        MatrixHierNpartiteGraph graph = new MatrixHierNpartiteGraph(outputFile, false,0);
+        HierGraph graph = new HierGraph(outputFile, false,0);
         
         float expRes = 0;
         /* First check the number of vertices. */
         //assertEquals(63, graph.vertexCount());
-        ArrayList<MatrixHierNpartiteSubgraph> connComps = graph.connectedComponents();
+        ArrayList<HierSubgraph> connComps = graph.connectedComponents();
         
         assertEquals(true, connComps.size()>0);
         System.out.println("The number of connected components: "+connComps.size());
@@ -177,12 +177,12 @@ public class SimGraphGenTest {
         float stdev = 0.0f;
         float result = gen.generateHierGeneralGraph(setSizes, outputFile, mean, stdev);
         /* Read the graph. */
-        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(outputFile, false,false,0);
+        HierGraphWIE graph = new HierGraphWIE(outputFile, false,false,0);
         
         float expRes = 0;
         /* First check the number of vertices. */
         //assertEquals(63, graph.vertexCount());
-        ArrayList<MatrixHierGeneralSubgraph> connComps = graph.connectedComponents();
+        ArrayList<HierSubgraphWIE> connComps = graph.connectedComponents();
         
         assertEquals(true, connComps.size()>0);
         System.out.println("The number of connected components: "+connComps.size());
@@ -221,11 +221,11 @@ public class SimGraphGenTest {
         float mean = 20.0f;
         float stdev = 0.0f;
         float result = gen.generateHierGeneralGraphXml(setSizes, outputFile, mean, stdev);
-        MatrixHierGeneralGraph graph = new MatrixHierGeneralGraph(outputFile, false,true,0);
+        HierGraphWIE graph = new HierGraphWIE(outputFile, false,true,0);
         float expRes = 0;
         /* First check the number of vertices. */
         //assertEquals(63, graph.vertexCount());
-        ArrayList<MatrixHierGeneralSubgraph> connComps = graph.connectedComponents();
+        ArrayList<HierSubgraphWIE> connComps = graph.connectedComponents();
         
         assertEquals(true, connComps.size()>0);
         System.out.println("The number of connected components: "+connComps.size());

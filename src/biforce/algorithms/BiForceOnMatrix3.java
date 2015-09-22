@@ -5,7 +5,7 @@
  */
 
 package biforce.algorithms;
-import biforce.graphs.MatrixBipartiteGraph;
+import biforce.graphs.BipartiteGraph;
 import biforce.matrices.BipartiteGraphMatrix;
 import biforce.matrices.BipartiteGraphMatrixV2;
 import java.io.IOException;

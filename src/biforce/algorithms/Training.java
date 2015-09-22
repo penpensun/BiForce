@@ -5,7 +5,7 @@
  */
 
 package biforce.algorithms;
-import biforce.graphs.BipartiteGraph;
+import biforce.graphs.BipartiteGraph_deprecated;
 import java.io.IOException;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
@@ -47,7 +47,7 @@ public class Training {
             //for all the parameter sets
             for(TrainingParam paraset: parasetarray)
             {
-                float Cost = (float)BiForceOnGraph2.run(new BipartiteGraph(input), paraset).getCost();            
+                float Cost = (float)BiForceOnGraph2.run(new BipartiteGraph_deprecated(input), paraset).getCost();            
                 paraset.setCost(Cost);
             }
             System.out.println("Iteration:  "+i);
@@ -195,7 +195,7 @@ public class Training {
                 //for each file
                 for(String InputFile: FileList)
                 {
-                    Cost += BiForceOnGraph2.run(new BipartiteGraph(inputfolder+"/"+InputFile), param).getCost();
+                    Cost += BiForceOnGraph2.run(new BipartiteGraph_deprecated(inputfolder+"/"+InputFile), param).getCost();
                 }
                 //System.out.println("Cost  "+Cost);
                 param.setCost(Cost);

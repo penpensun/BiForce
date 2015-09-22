@@ -11,14 +11,14 @@ import java.util.ArrayList;
  *
  * @author Administrator
  */
-public class SubBipartiteGraph extends BipartiteGraph implements Comparable<SubBipartiteGraph>{
+public class SubBipartiteGraph extends BipartiteGraph_deprecated implements Comparable<SubBipartiteGraph>{
     //this is the vertex set of the vertices in the subgraph
     ArrayList<Vertex> SubVertexSet;
     //constructors
-    BipartiteGraph SuperGraph;
+    BipartiteGraph_deprecated SuperGraph;
         
     public  SubBipartiteGraph (ArrayList<Vertex> SubVertexSet,
-            BipartiteGraph graph )
+            BipartiteGraph_deprecated graph )
     {
         super(graph);
         this.SuperGraph = graph;

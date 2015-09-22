@@ -49,9 +49,9 @@ public class MatrixBipartiteSubgraph2Test {
     @Test
     public void testBfs() {
         System.out.println("### MatrixBipartiteSubgraph2 testBfs starts.");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testBfsInput,true,0);
+        BipartiteGraph2 graph = new BipartiteGraph2(testBfsInput,true,0);
         /* Create the subgraph. */
-        MatrixBipartiteSubgraph2 subgraph = new MatrixBipartiteSubgraph2(graph.getVertices(),graph);
+        BipartiteSubgraph2 subgraph = new BipartiteSubgraph2(graph.getVertices(),graph);
         
         /* Get the vertices. */
         Vertex2 a1 = graph.getVertex("a1");
@@ -69,7 +69,7 @@ public class MatrixBipartiteSubgraph2Test {
         subVertices1.add(graph.getVertex("b2"));
         subVertices1.add(graph.getVertex("b3"));
         subVertices1.add(graph.getVertex("b4"));
-        MatrixBipartiteSubgraph2 correctSubgraph1 = new MatrixBipartiteSubgraph2(subVertices1,graph);
+        BipartiteSubgraph2 correctSubgraph1 = new BipartiteSubgraph2(subVertices1,graph);
         
         ArrayList<Vertex2> subVertices2 = new ArrayList<>();
         subVertices2.add(graph.getVertex("a4"));
@@ -77,19 +77,19 @@ public class MatrixBipartiteSubgraph2Test {
         subVertices2.add(graph.getVertex("a6"));
         subVertices2.add(graph.getVertex("b5"));
         subVertices2.add(graph.getVertex("b6"));
-        MatrixBipartiteSubgraph2 correctSubgraph2 = new MatrixBipartiteSubgraph2(subVertices2,graph);
+        BipartiteSubgraph2 correctSubgraph2 = new BipartiteSubgraph2(subVertices2,graph);
         
         
         ArrayList<Vertex2> subVertices3 = new ArrayList<>();
         subVertices3.add(graph.getVertex("a7"));
-        MatrixBipartiteSubgraph2 correctSubgraph3 = new MatrixBipartiteSubgraph2(subVertices3,graph);
+        BipartiteSubgraph2 correctSubgraph3 = new BipartiteSubgraph2(subVertices3,graph);
         
         /* Obtain the subgraphs by bfs(). */
-        MatrixBipartiteSubgraph2 bfsSubgraph1 = subgraph.bfs(a1);
-        MatrixBipartiteSubgraph2 bfsSubgraph2 = subgraph.bfs(b3);
-        MatrixBipartiteSubgraph2 bfsSubgraph3 = subgraph.bfs(b6);
-        MatrixBipartiteSubgraph2 bfsSubgraph4 = subgraph.bfs(a4);
-        MatrixBipartiteSubgraph2 bfsSubgraph5 = subgraph.bfs(a7);
+        BipartiteSubgraph2 bfsSubgraph1 = subgraph.bfs(a1);
+        BipartiteSubgraph2 bfsSubgraph2 = subgraph.bfs(b3);
+        BipartiteSubgraph2 bfsSubgraph3 = subgraph.bfs(b6);
+        BipartiteSubgraph2 bfsSubgraph4 = subgraph.bfs(a4);
+        BipartiteSubgraph2 bfsSubgraph5 = subgraph.bfs(a7);
         
         
         /* Compare the two subgraphs. */
@@ -107,7 +107,7 @@ public class MatrixBipartiteSubgraph2Test {
     @Test
     public void testCompareTo() {
         System.out.println("### MatrixBipartiteSubgraph2 testCompareTo starts. ");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testBfsInput,true,0);
+        BipartiteGraph2 graph = new BipartiteGraph2(testBfsInput,true,0);
         
         Vertex2 a1 = graph.getVertex("a1");
         Vertex2 a2 = graph.getVertex("a2");
@@ -118,12 +118,12 @@ public class MatrixBipartiteSubgraph2Test {
         subgraph1Vertices.add(a1);
         subgraph1Vertices.add(a2);
         subgraph1Vertices.add(a3);
-        MatrixBipartiteSubgraph2 sub1 = new MatrixBipartiteSubgraph2(subgraph1Vertices, graph);
+        BipartiteSubgraph2 sub1 = new BipartiteSubgraph2(subgraph1Vertices, graph);
         
         ArrayList<Vertex2> subgraph2Vertices = new ArrayList<>();
         subgraph2Vertices.add(a1);
         subgraph2Vertices.add(a2);
-        MatrixBipartiteSubgraph2 sub2 = new MatrixBipartiteSubgraph2(subgraph2Vertices, graph);
+        BipartiteSubgraph2 sub2 = new BipartiteSubgraph2(subgraph2Vertices, graph);
         
         assertEquals(sub1.compareTo(sub2)>0,true);
         
@@ -136,8 +136,8 @@ public class MatrixBipartiteSubgraph2Test {
     @Test
     public void testConnectedComponents() {
         System.out.println("### MatrixBipartiteSubgraph2 testConnectedComponents starts.");
-        MatrixBipartiteGraph2 input = new MatrixBipartiteGraph2(testConnCompInput,true,0);
-        MatrixBipartiteSubgraph2 sub = new MatrixBipartiteSubgraph2(input.vertices,input);
+        BipartiteGraph2 input = new BipartiteGraph2(testConnCompInput,true,0);
+        BipartiteSubgraph2 sub = new BipartiteSubgraph2(input.vertices,input);
         
         ArrayList<Vertex2> subvertices1 = new ArrayList<>();
         subvertices1.add(input.getVertex("a1"));
@@ -145,35 +145,35 @@ public class MatrixBipartiteSubgraph2Test {
         subvertices1.add(input.getVertex("a3"));
         subvertices1.add(input.getVertex("b1"));
         subvertices1.add(input.getVertex("b2"));
-        MatrixBipartiteSubgraph2 subgraph1 =new MatrixBipartiteSubgraph2(subvertices1,input);
+        BipartiteSubgraph2 subgraph1 =new BipartiteSubgraph2(subvertices1,input);
         
         ArrayList<Vertex2> subvertices2 = new ArrayList<>();
         subvertices2.add(input.getVertex("b3"));
-        MatrixBipartiteSubgraph2 subgraph2 = new MatrixBipartiteSubgraph2(subvertices2,input);
+        BipartiteSubgraph2 subgraph2 = new BipartiteSubgraph2(subvertices2,input);
         
         ArrayList<Vertex2> subvertices3 = new ArrayList<>();
         subvertices3.add(input.getVertex("a4"));
-        MatrixBipartiteSubgraph2 subgraph3 = new MatrixBipartiteSubgraph2(subvertices3,input);
+        BipartiteSubgraph2 subgraph3 = new BipartiteSubgraph2(subvertices3,input);
         
         ArrayList<Vertex2> subvertices4 = new ArrayList<>();
         subvertices4.add(input.getVertex("a5"));
         subvertices4.add(input.getVertex("b4"));
         subvertices4.add(input.getVertex("b5"));
-        MatrixBipartiteSubgraph2 subgraph4 = new MatrixBipartiteSubgraph2(subvertices4,input);
+        BipartiteSubgraph2 subgraph4 = new BipartiteSubgraph2(subvertices4,input);
         
-        ArrayList<MatrixBipartiteSubgraph2> correctConnComp = new ArrayList<>();
+        ArrayList<BipartiteSubgraph2> correctConnComp = new ArrayList<>();
         correctConnComp.add(subgraph1);
         correctConnComp.add(subgraph2);
         correctConnComp.add(subgraph3);
         correctConnComp.add(subgraph4);
         
         /* Obtain the connected components by connectedComponents(). */
-        ArrayList<MatrixBipartiteSubgraph2> connectedComponents = 
+        ArrayList<BipartiteSubgraph2> connectedComponents = 
                 new ArrayList<>(sub.connectedComponents());
         
         /* Compare the results. */
         assertEquals(correctConnComp.size(), connectedComponents.size());
-        for(MatrixBipartiteSubgraph2 connComp: connectedComponents){
+        for(BipartiteSubgraph2 connComp: connectedComponents){
             assertEquals(correctConnComp.contains(connComp),true);
         }
         
@@ -187,7 +187,7 @@ public class MatrixBipartiteSubgraph2Test {
     @Test
     public void testEquals() {
         System.out.println("### MatrixBipartiteSubgraph2 testEquals starts.");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testBfsInput,true,0);
+        BipartiteGraph2 graph = new BipartiteGraph2(testBfsInput,true,0);
         
         ArrayList<Vertex2> subVertices1 = new ArrayList<>();
         ArrayList<Vertex2> subVertices2 = new ArrayList<>();
@@ -200,8 +200,8 @@ public class MatrixBipartiteSubgraph2Test {
         subVertices1.add(a1);
         subVertices2.add(b1);
         
-        MatrixBipartiteSubgraph2 unequalSub1 = new MatrixBipartiteSubgraph2(subVertices1, graph);
-        MatrixBipartiteSubgraph2 unequalSub2 = new MatrixBipartiteSubgraph2(subVertices2, graph);
+        BipartiteSubgraph2 unequalSub1 = new BipartiteSubgraph2(subVertices1, graph);
+        BipartiteSubgraph2 unequalSub2 = new BipartiteSubgraph2(subVertices2, graph);
         
         assertEquals(unequalSub1.equals(unequalSub2),false);
         
@@ -209,8 +209,8 @@ public class MatrixBipartiteSubgraph2Test {
         subVertices1.add(b1);
         subVertices2.add(a1);
         
-        MatrixBipartiteSubgraph2 equalSub1 = new MatrixBipartiteSubgraph2(subVertices1, graph);
-        MatrixBipartiteSubgraph2 equalSub2 = new MatrixBipartiteSubgraph2(subVertices2, graph);
+        BipartiteSubgraph2 equalSub1 = new BipartiteSubgraph2(subVertices1, graph);
+        BipartiteSubgraph2 equalSub2 = new BipartiteSubgraph2(subVertices2, graph);
         
         assertEquals(equalSub1.equals(equalSub2),true);
         // TODO review the generated test code and remove the default call to fail.
@@ -224,7 +224,7 @@ public class MatrixBipartiteSubgraph2Test {
     @Test
     public void testNeighbours() {
         System.out.println("### MatrixBipartiteSubgraph2 testNeighbours starts.");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testBfsInput,true,0);
+        BipartiteGraph2 graph = new BipartiteGraph2(testBfsInput,true,0);
         Vertex2 a1 = graph.getVertex("a1");
         Vertex2 a2 = graph.getVertex("a2");
         Vertex2 b2 = graph.getVertex("b2");
@@ -245,7 +245,7 @@ public class MatrixBipartiteSubgraph2Test {
         subVertices1.add(b3);
         subVertices1.add(b4);
         
-        MatrixBipartiteSubgraph2 sub1 = new MatrixBipartiteSubgraph2(subVertices1, graph);
+        BipartiteSubgraph2 sub1 = new BipartiteSubgraph2(subVertices1, graph);
         
         ArrayList<Vertex2> subVertices2 = new ArrayList<>();
         subVertices2.add(b5);
@@ -253,7 +253,7 @@ public class MatrixBipartiteSubgraph2Test {
         subVertices2.add(a1);
         subVertices2.add(b1);
         subVertices2.add(a5);
-        MatrixBipartiteSubgraph2 sub2 = new MatrixBipartiteSubgraph2(subVertices2,graph);
+        BipartiteSubgraph2 sub2 = new BipartiteSubgraph2(subVertices2,graph);
         
         /* Obtain the neighbours. */
         ArrayList<Vertex2> nb1 = sub1.neighbours(a1);

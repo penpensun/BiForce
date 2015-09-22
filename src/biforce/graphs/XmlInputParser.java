@@ -19,7 +19,7 @@ public class XmlInputParser {
      * @param entityContent
      * @param inputGraph 
      */
-    public void parseEntityString(String entityContent, MatrixHierGeneralGraph inputGraph){
+    public void parseEntityString(String entityContent, HierGraphWIE inputGraph){
         /* Check if setSizes in the inputGraph has been checked.*/
         if(inputGraph == null || inputGraph.setSizes == null)
             throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) The setSizes array is not initialized in the graph.");
@@ -66,7 +66,7 @@ public class XmlInputParser {
      * @param entityContent
      * @param inputGraph 
      */
-    public void parseEntityString(String entityContent, MatrixHierNpartiteGraph inputGraph){
+    public void parseEntityString(String entityContent, HierGraph inputGraph){
         /* Check if setSizes in the inputGraph has been checked.*/
         if(inputGraph == null || inputGraph.setSizes == null)
             throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) The setSizes array is not initialized in the graph.");
@@ -113,7 +113,7 @@ public class XmlInputParser {
      * @param entityContent
      * @param inputGraph 
      */
-    public void parseEntityString(String entityContent, MatrixGeneralNpartiteGraph inputGraph){
+    public void parseEntityString(String entityContent, NpartiteGraph inputGraph){
         /* Check if setSizes in the inputGraph has been checked.*/
         if(inputGraph == null || inputGraph.setSizes == null)
             throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) The setSizes array is not initialized in the graph.");
@@ -161,7 +161,7 @@ public class XmlInputParser {
      * @param entityContent
      * @param inputGraph 
      */
-    public void parseEntityString(String entityContent, MatrixGraph inputGraph){
+    public void parseEntityString(String entityContent, GeneralGraph inputGraph){
          /* Check if setSizes in the inputGraph has been checked.*/
         if(inputGraph == null)
             throw new IllegalArgumentException("(biforce.graphs.XmlInputParser.parseEntity) The setSizes array is not initialized in the graph.");
@@ -180,7 +180,7 @@ public class XmlInputParser {
      * @param inputFile
      * @param inputGraph 
      */
-    public void parseEntityFile(String inputFile, MatrixHierGeneralGraph inputGraph){
+    public void parseEntityFile(String inputFile, HierGraphWIE inputGraph){
         /* Init the FileReader.*/
         FileReader fr = null;
         BufferedReader br = null;
@@ -231,7 +231,7 @@ public class XmlInputParser {
      * @param inputFile
      * @param inputGraph 
      */
-    public void parseEntityFile(String inputFile, MatrixHierNpartiteGraph inputGraph){
+    public void parseEntityFile(String inputFile, HierGraph inputGraph){
         /* Init the FileReader.*/
         FileReader fr = null;
         BufferedReader br = null;
@@ -282,7 +282,7 @@ public class XmlInputParser {
      * @param inputFile
      * @param inputGraph 
      */
-    public void parseEntityFile(String inputFile, MatrixGeneralNpartiteGraph inputGraph){
+    public void parseEntityFile(String inputFile, NpartiteGraph inputGraph){
         /* Init the FileReader.*/
         FileReader fr = null;
         BufferedReader br = null;
@@ -334,7 +334,7 @@ public class XmlInputParser {
      * @param inputFile
      * @param inputGraph 
      */
-    public final void parseEntityFile(String inputFile, MatrixGraph inputGraph){
+    public final void parseEntityFile(String inputFile, GeneralGraph inputGraph){
         /* Init the FileReader.*/
         FileReader fr = null;
         BufferedReader br = null;
@@ -366,7 +366,7 @@ public class XmlInputParser {
      * @param inputGraph 
      */
     public void parseInterMatrixString(String matrixContent, int matrixLevel1, int matrixLevel2,
-            MatrixHierGeneralGraph inputGraph){
+            HierGraphWIE inputGraph){
         /* Get the inter matrix in the interEdgeWeights. The index of interMatrix is the min of matrixLevel1 and matrixLevel2. */
         float[][] interMatrix = inputGraph.interEdgeWeights.get(Math.min(matrixLevel1, matrixLevel2));
         /* Split the matrixContent. */
@@ -413,7 +413,7 @@ public class XmlInputParser {
      * @param inputGraph 
      */
     public void parseInterMatrixString(String matrixContent, int matrixLevel1, int matrixLevel2, 
-            MatrixHierNpartiteGraph inputGraph){
+            HierGraph inputGraph){
         float[][] interMatrix= inputGraph.edgeWeights.get(Math.min(matrixLevel1, matrixLevel2));
         String[] rowsStr = matrixContent.split("\n");
         for(int i=0;i<rowsStr.length;i++){
@@ -458,7 +458,7 @@ public class XmlInputParser {
      * @param inputGraph 
      */
     public void parseInterMatrixString(String matrixContent, int matrixLevel1, int matrixLevel2,
-            MatrixGeneralNpartiteGraph inputGraph){
+            NpartiteGraph inputGraph){
         float[][] interMatrix;
         if(matrixLevel1 - matrixLevel2 == 1 || matrixLevel1 - matrixLevel2 == -1)
             interMatrix= inputGraph.interEdgeWeights.get(Math.min(matrixLevel1, matrixLevel2));
@@ -516,7 +516,7 @@ public class XmlInputParser {
     * @param inputGraph 
     */
     public void parseInterMatrixFile(String matrixFile, int matrixLevel1,int matrixLevel2, 
-            MatrixHierGeneralGraph inputGraph){
+            HierGraphWIE inputGraph){
         FileReader fr = null;
         BufferedReader br = null;
         try{
@@ -581,7 +581,7 @@ public class XmlInputParser {
      * @param inputGraph 
      */
     public void parseInterMatrixFile(String matrixFile, int matrixLevel1, int matrixLevel2,
-            MatrixHierNpartiteGraph inputGraph){
+            HierGraph inputGraph){
         FileReader fr = null;
         BufferedReader br = null;
         try{
@@ -645,7 +645,7 @@ public class XmlInputParser {
      * @param inputGraph 
      */
     public void parseInterMatrixFile(String matrixFile, int matrixLevel1, int matrixLevel2,
-            MatrixGeneralNpartiteGraph inputGraph){
+            NpartiteGraph inputGraph){
         FileReader fr = null;
         BufferedReader br = null;
         try{
@@ -719,7 +719,7 @@ public class XmlInputParser {
      * @param inputGraph 
      */
     public void parseIntraMatrixFile(String matrixFile, int matrixLevel1, int matrixLevel2, 
-            MatrixHierNpartiteGraph inputGraph){
+            HierGraph inputGraph){
         FileReader fr = null;
         BufferedReader br = null;
         try{
@@ -781,7 +781,7 @@ public class XmlInputParser {
      * @param inputGraph 
      */
     public void parseIntraMatrixString(String matrixContent, int matrixLevel,
-            MatrixHierGeneralGraph inputGraph){
+            HierGraphWIE inputGraph){
         float[][] intraMatrix = inputGraph.intraEdgeWeights.get(matrixLevel);
         /* Split the matrixContent. */
         String[] rowsStr = matrixContent.split("\n");
@@ -836,7 +836,7 @@ public class XmlInputParser {
      * @param inputGraph 
      */
     public void parseIntraMatrixString(String matrixContent, int matrixLevel,
-            MatrixGeneralNpartiteGraph inputGraph){
+            NpartiteGraph inputGraph){
         
     }
     /**
@@ -847,7 +847,7 @@ public class XmlInputParser {
      * @param inputGraph
      */
     public void parseIntraMatrixFile(String matrixFile, int matrixLevel,
-            MatrixHierGeneralGraph inputGraph){
+            HierGraphWIE inputGraph){
         /* Create FileReader and BufferedReader. */
         FileReader fr = null;
         BufferedReader br = null;
@@ -926,7 +926,7 @@ public class XmlInputParser {
      * @param inputGraph 
      */
     public void parseIntraMatrixFile(String matrixFile, int matrixLevel,
-            MatrixGeneralNpartiteGraph inputGraph){
+            NpartiteGraph inputGraph){
         /* Create FileReader and BufferedReader. */
         FileReader fr = null;
         BufferedReader br = null;
@@ -1005,7 +1005,7 @@ public class XmlInputParser {
      * @param matrixContent
      * @param inputGraph 
      */
-    public final void parseMatrixString(String matrixContent, MatrixGraph inputGraph){
+    public final void parseMatrixString(String matrixContent, GeneralGraph inputGraph){
         float[][] matrix = inputGraph.edgeWeights;
         String[] rowsStr = matrixContent.split("\n");
         for(int i=0;i<rowsStr.length;i++){
@@ -1056,7 +1056,7 @@ public class XmlInputParser {
      * @param matrixFile
      * @param inputGraph 
      */
-    public final void parseMatrixFile(String matrixFile, MatrixGraph inputGraph){
+    public final void parseMatrixFile(String matrixFile, GeneralGraph inputGraph){
         FileReader fr = null;
         BufferedReader br = null;
         try{

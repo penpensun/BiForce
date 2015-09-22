@@ -5,10 +5,10 @@
  */
 
 package performance;
-import biforce.graphs.MatrixBipartiteGraph;
-import biforce.graphs.MatrixBipartiteGraph2;
-import biforce.graphs.MatrixHierNpartiteGraph;
-import biforce.graphs.MatrixHierGeneralGraph;
+import biforce.graphs.BipartiteGraph;
+import biforce.graphs.BipartiteGraph2;
+import biforce.graphs.HierGraph;
+import biforce.graphs.HierGraphWIE;
 import biforce.algorithms.BiForceOnGraph4;
 import biforce.algorithms.BiForceOnGraph4;
 import biforce.algorithms.BiForceOnGraph4;
@@ -236,8 +236,8 @@ public class PerformanceAnalyzer {
             bw.write("Input prefix\tStandard costs\tEditing costs\r\n");
         }catch(IOException e){}
         /* Read the input graph.*/
-        MatrixHierGeneralGraph hierGeneralInput =
-                new MatrixHierGeneralGraph(input,false,isXml,0);
+        HierGraphWIE hierGeneralInput =
+                new HierGraphWIE(input,false,isXml,0);
         BiForceOnGraph4 biforce = new BiForceOnGraph4();
         Param p = Param.readParams(paramFile);
         try{
@@ -290,8 +290,8 @@ public class PerformanceAnalyzer {
         /* Run BiforceOnGraph4 on the graph. */
         for(int i=0;i<number;i++){
             /* Read the input graph.*/
-            MatrixHierGeneralGraph hierGeneralInput =
-                    new MatrixHierGeneralGraph(inputPrefix+"_"+i+".txt",false,isXml,0);
+            HierGraphWIE hierGeneralInput =
+                    new HierGraphWIE(inputPrefix+"_"+i+".txt",false,isXml,0);
             BiForceOnGraph4 biforce = new BiForceOnGraph4();
             Param p = Param.readParams(paramFile);
             try{

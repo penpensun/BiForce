@@ -5,7 +5,7 @@
  */
 
 package biforce.algorithms;
-import biforce.graphs.MatrixBipartiteGraph;
+import biforce.graphs.BipartiteGraph;
 import biforce.graphs.Vertex;
 import biforce.graphs.Cluster;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class BiForceOnGraph3 {
      * @return 
      * @throws IllegalArgumentException. When there is point without a cluster assignment.
      */
-    private void assignActions(MatrixBipartiteGraph graph, Param p) throws IllegalArgumentException
+    private void assignActions(BipartiteGraph graph, Param p) throws IllegalArgumentException
     {
 
         //first check if there is no unassigned vertex
@@ -71,7 +71,7 @@ public class BiForceOnGraph3 {
      * This method assigns clusters to each node in the given graph.
      * @param graph 
      */
-    private void assignClusters(MatrixBipartiteGraph graph)
+    private void assignClusters(BipartiteGraph graph)
     {
         int maxClusterIdx = 0;
         for(int i=0;i<graph.getVertexCount();i++)
@@ -103,7 +103,7 @@ public class BiForceOnGraph3 {
      * @param p
      * @return 
      */
-    public double computeCost(MatrixBipartiteGraph graph, Param p)
+    public double computeCost(BipartiteGraph graph, Param p)
     {
 
         double cost = 0;
@@ -148,7 +148,7 @@ public class BiForceOnGraph3 {
      * @param c2
      * @return 
      */
-    private double computeMergeCost(MatrixBipartiteGraph graph, Cluster c1, Cluster c2, Param p )
+    private double computeMergeCost(BipartiteGraph graph, Cluster c1, Cluster c2, Param p )
     {
         double CostDiff = 0;
         for(Vertex pt1: c1.getVertices())
@@ -175,7 +175,7 @@ public class BiForceOnGraph3 {
      * @param clt
      * @return 
      */
-    private double computeMoveCost(MatrixBipartiteGraph graph, Vertex toMove, Cluster SourceCls, Cluster TargetCls, Param p)
+    private double computeMoveCost(BipartiteGraph graph, Vertex toMove, Cluster SourceCls, Cluster TargetCls, Param p)
     {
         //check if the point toMove belongs to the cluster SourceCls
         if(toMove.ClustNum != SourceCls.getClustIdx())
@@ -233,7 +233,7 @@ public class BiForceOnGraph3 {
      * @param p
      * @return 
      */
-    private double[][] displace(MatrixBipartiteGraph graph, Param p)
+    private double[][] displace(BipartiteGraph graph, Param p)
     {
 
         double[][] DispVectors = new double[graph.getVertexCount()][p.getDim()];
@@ -289,7 +289,7 @@ public class BiForceOnGraph3 {
      * @param vtx2
      * @return 
      */
-    public double getDist( MatrixBipartiteGraph graph,double[][] Distances, Vertex vtx1, Vertex vtx2)
+    public double getDist( BipartiteGraph graph,double[][] Distances, Vertex vtx1, Vertex vtx2)
     {
         return Distances[vtx1.getIdx()+vtx1.vtxSet*graph.getSetSize(0)][vtx2.getIdx()+vtx2.vtxSet*graph.getSetSize(0)];
     }
@@ -369,7 +369,7 @@ public class BiForceOnGraph3 {
      * @param p
      * @return 
      */
-    private ArrayList<Vertex> initLayout(MatrixBipartiteGraph graph, Param p){
+    private ArrayList<Vertex> initLayout(BipartiteGraph graph, Param p){
         
         int dim = p.getDim();
         double radius = p.getRadius();
@@ -438,7 +438,7 @@ public class BiForceOnGraph3 {
      * @param Points
      * @param k 
      */
-    private void kmeansClust(MatrixBipartiteGraph input, int k, Param p)
+    private void kmeansClust(BipartiteGraph input, int k, Param p)
     {
 
         for(Vertex vtx: input.getVertices())
@@ -543,7 +543,7 @@ public class BiForceOnGraph3 {
      * @param vtx2
      * @param dist 
      */
-    public void putDist(double[][] Distances, MatrixBipartiteGraph graph,
+    public void putDist(double[][] Distances, BipartiteGraph graph,
             Vertex vtx1, Vertex vtx2, double dist)
     {
         Distances[vtx1.getIdx()+vtx1.vtxSet*graph.getSetSize(0)]
@@ -559,7 +559,7 @@ public class BiForceOnGraph3 {
      * @return
      * @throws IOException 
      */
-    public MatrixBipartiteGraph run(MatrixBipartiteGraph graph, Param p) throws IOException{
+    public BipartiteGraph run(BipartiteGraph graph, Param p) throws IOException{
         initLayout(graph, p);
         //Get the list of vertices in the input graph
         /*
@@ -746,9 +746,9 @@ public class BiForceOnGraph3 {
      * @return
      * @throws IOException 
      */
-    public MatrixBipartiteGraph run(String inputfile, Param p) throws IOException
+    public BipartiteGraph run(String inputfile, Param p) throws IOException
     {
-        MatrixBipartiteGraph graph = new MatrixBipartiteGraph(inputfile);
+        BipartiteGraph graph = new BipartiteGraph(inputfile);
         return run(graph,p);
     }
     
@@ -758,7 +758,7 @@ public class BiForceOnGraph3 {
      * @param VertexList
      * @param DistThresh 
      */
-    private void singleLinkageClust(MatrixBipartiteGraph graph, double[][] distances, double DistThresh)
+    private void singleLinkageClust(BipartiteGraph graph, double[][] distances, double DistThresh)
     {
 
         //init all the clust num to be -1
@@ -802,7 +802,7 @@ public class BiForceOnGraph3 {
      * @param iter
      * @param p 
      */
-    private void update(MatrixBipartiteGraph input, 
+    private void update(BipartiteGraph input, 
             ArrayList<double[]> DispVectors, int iter, Param p)
     {
 
@@ -837,7 +837,7 @@ public class BiForceOnGraph3 {
      * @param iter
      * @param p 
      */
-    private void update(MatrixBipartiteGraph input,
+    private void update(BipartiteGraph input,
             double[][] DispVectors, int iter,Param p)
     {
         //this variable stores the magnitude of the current iteration. which limits the max

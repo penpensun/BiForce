@@ -53,11 +53,11 @@ public class MatrixBipartiteGraph2Test {
      */
     public void testConstructor(){
         System.out.println("### testConstructor starts.");
-        MatrixBipartiteGraph2 graphHeader = new MatrixBipartiteGraph2(testHeaderInput,true);
-        MatrixBipartiteGraph2 graphNoheader = new MatrixBipartiteGraph2(testNoHeaderInput,false);
-        MatrixBipartiteGraph graphStableVer = null;
+        BipartiteGraph2 graphHeader = new BipartiteGraph2(testHeaderInput,true);
+        BipartiteGraph2 graphNoheader = new BipartiteGraph2(testNoHeaderInput,false);
+        BipartiteGraph graphStableVer = null;
         try{
-            graphStableVer = new MatrixBipartiteGraph(testNoHeaderInput);
+            graphStableVer = new BipartiteGraph(testNoHeaderInput);
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -147,7 +147,7 @@ public class MatrixBipartiteGraph2Test {
      */
     public void testErrorConstructor(){
         System.out.println("### testErrorConstructor starts.");
-        MatrixBipartiteGraph2 errorGraph = new MatrixBipartiteGraph2(testInvalidHeaderInput,true);
+        BipartiteGraph2 errorGraph = new BipartiteGraph2(testInvalidHeaderInput,true);
         System.out.println("### testErrorConstructor ends.");
         System.out.println();
     }
@@ -157,7 +157,7 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testBfs() {
         System.out.println("### testBfs starts.");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testBfsInput,true,0);
+        BipartiteGraph2 graph = new BipartiteGraph2(testBfsInput,true,0);
         /* Get the vertices. */
         Vertex2 a1 = graph.getVertex("a1");
         Vertex2 b3 = graph.getVertex("b3");
@@ -174,7 +174,7 @@ public class MatrixBipartiteGraph2Test {
         subVertices1.add(graph.getVertex("b2"));
         subVertices1.add(graph.getVertex("b3"));
         subVertices1.add(graph.getVertex("b4"));
-        MatrixBipartiteSubgraph2 correctSubgraph1 = new MatrixBipartiteSubgraph2(subVertices1,graph);
+        BipartiteSubgraph2 correctSubgraph1 = new BipartiteSubgraph2(subVertices1,graph);
         
         ArrayList<Vertex2> subVertices2 = new ArrayList<>();
         subVertices2.add(graph.getVertex("a4"));
@@ -182,19 +182,19 @@ public class MatrixBipartiteGraph2Test {
         subVertices2.add(graph.getVertex("a6"));
         subVertices2.add(graph.getVertex("b5"));
         subVertices2.add(graph.getVertex("b6"));
-        MatrixBipartiteSubgraph2 correctSubgraph2 = new MatrixBipartiteSubgraph2(subVertices2,graph);
+        BipartiteSubgraph2 correctSubgraph2 = new BipartiteSubgraph2(subVertices2,graph);
         
         
         ArrayList<Vertex2> subVertices3 = new ArrayList<>();
         subVertices3.add(graph.getVertex("a7"));
-        MatrixBipartiteSubgraph2 correctSubgraph3 = new MatrixBipartiteSubgraph2(subVertices3,graph);
+        BipartiteSubgraph2 correctSubgraph3 = new BipartiteSubgraph2(subVertices3,graph);
         
         /* Obtain the subgraphs by bfs(). */
-        MatrixBipartiteSubgraph2 bfsSubgraph1 = graph.bfs(a1);
-        MatrixBipartiteSubgraph2 bfsSubgraph2 = graph.bfs(b3);
-        MatrixBipartiteSubgraph2 bfsSubgraph3 = graph.bfs(b6);
-        MatrixBipartiteSubgraph2 bfsSubgraph4 = graph.bfs(a4);
-        MatrixBipartiteSubgraph2 bfsSubgraph5 = graph.bfs(a7);
+        BipartiteSubgraph2 bfsSubgraph1 = graph.bfs(a1);
+        BipartiteSubgraph2 bfsSubgraph2 = graph.bfs(b3);
+        BipartiteSubgraph2 bfsSubgraph3 = graph.bfs(b6);
+        BipartiteSubgraph2 bfsSubgraph4 = graph.bfs(a4);
+        BipartiteSubgraph2 bfsSubgraph5 = graph.bfs(a7);
         
         /* Compare the two subgraphs. */
         assertEquals(true,bfsSubgraph1.equals(correctSubgraph1));
@@ -215,7 +215,7 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testConnectedComponents() {
         System.out.println("### testConnectedComponents starts.");
-        MatrixBipartiteGraph2 input = new MatrixBipartiteGraph2(testConnectedComponents,true,0);
+        BipartiteGraph2 input = new BipartiteGraph2(testConnectedComponents,true,0);
         /* Create the correct connected components. */
         ArrayList<Vertex2> subvertices1 = new ArrayList<>();
         subvertices1.add(input.getVertex("a1"));
@@ -223,35 +223,35 @@ public class MatrixBipartiteGraph2Test {
         subvertices1.add(input.getVertex("a3"));
         subvertices1.add(input.getVertex("b1"));
         subvertices1.add(input.getVertex("b2"));
-        MatrixBipartiteSubgraph2 subgraph1 =new MatrixBipartiteSubgraph2(subvertices1,input);
+        BipartiteSubgraph2 subgraph1 =new BipartiteSubgraph2(subvertices1,input);
         
         ArrayList<Vertex2> subvertices2 = new ArrayList<>();
         subvertices2.add(input.getVertex("b3"));
-        MatrixBipartiteSubgraph2 subgraph2 = new MatrixBipartiteSubgraph2(subvertices2,input);
+        BipartiteSubgraph2 subgraph2 = new BipartiteSubgraph2(subvertices2,input);
         
         ArrayList<Vertex2> subvertices3 = new ArrayList<>();
         subvertices3.add(input.getVertex("a4"));
-        MatrixBipartiteSubgraph2 subgraph3 = new MatrixBipartiteSubgraph2(subvertices3,input);
+        BipartiteSubgraph2 subgraph3 = new BipartiteSubgraph2(subvertices3,input);
         
         ArrayList<Vertex2> subvertices4 = new ArrayList<>();
         subvertices4.add(input.getVertex("a5"));
         subvertices4.add(input.getVertex("b4"));
         subvertices4.add(input.getVertex("b5"));
-        MatrixBipartiteSubgraph2 subgraph4 = new MatrixBipartiteSubgraph2(subvertices4,input);
+        BipartiteSubgraph2 subgraph4 = new BipartiteSubgraph2(subvertices4,input);
         
-        ArrayList<MatrixBipartiteSubgraph2> correctConnComp = new ArrayList<>();
+        ArrayList<BipartiteSubgraph2> correctConnComp = new ArrayList<>();
         correctConnComp.add(subgraph1);
         correctConnComp.add(subgraph2);
         correctConnComp.add(subgraph3);
         correctConnComp.add(subgraph4);
         
         /* Obtain the connected components by connectedComponents(). */
-        ArrayList<MatrixBipartiteSubgraph2> connectedComponents = 
+        ArrayList<BipartiteSubgraph2> connectedComponents = 
                 new ArrayList<>(input.connectedComponents());
         
         /* Compare the results. */
         assertEquals(correctConnComp.size(), connectedComponents.size());
-        for(MatrixBipartiteSubgraph2 sub: connectedComponents){
+        for(BipartiteSubgraph2 sub: connectedComponents){
             assertEquals(correctConnComp.contains(sub),true);
         }
         
@@ -265,9 +265,9 @@ public class MatrixBipartiteGraph2Test {
     public void testDetractThresh(){
         System.out.println("## testDetractThresh starts.  ");
         
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testEdgeDetractInput,true);
+        BipartiteGraph2 graph = new BipartiteGraph2(testEdgeDetractInput,true);
         
-        MatrixBipartiteGraph2 graphDetracted = new MatrixBipartiteGraph2(testEdgeDetractInput,true,10);
+        BipartiteGraph2 graphDetracted = new BipartiteGraph2(testEdgeDetractInput,true,10);
         
         /* Get the edges. */
         float[][] oriEdgeWeights =new float[graph.set0Size][graph.set1Size];
@@ -311,7 +311,7 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testDist() {
         System.out.println("### testDist starts.");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testDistInput,true,0);
+        BipartiteGraph2 graph = new BipartiteGraph2(testDistInput,true,0);
         /* Create the coords for all vertices. */
         float[] a1Coords = {0,0};
         float[] a2Coords = {0,3};
@@ -348,7 +348,7 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testEdgeWeight() {
         System.out.println("### testEdgeWeight starts.");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testEdgeWeightInput,true,0);
+        BipartiteGraph2 graph = new BipartiteGraph2(testEdgeWeightInput,true,0);
         /* Get vertices for test cases. */
         Vertex2 a1 = graph.getVertex("a1");
         Vertex2 b1 = graph.getVertex("b1");
@@ -372,7 +372,7 @@ public class MatrixBipartiteGraph2Test {
     public void testIsActionTaken() {
         System.out.println("### testIsActionTaken starts.");
         int ActIndx = 0;
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testBfsInput,true,0);
+        BipartiteGraph2 graph = new BipartiteGraph2(testBfsInput,true,0);
         Vertex2 a1 = graph.getVertex("a1");
         Vertex2 b1 = graph.getVertex("b1");
         graph.pushAction(a1, b1);
@@ -388,7 +388,7 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testGetCost() {
         System.out.println("### testGetCost starts.");
-        MatrixBipartiteGraph2 instance = new MatrixBipartiteGraph2(testBfsInput,true);
+        BipartiteGraph2 instance = new BipartiteGraph2(testBfsInput,true);
         instance.setThreshold(0);
         
         assertEquals(instance.getCost(),0,0.0001);
@@ -420,7 +420,7 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testNeighbours(){
         System.out.println("### testnNeighbours starts.");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testNeighboursInput,true);
+        BipartiteGraph2 graph = new BipartiteGraph2(testNeighboursInput,true);
         graph.detractThresh(0);
         /* Create the seeds of vertices. */
         Vertex2 seed1 = graph.getVertex("a1");
@@ -471,7 +471,7 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testPushAction() {
         System.out.println("### testPushAction starts.");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testBfsInput,true,0);
+        BipartiteGraph2 graph = new BipartiteGraph2(testBfsInput,true,0);
         Vertex2 a1 = graph.getVertex("a1");
         Vertex2 b1 = graph.getVertex("b1");
         graph.pushAction(a1, b1);
@@ -492,9 +492,9 @@ public class MatrixBipartiteGraph2Test {
     public void testRestoreDetract(){
         System.out.println("## testRestoreThresh starts.  ");
         
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testEdgeDetractInput,true);
+        BipartiteGraph2 graph = new BipartiteGraph2(testEdgeDetractInput,true);
         
-        MatrixBipartiteGraph2 graphDetracted = new MatrixBipartiteGraph2(testEdgeDetractInput,true,10);
+        BipartiteGraph2 graphDetracted = new BipartiteGraph2(testEdgeDetractInput,true,10);
         
         /* Get the edges. */
         float[][] oriEdgeWeights =new float[graph.set0Size][graph.set1Size];
@@ -555,7 +555,7 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testSetEdgeWeight() {
         System.out.println("### testSetEdgeWeight starts.");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testEdgeWeightInput,true);
+        BipartiteGraph2 graph = new BipartiteGraph2(testEdgeWeightInput,true);
         Vertex2 b2 = graph.getVertex("b2");
         Vertex2 a1 = graph.getVertex("a1");
         Vertex2 a3 = graph.getVertex("a3");
@@ -609,7 +609,7 @@ public class MatrixBipartiteGraph2Test {
     public void testTakeAction() {
         System.out.println("### testTakeAction starts.");
         System.out.println("### testPushAction starts.");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testBfsInput,true,0);
+        BipartiteGraph2 graph = new BipartiteGraph2(testBfsInput,true,0);
         Vertex2 a1 = graph.getVertex("a1");
         Vertex2 b1 = graph.getVertex("b1");
         graph.pushAction(a1, b1);
@@ -623,7 +623,7 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testTakeActions() {
         System.out.println("### testTakeActions starts.");
-        MatrixBipartiteGraph2 instance = new MatrixBipartiteGraph2(testBfsInput,true,0.5f);
+        BipartiteGraph2 instance = new BipartiteGraph2(testBfsInput,true,0.5f);
         /* We push 3 actions into the graph, 2 insertions and 1 deletion. */
         Vertex2 a1 = instance.getVertex("a1");
         Vertex2 b1 = instance.getVertex("b1");
@@ -653,7 +653,7 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testVertexSetCount() {
         System.out.println("### testVertexSetCount starts.");
-        MatrixBipartiteGraph2 instance = new MatrixBipartiteGraph2(testBfsInput,true,0);
+        BipartiteGraph2 instance = new BipartiteGraph2(testBfsInput,true,0);
         assertEquals(instance.vertexCount(),13);
         assertEquals(instance.vertexSetCount(),2);
         
@@ -663,13 +663,13 @@ public class MatrixBipartiteGraph2Test {
     @Test
     public void testWriteGraphTo(){
         System.out.println("(MatrixBipartiteGraph2Test.testWriteGraphTo) Test starts.");
-        MatrixBipartiteGraph2 graph = new MatrixBipartiteGraph2(testHeaderInput, true);
+        BipartiteGraph2 graph = new BipartiteGraph2(testHeaderInput, true);
         graph.writeGraphTo(testWriteXmlGraphOutput, true);
         graph.writeGraphTo(testWritePlainGraphOutput, false);
         /* Check if the the outputted graph is the same with the input graph. */
         /* Check the xml output. */
         /* Check the plain output. */
-        MatrixBipartiteGraph2 writtenGraphPlain = new MatrixBipartiteGraph2(testWritePlainGraphOutput,
+        BipartiteGraph2 writtenGraphPlain = new BipartiteGraph2(testWritePlainGraphOutput,
             true);
         assertTrue(graph.isSame(writtenGraphPlain));
         System.out.println("(MatrixBipartiteGraph2Test.testWriteGraphTo) Test ends.");

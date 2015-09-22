@@ -20,7 +20,7 @@ import java.io.FileWriter;
 public class BipartiteGraphMatrixV2{
     //This variable stores the reference to the MatrixBipartiteGraph， which is going 
     //to be inited when the data from input file is read.
-    MatrixBipartiteGraph Graph;
+    BipartiteGraph Graph;
     /**
      * Inits matrix on input.
      * @param input
@@ -109,16 +109,16 @@ public class BipartiteGraphMatrixV2{
         }
         
         if(hasHeader)
-            Graph =  new MatrixBipartiteGraph(edgweight, RowNames, ColNames);
+            Graph =  new BipartiteGraph(edgweight, RowNames, ColNames);
         else
-            Graph = new MatrixBipartiteGraph(edgweight);
+            Graph = new BipartiteGraph(edgweight);
     }
     
     /**
      * This method returns the bipartitegraph.
      * @return 
      */
-    public MatrixBipartiteGraph getGraph ()
+    public BipartiteGraph getGraph ()
     {
         return Graph;
     }
