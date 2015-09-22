@@ -8,7 +8,7 @@ package biforce.algorithms;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import biforce.graphs.BipartiteGraph;
+import biforce.graphs.BipartiteGraph_deprecated;
 
 /**
  *
@@ -77,7 +77,7 @@ public class DeprecatedRunGraph {
         
         if(thresh != -Double.MAX_VALUE)
             p.setThresh((float)thresh);
-        BipartiteGraph graph = new BipartiteGraph(input);
+        BipartiteGraph_deprecated graph = new BipartiteGraph_deprecated(input);
         BiForceOnGraph2.run(graph,p);
         BufferedWriter bw = new BufferedWriter(new FileWriter(clusterout,true));
         bw.write("<output>"+input+"\r\n");

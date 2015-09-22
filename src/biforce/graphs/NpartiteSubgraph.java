@@ -1,34 +1,34 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package biforce.graphs;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
 /**
- * This class
+ *
  * @author penpen926
  */
-public class MatrixHierNpartiteSubgraph extends Subgraph2 implements
-        Comparable<MatrixHierNpartiteSubgraph>{
+public class NpartiteSubgraph extends Subgraph2 implements Comparable<NpartiteSubgraph>{
     /* The supergraph. */
-    MatrixHierNpartiteGraph supergraph = null;
+    NpartiteGraph supergraph = null;
     
-    public MatrixHierNpartiteSubgraph(ArrayList<Vertex2> subVertices, MatrixHierNpartiteGraph supergraph){
+    public NpartiteSubgraph(ArrayList<Vertex2> subVertices, 
+            NpartiteGraph supergraph){
         this.subvertices = subVertices;
         this.supergraph = supergraph;
     }
+    
     /**
      * This method returns the connected component given a vertex using breadth-first search.
      * @param Vtx
      * @return 
      */
     @Override
-    public MatrixHierNpartiteSubgraph bfs(Vertex2 Vtx) {
+    public NpartiteSubgraph bfs(Vertex2 Vtx) {
         LinkedList<Vertex2> queue = new LinkedList<>();
         //create a marker
         HashMap<String, Boolean> marker = new HashMap<>();
@@ -67,8 +67,18 @@ public class MatrixHierNpartiteSubgraph extends Subgraph2 implements
 
          }
          /* Create a new subhierNpartitegraph. */
-         MatrixHierNpartiteSubgraph sub = new MatrixHierNpartiteSubgraph(result,this.supergraph);
+         NpartiteSubgraph sub = new NpartiteSubgraph(result,this.supergraph);
          return sub;
+    }
+    
+    
+    @Override
+    public int compareTo(NpartiteSubgraph o) {
+        if(this.vertexCount() < o.vertexCount())
+            return -1;
+        else if(this.vertexCount() == o.vertexCount())
+            return 0;
+        else return 1;
     }
 
     /**
@@ -77,7 +87,7 @@ public class MatrixHierNpartiteSubgraph extends Subgraph2 implements
      */
     @Override
     public List<? extends Subgraph2> connectedComponents() {
-        ArrayList<MatrixHierNpartiteSubgraph> connectedComps = new ArrayList<>();
+        ArrayList<NpartiteSubgraph> connectedComps = new ArrayList<>();
         //create a indicator LinkedList of vertices, when a vertex is included in one of the subgraphs, then it is 
         //removed from the indicator LinkedList
         LinkedList<Vertex2> indicatorList = new LinkedList<>();
@@ -88,7 +98,7 @@ public class MatrixHierNpartiteSubgraph extends Subgraph2 implements
         //While there is still unvisited vertex, we use it as the seed to search for subgraphs.
         while(!indicatorList.isEmpty()){
             Vertex2 Seed = indicatorList.pollFirst();
-            MatrixHierNpartiteSubgraph ConnectedComponent = bfs(Seed);
+            NpartiteSubgraph ConnectedComponent = bfs(Seed);
             connectedComps.add(ConnectedComponent);
             //remove all the vertex in the ConnectedComponent from indicatorList
             for(Vertex2 vtx: ConnectedComponent.getSubvertices()){
@@ -111,7 +121,31 @@ public class MatrixHierNpartiteSubgraph extends Subgraph2 implements
     }
 
     @Override
-    public MatrixHierNpartiteGraph getSuperGraph() {
+    public boolean equals(Object o){
+        /* First we check if the given object is an instance of MatrixHierGeneralSubgraph. */
+        if(o instanceof HierSubgraphWIE){
+            HierSubgraphWIE sub = (HierSubgraphWIE)o;
+            ArrayList<Vertex2> subVertices2 = sub.getSubvertices();
+            /* Then we check the sizes of the two Vertex2 arraylists. */
+            if(this.subvertices.size() != subVertices2.size())
+                return false;
+            /* Then we check the vertex one by one. */
+            /* We first generate a copy of the subvertices in this class. */
+            ArrayList<Vertex2> subverticesCopy = new ArrayList(subvertices);
+            for(int i=0;i<subVertices2.size();i++){
+                if(!subverticesCopy.remove(subVertices2.get(i)))
+                    return false;
+            }
+            /* If all vertices in subVertices2 can be found in subverticesCopy, 
+             * then we return true.*/
+            return true;
+        }
+        else
+            return false;
+    }
+    
+    @Override
+    public NpartiteGraph getSuperGraph() {
         return supergraph;
     }
 
@@ -140,13 +174,4 @@ public class MatrixHierNpartiteSubgraph extends Subgraph2 implements
         return subvertices.size();
     }
 
-    @Override
-    public int compareTo(MatrixHierNpartiteSubgraph o) {
-        if(this.vertexCount() < o.vertexCount())
-            return -1;
-        else if(this.vertexCount() == o.vertexCount())
-            return 0;
-        else return 1;
-    }
-    
 }

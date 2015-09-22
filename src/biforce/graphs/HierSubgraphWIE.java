@@ -1,34 +1,35 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
+ * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package biforce.graphs;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 /**
- *
+ * This is a subgraph of MatrixHierGeneralGraph
  * @author penpen926
  */
-public class MatrixGeneralNpartiteSubgraph extends Subgraph2 implements Comparable<MatrixGeneralNpartiteSubgraph>{
+public class HierSubgraphWIE extends Subgraph2 implements
+    Comparable<HierSubgraphWIE>{
     /* The supergraph. */
-    MatrixGeneralNpartiteGraph supergraph = null;
+    HierGraphWIE supergraph = null;
     
-    public MatrixGeneralNpartiteSubgraph(ArrayList<Vertex2> subVertices, 
-            MatrixGeneralNpartiteGraph supergraph){
+    public HierSubgraphWIE
+            (ArrayList<Vertex2> subVertices, HierGraphWIE supergraph){
         this.subvertices = subVertices;
         this.supergraph = supergraph;
     }
-    
     /**
      * This method returns the connected component given a vertex using breadth-first search.
      * @param Vtx
      * @return 
      */
     @Override
-    public MatrixGeneralNpartiteSubgraph bfs(Vertex2 Vtx) {
+    public HierSubgraphWIE bfs(Vertex2 Vtx) {
         LinkedList<Vertex2> queue = new LinkedList<>();
         //create a marker
         HashMap<String, Boolean> marker = new HashMap<>();
@@ -67,13 +68,12 @@ public class MatrixGeneralNpartiteSubgraph extends Subgraph2 implements Comparab
 
          }
          /* Create a new subhierNpartitegraph. */
-         MatrixGeneralNpartiteSubgraph sub = new MatrixGeneralNpartiteSubgraph(result,this.supergraph);
+         HierSubgraphWIE sub = new HierSubgraphWIE(result,this.supergraph);
          return sub;
     }
     
-    
     @Override
-    public int compareTo(MatrixGeneralNpartiteSubgraph o) {
+    public int compareTo(HierSubgraphWIE o) {
         if(this.vertexCount() < o.vertexCount())
             return -1;
         else if(this.vertexCount() == o.vertexCount())
@@ -87,7 +87,7 @@ public class MatrixGeneralNpartiteSubgraph extends Subgraph2 implements Comparab
      */
     @Override
     public List<? extends Subgraph2> connectedComponents() {
-        ArrayList<MatrixGeneralNpartiteSubgraph> connectedComps = new ArrayList<>();
+        ArrayList<HierSubgraphWIE> connectedComps = new ArrayList<>();
         //create a indicator LinkedList of vertices, when a vertex is included in one of the subgraphs, then it is 
         //removed from the indicator LinkedList
         LinkedList<Vertex2> indicatorList = new LinkedList<>();
@@ -98,7 +98,7 @@ public class MatrixGeneralNpartiteSubgraph extends Subgraph2 implements Comparab
         //While there is still unvisited vertex, we use it as the seed to search for subgraphs.
         while(!indicatorList.isEmpty()){
             Vertex2 Seed = indicatorList.pollFirst();
-            MatrixGeneralNpartiteSubgraph ConnectedComponent = bfs(Seed);
+            HierSubgraphWIE ConnectedComponent = bfs(Seed);
             connectedComps.add(ConnectedComponent);
             //remove all the vertex in the ConnectedComponent from indicatorList
             for(Vertex2 vtx: ConnectedComponent.getSubvertices()){
@@ -123,8 +123,8 @@ public class MatrixGeneralNpartiteSubgraph extends Subgraph2 implements Comparab
     @Override
     public boolean equals(Object o){
         /* First we check if the given object is an instance of MatrixHierGeneralSubgraph. */
-        if(o instanceof MatrixHierGeneralSubgraph){
-            MatrixHierGeneralSubgraph sub = (MatrixHierGeneralSubgraph)o;
+        if(o instanceof HierSubgraphWIE){
+            HierSubgraphWIE sub = (HierSubgraphWIE)o;
             ArrayList<Vertex2> subVertices2 = sub.getSubvertices();
             /* Then we check the sizes of the two Vertex2 arraylists. */
             if(this.subvertices.size() != subVertices2.size())
@@ -143,9 +143,8 @@ public class MatrixGeneralNpartiteSubgraph extends Subgraph2 implements Comparab
         else
             return false;
     }
-    
     @Override
-    public MatrixGeneralNpartiteGraph getSuperGraph() {
+    public HierGraphWIE getSuperGraph() {
         return supergraph;
     }
 
@@ -174,4 +173,5 @@ public class MatrixGeneralNpartiteSubgraph extends Subgraph2 implements Comparab
         return subvertices.size();
     }
 
+    
 }

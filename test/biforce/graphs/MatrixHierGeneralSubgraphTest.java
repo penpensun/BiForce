@@ -40,8 +40,8 @@ public class MatrixHierGeneralSubgraphTest {
     @Test
     public void testConstructor(){
         System.out.println("(MatrixHierGeneralSubgraphTest.constructor) Test starts.");
-        MatrixHierGeneralGraph graphInstance =
-                new MatrixHierGeneralGraph(testConstructorSubgraph,true,false,0);
+        HierGraphWIE graphInstance =
+                new HierGraphWIE(testConstructorSubgraph,true,false,0);
         /* Create an arraylist of nodes for subgraph. */
         ArrayList<Vertex2> subgraphVertices = new ArrayList<Vertex2>();
         /* Get the vertices. */
@@ -59,8 +59,8 @@ public class MatrixHierGeneralSubgraphTest {
         subgraphVertices.add(d1);
         subgraphVertices.add(b2);
         /* Create the subgraph */
-        MatrixHierGeneralSubgraph subgraphInstance = 
-                new MatrixHierGeneralSubgraph(subgraphVertices,graphInstance);
+        HierSubgraphWIE subgraphInstance = 
+                new HierSubgraphWIE(subgraphVertices,graphInstance);
         /* Check the number of vertices. */
         assertEquals(6,subgraphInstance.vertexCount());
         assertEquals(1.2,subgraphInstance.edgeWeight(a4,a5),0.0001);
@@ -80,9 +80,9 @@ public class MatrixHierGeneralSubgraphTest {
     public void testBfs() {
         System.out.println("bfs");
         Vertex2 Vtx = null;
-        MatrixHierGeneralSubgraph instance = null;
-        MatrixHierGeneralSubgraph expResult = null;
-        MatrixHierGeneralSubgraph result = instance.bfs(Vtx);
+        HierSubgraphWIE instance = null;
+        HierSubgraphWIE expResult = null;
+        HierSubgraphWIE result = instance.bfs(Vtx);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -94,7 +94,7 @@ public class MatrixHierGeneralSubgraphTest {
     @Test
     public void testConnectedComponents() {
         System.out.println("connectedComponents");
-        MatrixHierGeneralSubgraph instance = null;
+        HierSubgraphWIE instance = null;
         List expResult = null;
         List result = instance.connectedComponents();
         assertEquals(expResult, result);
@@ -110,7 +110,7 @@ public class MatrixHierGeneralSubgraphTest {
         System.out.println("edgeWeight");
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
-        MatrixHierGeneralSubgraph instance = null;
+        HierSubgraphWIE instance = null;
         float expResult = 0.0f;
         float result = instance.edgeWeight(vtx1, vtx2);
         assertEquals(expResult, result, 0.0f);
@@ -124,9 +124,9 @@ public class MatrixHierGeneralSubgraphTest {
     @Test
     public void testGetSuperGraph() {
         System.out.println("getSuperGraph");
-        MatrixHierGeneralSubgraph instance = null;
-        MatrixHierGeneralGraph expResult = null;
-        MatrixHierGeneralGraph result = instance.getSuperGraph();
+        HierSubgraphWIE instance = null;
+        HierGraphWIE expResult = null;
+        HierGraphWIE result = instance.getSuperGraph();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -139,7 +139,7 @@ public class MatrixHierGeneralSubgraphTest {
     public void testNeighbours() {
         System.out.println("neighbours");
         Vertex2 vtx = null;
-        MatrixHierGeneralSubgraph instance = null;
+        HierSubgraphWIE instance = null;
         ArrayList expResult = null;
         ArrayList result = instance.neighbours(vtx);
         assertEquals(expResult, result);
@@ -156,7 +156,7 @@ public class MatrixHierGeneralSubgraphTest {
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
         float edgeWeight = 0.0f;
-        MatrixHierGeneralSubgraph instance = null;
+        HierSubgraphWIE instance = null;
         instance.setEdgeWeight(vtx1, vtx2, edgeWeight);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -168,7 +168,7 @@ public class MatrixHierGeneralSubgraphTest {
     @Test
     public void testVertexSetCount() {
         System.out.println("vertexSetCount");
-        MatrixHierGeneralSubgraph instance = null;
+        HierSubgraphWIE instance = null;
         int expResult = 0;
         int result = instance.vertexSetCount();
         assertEquals(expResult, result);
@@ -182,8 +182,8 @@ public class MatrixHierGeneralSubgraphTest {
     @Test
     public void testCompareTo() {
         System.out.println("compareTo");
-        MatrixHierGeneralSubgraph o = null;
-        MatrixHierGeneralSubgraph instance = null;
+        HierSubgraphWIE o = null;
+        HierSubgraphWIE instance = null;
         int expResult = 0;
         int result = instance.compareTo(o);
         assertEquals(expResult, result);

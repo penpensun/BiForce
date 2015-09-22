@@ -48,9 +48,9 @@ public class MatrixHierNpartiteGraphTest {
     public void testBfs() {
         System.out.println("bfs");
         Vertex2 Vtx = null;
-        MatrixHierNpartiteGraph instance = null;
-        MatrixHierNpartiteSubgraph expResult = null;
-        MatrixHierNpartiteSubgraph result = instance.bfs(Vtx);
+        HierGraph instance = null;
+        HierSubgraph expResult = null;
+        HierSubgraph result = instance.bfs(Vtx);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -62,7 +62,7 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testConnectedComponents() {
         System.out.println("connectedComponents");
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         List expResult = null;
         List result = instance.connectedComponents();
         assertEquals(expResult, result);
@@ -76,7 +76,7 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testDetractThresh_0args() {
         System.out.println("detractThresh");
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         instance.detractThresh();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -89,7 +89,7 @@ public class MatrixHierNpartiteGraphTest {
     public void testDetractThresh_float() {
         System.out.println("detractThresh");
         float thresh = 0.0f;
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         instance.detractThresh(thresh);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -103,7 +103,7 @@ public class MatrixHierNpartiteGraphTest {
         System.out.println("dist");
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         float expResult = 0.0f;
         float result = instance.dist(vtx1, vtx2);
         assertEquals(expResult, result, 0.0);
@@ -117,7 +117,7 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testEdgeWeight() {
         System.out.println("(MatrixHierNpartiteGraph.edgeWeight) Test starts.");
-        MatrixHierNpartiteGraph instance = new MatrixHierNpartiteGraph(testEdgeWeightInput,true,0);
+        HierGraph instance = new HierGraph(testEdgeWeightInput,true,0);
         /* Get the vertices. */
         Vertex2 a1 = instance.getVertex("a1");
         Vertex2 b1 = instance.getVertex("b1");
@@ -146,7 +146,7 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testGetCost() {
         System.out.println("getCost");
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         float expResult = 0.0f;
         float result = instance.getCost();
         assertEquals(expResult, result, 0.0);
@@ -161,7 +161,7 @@ public class MatrixHierNpartiteGraphTest {
     public void testIsActionTaken() {
         System.out.println("isActionTaken");
         int actIdx = 0;
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         boolean expResult = false;
         boolean result = instance.isActionTaken(actIdx);
         assertEquals(expResult, result);
@@ -175,7 +175,7 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testNeighbours() {
         System.out.println("(MatrixHierNpartiteGraph.neighbours) Test starts.");
-        MatrixHierNpartiteGraph instance = new MatrixHierNpartiteGraph(testNeighboursInput,true,0);
+        HierGraph instance = new HierGraph(testNeighboursInput,true,0);
         /* Get 3 vertices whose neighbours are to be found. */
         Vertex2 b1 = instance.getVertex("b1");
         Vertex2 d1 = instance.getVertex("d1");
@@ -210,7 +210,7 @@ public class MatrixHierNpartiteGraphTest {
         System.out.println("pushAction");
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         boolean expResult = false;
         boolean result = instance.pushAction(vtx1, vtx2);
         assertEquals(expResult, result);
@@ -224,8 +224,8 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testReadGraph() throws Exception {
         System.out.println("(MatrixHierNpartiteGraph.readGraph) Test starts.");
-        MatrixHierNpartiteGraph instance = 
-                new MatrixHierNpartiteGraph(testReadGraphInput,false,0);
+        HierGraph instance = 
+                new HierGraph(testReadGraphInput,false,0);
         /* In this test, we check 2 properties: (1) The number and details of all vertices. 
          (2) The structres and weights of all edges.*/
         /* Check the vertices. */
@@ -290,8 +290,8 @@ public class MatrixHierNpartiteGraphTest {
     public void testReadGraphWithHeader() throws Exception {
         System.out.println("(MatrixHierNpartiteGraph.readGraphWithHeader) Test starts.");
         
-        MatrixHierNpartiteGraph instance = 
-                new MatrixHierNpartiteGraph(testReadGraphWithHeaderInput,true,0);
+        HierGraph instance = 
+                new HierGraph(testReadGraphWithHeaderInput,true,0);
         /* In this test, we check 2 properties: (1) The number and details of all vertices. 
          (2) The structres and weights of all edges.*/
         /* Check the vertices. */
@@ -356,7 +356,7 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testRestoreThresh() {
         System.out.println("restoreThresh");
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         instance.restoreThresh();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -369,7 +369,7 @@ public class MatrixHierNpartiteGraphTest {
     public void testRemoveAction() {
         System.out.println("removeAction");
         int Index = 0;
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         boolean expResult = false;
         boolean result = instance.removeAction(Index);
         assertEquals(expResult, result);
@@ -385,7 +385,7 @@ public class MatrixHierNpartiteGraphTest {
         System.out.println("setDist");
         Vertex2 vtx1 = null;
         Vertex2 vtx2 = null;
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         instance.setDist(vtx1, vtx2);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -397,7 +397,7 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testSetEdgeWeight() {
         System.out.println("(MatrixHierNpartiteGraph.setEdgeWeight) Test starts.");
-        MatrixHierNpartiteGraph instance = new MatrixHierNpartiteGraph(testEdgeWeightInput,true,0);
+        HierGraph instance = new HierGraph(testEdgeWeightInput,true,0);
         /* Get the vertices. */
         Vertex2 a1 = instance.getVertex("a1");
         Vertex2 b1 = instance.getVertex("b1");
@@ -441,7 +441,7 @@ public class MatrixHierNpartiteGraphTest {
     public void testTakeAction() {
         System.out.println("takeAction");
         int idx = 0;
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         boolean expResult = false;
         boolean result = instance.takeAction(idx);
         assertEquals(expResult, result);
@@ -455,7 +455,7 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testTakeActions() {
         System.out.println("takeActions");
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         boolean expResult = false;
         boolean result = instance.takeActions();
         assertEquals(expResult, result);
@@ -469,7 +469,7 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testUpdateDist() {
         System.out.println("updateDist");
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         instance.updateDist();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -482,7 +482,7 @@ public class MatrixHierNpartiteGraphTest {
     public void testUpdatePos() {
         System.out.println("updatePos");
         float[][] dispVector = null;
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         instance.updatePos(dispVector);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -494,7 +494,7 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testVertexSetCount() {
         System.out.println("vertexSetCount");
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         int expResult = 0;
         int result = instance.vertexSetCount();
         assertEquals(expResult, result);
@@ -508,11 +508,11 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testWriteGraphTo() {
         System.out.println("(MatrixHierNpartiteGraphTest.testWriteGraphTo) Test starts.");
-        MatrixHierNpartiteGraph graph = new
-                MatrixHierNpartiteGraph(testReadGraphWithHeaderInput,true);
+        HierGraph graph = new
+                HierGraph(testReadGraphWithHeaderInput,true);
         graph.writeGraphTo(testOutputPlain,false);
-        MatrixHierNpartiteGraph out = new 
-                MatrixHierNpartiteGraph(testOutputPlain,true);
+        HierGraph out = new 
+                HierGraph(testOutputPlain,true);
         
         System.out.println("(MatrixHierNpartiteGraphTest.testWriteGraphTO) Test ends.");
     }
@@ -523,8 +523,8 @@ public class MatrixHierNpartiteGraphTest {
     @Test
     public void testWriteClusterTo() {
         System.out.println("(MatrixNpartiteGraphTest.testWriteClusterTo) Test starts.");
-        MatrixHierNpartiteGraph graph = new 
-                MatrixHierNpartiteGraph(testReadGraphWithHeaderInput, true);
+        HierGraph graph = new 
+                HierGraph(testReadGraphWithHeaderInput, true);
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
         Param p = new Param("./parameters.ini");
         try{
@@ -543,7 +543,7 @@ public class MatrixHierNpartiteGraphTest {
     public void testWriteResultInfoTo() {
         System.out.println("writeResultInfoTo");
         String FilePath = "";
-        MatrixHierNpartiteGraph instance = null;
+        HierGraph instance = null;
         instance.writeResultInfoTo(FilePath);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

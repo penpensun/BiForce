@@ -23,7 +23,7 @@ import org.jdom2.input.SAXBuilder;
  * This class is the object for normal class.
  * @author Peng Sun
  */
-public class MatrixGraph extends Graph2 {
+public class GeneralGraph extends Graph2 {
     /* The float value for cost. */
     float cost = 0;
     /* The two dimensional array stores the adjacency matrix.*/
@@ -40,7 +40,7 @@ public class MatrixGraph extends Graph2 {
      * @param isHeader 
      * @param isXmlFile 
      */
-    public MatrixGraph(String filePath, boolean isHeader, boolean isXmlFile){
+    public GeneralGraph(String filePath, boolean isHeader, boolean isXmlFile){
         vertices= new ArrayList<>();
         actions =new ArrayList<>();
         clusters = new ArrayList<>();
@@ -82,7 +82,7 @@ public class MatrixGraph extends Graph2 {
      * @param isHeader
      * @param thresh 
      */
-    public MatrixGraph(String filePath, boolean isHeader, boolean isXmlFile, float thresh){
+    public GeneralGraph(String filePath, boolean isHeader, boolean isXmlFile, float thresh){
         if(isXmlFile)
             try{
                 readXmlGraph(filePath);
@@ -119,7 +119,7 @@ public class MatrixGraph extends Graph2 {
      * @return 
      */
     @Override
-    public MatrixSubgraph bfs(Vertex2 Vtx) {
+    public GeneralSubgraph bfs(Vertex2 Vtx) {
         LinkedList<Vertex2> queue = new LinkedList<>();
         //create a marker
         HashMap<String, Boolean> marker = new HashMap<>();
@@ -157,7 +157,7 @@ public class MatrixGraph extends Graph2 {
              }
          }
          //create a new subkpartitegraph
-         MatrixSubgraph sub = new MatrixSubgraph(result,this);
+         GeneralSubgraph sub = new GeneralSubgraph(result,this);
          return sub;
     }
 
@@ -166,8 +166,8 @@ public class MatrixGraph extends Graph2 {
      * @return 
      */
     @Override
-    public List<MatrixSubgraph> connectedComponents() {
-        ArrayList<MatrixSubgraph> connectecComps = new ArrayList<>();
+    public List<GeneralSubgraph> connectedComponents() {
+        ArrayList<GeneralSubgraph> connectecComps = new ArrayList<>();
         //create a indicator LinkedList of vertices, when a vertex is included in one of the subgraphs, then it is 
         //removed from the indicator LinkedList
         LinkedList<Vertex2> indicatorList = new LinkedList<>();
@@ -178,7 +178,7 @@ public class MatrixGraph extends Graph2 {
         //While there is still unvisited vertex, we use it as the seed to search for subgraphs.
         while(!indicatorList.isEmpty()){
             Vertex2 Seed = indicatorList.pollFirst();
-            MatrixSubgraph comp = bfs(Seed);
+            GeneralSubgraph comp = bfs(Seed);
             connectecComps.add(comp);
             //remove all the vertex in the comp from indicatorList
             for(Vertex2 vtx: comp.getSubvertices()){
@@ -289,9 +289,9 @@ public class MatrixGraph extends Graph2 {
     
     @Override 
     public boolean isSame(Graph2 graph){
-        if(!(graph instanceof MatrixGraph))
+        if(!(graph instanceof GeneralGraph))
             return false;
-        MatrixGraph converted = (MatrixGraph) graph;
+        GeneralGraph converted = (GeneralGraph) graph;
         /* Check the vertices. */
         if(vertices.size()!= converted.vertices.size())
             return false;

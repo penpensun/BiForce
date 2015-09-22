@@ -10,16 +10,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This is a subgraph of MatrixHierGeneralGraph
+ * This class
  * @author penpen926
  */
-public class MatrixHierGeneralSubgraph extends Subgraph2 implements
-    Comparable<MatrixHierGeneralSubgraph>{
+public class HierSubgraph extends Subgraph2 implements
+        Comparable<HierSubgraph>{
     /* The supergraph. */
-    MatrixHierGeneralGraph supergraph = null;
+    HierGraph supergraph = null;
     
-    public MatrixHierGeneralSubgraph
-            (ArrayList<Vertex2> subVertices, MatrixHierGeneralGraph supergraph){
+    public HierSubgraph(ArrayList<Vertex2> subVertices, HierGraph supergraph){
         this.subvertices = subVertices;
         this.supergraph = supergraph;
     }
@@ -29,7 +28,7 @@ public class MatrixHierGeneralSubgraph extends Subgraph2 implements
      * @return 
      */
     @Override
-    public MatrixHierGeneralSubgraph bfs(Vertex2 Vtx) {
+    public HierSubgraph bfs(Vertex2 Vtx) {
         LinkedList<Vertex2> queue = new LinkedList<>();
         //create a marker
         HashMap<String, Boolean> marker = new HashMap<>();
@@ -68,17 +67,8 @@ public class MatrixHierGeneralSubgraph extends Subgraph2 implements
 
          }
          /* Create a new subhierNpartitegraph. */
-         MatrixHierGeneralSubgraph sub = new MatrixHierGeneralSubgraph(result,this.supergraph);
+         HierSubgraph sub = new HierSubgraph(result,this.supergraph);
          return sub;
-    }
-    
-    @Override
-    public int compareTo(MatrixHierGeneralSubgraph o) {
-        if(this.vertexCount() < o.vertexCount())
-            return -1;
-        else if(this.vertexCount() == o.vertexCount())
-            return 0;
-        else return 1;
     }
 
     /**
@@ -87,7 +77,7 @@ public class MatrixHierGeneralSubgraph extends Subgraph2 implements
      */
     @Override
     public List<? extends Subgraph2> connectedComponents() {
-        ArrayList<MatrixHierGeneralSubgraph> connectedComps = new ArrayList<>();
+        ArrayList<HierSubgraph> connectedComps = new ArrayList<>();
         //create a indicator LinkedList of vertices, when a vertex is included in one of the subgraphs, then it is 
         //removed from the indicator LinkedList
         LinkedList<Vertex2> indicatorList = new LinkedList<>();
@@ -98,7 +88,7 @@ public class MatrixHierGeneralSubgraph extends Subgraph2 implements
         //While there is still unvisited vertex, we use it as the seed to search for subgraphs.
         while(!indicatorList.isEmpty()){
             Vertex2 Seed = indicatorList.pollFirst();
-            MatrixHierGeneralSubgraph ConnectedComponent = bfs(Seed);
+            HierSubgraph ConnectedComponent = bfs(Seed);
             connectedComps.add(ConnectedComponent);
             //remove all the vertex in the ConnectedComponent from indicatorList
             for(Vertex2 vtx: ConnectedComponent.getSubvertices()){
@@ -121,30 +111,7 @@ public class MatrixHierGeneralSubgraph extends Subgraph2 implements
     }
 
     @Override
-    public boolean equals(Object o){
-        /* First we check if the given object is an instance of MatrixHierGeneralSubgraph. */
-        if(o instanceof MatrixHierGeneralSubgraph){
-            MatrixHierGeneralSubgraph sub = (MatrixHierGeneralSubgraph)o;
-            ArrayList<Vertex2> subVertices2 = sub.getSubvertices();
-            /* Then we check the sizes of the two Vertex2 arraylists. */
-            if(this.subvertices.size() != subVertices2.size())
-                return false;
-            /* Then we check the vertex one by one. */
-            /* We first generate a copy of the subvertices in this class. */
-            ArrayList<Vertex2> subverticesCopy = new ArrayList(subvertices);
-            for(int i=0;i<subVertices2.size();i++){
-                if(!subverticesCopy.remove(subVertices2.get(i)))
-                    return false;
-            }
-            /* If all vertices in subVertices2 can be found in subverticesCopy, 
-             * then we return true.*/
-            return true;
-        }
-        else
-            return false;
-    }
-    @Override
-    public MatrixHierGeneralGraph getSuperGraph() {
+    public HierGraph getSuperGraph() {
         return supergraph;
     }
 
@@ -173,5 +140,13 @@ public class MatrixHierGeneralSubgraph extends Subgraph2 implements
         return subvertices.size();
     }
 
+    @Override
+    public int compareTo(HierSubgraph o) {
+        if(this.vertexCount() < o.vertexCount())
+            return -1;
+        else if(this.vertexCount() == o.vertexCount())
+            return 0;
+        else return 1;
+    }
     
 }

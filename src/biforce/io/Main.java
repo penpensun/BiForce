@@ -8,7 +8,7 @@ package biforce.io;
 import biforce.algorithms.BiForceOnGraph2;
 import biforce.algorithms.BiForceOnMatrix2;
 import biforce.algorithms.Param;
-import biforce.graphs.BipartiteGraph;
+import biforce.graphs.BipartiteGraph_deprecated;
 import biforce.matrices.BipartiteGraphMatrix;
 import java.io.IOException;
 import java.io.FileWriter;
@@ -102,7 +102,7 @@ public class Main {
     public static void runGraph(String input, String clusterout, String graphout, String paramfile) throws IOException
     {
        Param p = Param.readParams(paramfile);
-       BipartiteGraph graph = new BipartiteGraph(input);
+       BipartiteGraph_deprecated graph = new BipartiteGraph_deprecated(input);
        BiForceOnGraph2.run(graph,p);
        BufferedWriter bw = new BufferedWriter(new FileWriter(clusterout,true));
        bw.write("<output>"+input+"\r\n");

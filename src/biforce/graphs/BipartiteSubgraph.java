@@ -15,26 +15,26 @@ import java.util.LinkedList;
  * Note: Subgraph does not receive any editing actions, all editing actions go to the supergraph.
  * @author penpen926
  */
-public class MatrixBipartiteSubgraph implements Subgraph, 
-        Comparable<MatrixBipartiteSubgraph> {
+public class BipartiteSubgraph implements Subgraph, 
+        Comparable<BipartiteSubgraph> {
     //This variable stores the vertices in the subgraph
     Collection<Vertex> SubVertices;
     //This references points to the super graph
-    MatrixBipartiteGraph Supergraph;
+    BipartiteGraph Supergraph;
     
     /**
      * Constructor
      * @param SubVertices. The vertices for subgraph.
      * @param SuperGraph. The super graph.
      */
-    public MatrixBipartiteSubgraph(Collection<Vertex> SubVertices,
-            MatrixBipartiteGraph SuperGraph){
+    public BipartiteSubgraph(Collection<Vertex> SubVertices,
+            BipartiteGraph SuperGraph){
         this.Supergraph = SuperGraph;
         this.SubVertices = SubVertices;
     }
     
     @Override
-    public int compareTo(MatrixBipartiteSubgraph g1){
+    public int compareTo(BipartiteSubgraph g1){
         if(g1.getVertexCount() < this.getVertexCount()){
            return 1;
         }
@@ -124,8 +124,8 @@ public class MatrixBipartiteSubgraph implements Subgraph,
      * @return The collection of subgraphs, each of which is a connected component.
      */
     @Override
-    public Collection<MatrixBipartiteSubgraph> getAllConnectedComponents(){
-        ArrayList<MatrixBipartiteSubgraph> AllConnectedComponents = new ArrayList<>();
+    public Collection<BipartiteSubgraph> getAllConnectedComponents(){
+        ArrayList<BipartiteSubgraph> AllConnectedComponents = new ArrayList<>();
         //create a indicator LinkedList of vertices, when a vertex is included in one of the subgraphs, then it is 
         //removed from the indicator LinkedList
         LinkedList<Vertex> IndicatorList = new LinkedList<>();
@@ -138,7 +138,7 @@ public class MatrixBipartiteSubgraph implements Subgraph,
         while(!IndicatorList.isEmpty())
         {
             Vertex Seed = IndicatorList.pollFirst();
-            MatrixBipartiteSubgraph ConnectedComponent = runBFS(Seed);
+            BipartiteSubgraph ConnectedComponent = runBFS(Seed);
             AllConnectedComponents.add(ConnectedComponent);
             //remove all the vertex in the ConnectedComponent from IndicatorList
             for(Vertex vtx: ConnectedComponent.getSubVertices())
@@ -156,7 +156,7 @@ public class MatrixBipartiteSubgraph implements Subgraph,
      * @return Super graph is returned.
      */
     @Override
-    public MatrixBipartiteGraph getSuperGraph(){
+    public BipartiteGraph getSuperGraph(){
         return Supergraph;
     }
     
@@ -166,7 +166,7 @@ public class MatrixBipartiteSubgraph implements Subgraph,
      * @return The connected component.
      */
     @Override
-    public MatrixBipartiteSubgraph runBFS(Vertex Vtx){
+    public BipartiteSubgraph runBFS(Vertex Vtx){
          LinkedList<Vertex> queue = new LinkedList<>();
         //create a marker
         HashMap<String, Boolean> marker = new HashMap<>();
@@ -206,7 +206,7 @@ public class MatrixBipartiteSubgraph implements Subgraph,
 
          }
          //create a new subkpartitegraph
-         MatrixBipartiteSubgraph sub = new MatrixBipartiteSubgraph(result,this.Supergraph);
+         BipartiteSubgraph sub = new BipartiteSubgraph(result,this.Supergraph);
          return sub;
     }
     

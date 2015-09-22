@@ -7,7 +7,7 @@
 package biforce.io;
 import java.io.*;
 import biforce.algorithms.Param;
-import biforce.graphs.MatrixBipartiteGraph;
+import biforce.graphs.BipartiteGraph;
 import biforce.algorithms.BiForceOnGraph3;
 import biforce.algorithms.BiForceOnMatrix2;
 import biforce.matrices.BipartiteGraphMatrix;
@@ -100,7 +100,7 @@ public class Main2 {
     public static void runGraph(String input, String clusterOut,
             String graphOut, String paramFile) throws IOException{
        Param p = Param.readParams(paramFile);
-       MatrixBipartiteGraph graph = new MatrixBipartiteGraph(input);
+       BipartiteGraph graph = new BipartiteGraph(input);
        //Create a algorithm instance
        BiForceOnGraph3 BiForceAlgor = new BiForceOnGraph3();
        BiForceAlgor.run(graph,p);

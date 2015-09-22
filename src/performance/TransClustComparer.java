@@ -20,7 +20,7 @@ public class TransClustComparer {
      * @param outputFile 
      */
     public void genInput(String inputFile, String outputFile){
-        MatrixGraph inputGraph  = new MatrixGraph(inputFile, true,false,0);
+        GeneralGraph inputGraph  = new GeneralGraph(inputFile, true,false,0);
         FileWriter fw = null;
         BufferedWriter bw = null;
         try{

@@ -5,7 +5,7 @@
  */
 
 package biforce.algorithms;
-import biforce.graphs.BipartiteGraph;
+import biforce.graphs.BipartiteGraph_deprecated;
 import biforce.graphs.SubBipartiteGraph;
 import biforce.matrices.BipartiteGraphMatrix;
 import biforce.graphs.Vertex;

@@ -105,7 +105,7 @@ public class Main3 {
         try{
         fr = new FileReader(graphIn);
         }catch(IOException e){
-            System.err.println("(runGraph) The input graph cannot be read. ");
+            System.err.println("(runGraph) The input graph cannot be read: "+graphIn);
             return;
         }
         try{
@@ -135,19 +135,19 @@ public class Main3 {
         Graph2 inputGraph = null;
         switch(graphType){
             case 1: /* bipartite graph. */
-                inputGraph = new MatrixBipartiteGraph2(graphIn,isHeader); 
+                inputGraph = new BipartiteGraph2(graphIn,isHeader); 
                 break;
             case 2:/* hierarchy npartite graph. */
-                inputGraph = new MatrixHierNpartiteGraph(graphIn, isHeader);
+                inputGraph = new HierGraph(graphIn, isHeader);
                 break;
             case 3: /* hierarchy general graph. */
-                inputGraph = new MatrixHierGeneralGraph(graphIn,isHeader,isInXmlFile);
+                inputGraph = new HierGraphWIE(graphIn,isHeader,isInXmlFile);
                 break;
             case 4: /* General graph. */
-                inputGraph = new MatrixGraph(graphIn,isHeader, isInXmlFile);
+                inputGraph = new GeneralGraph(graphIn,isHeader, isInXmlFile);
                 break;
             case 5: /* General npartite graph. */
-                inputGraph = new MatrixGeneralNpartiteGraph(graphIn, isHeader, isInXmlFile);
+                inputGraph = new NpartiteGraph(graphIn, isHeader, isInXmlFile);
                 break;
             default: 
                 throw new IllegalArgumentException("(runGraph) The given graph type is illegal.");   
@@ -175,7 +175,7 @@ public class Main3 {
         System.out.println("The editing information is written to:  "+editingOut);
     }
     
-    public static MatrixGeneralNpartiteGraph runDrugRepos(float thresh,
+    public static NpartiteGraph runDrugRepos(float thresh,
             float[] threshArray,
             String graphIn,
             String graphOut,
@@ -205,11 +205,11 @@ public class Main3 {
         try{
         fr = new FileReader(graphIn);
         }catch(IOException e){
-            System.err.println("(runGraph) The input graph cannot be read. ");
+            System.err.println("(runGraph) The input graph cannot be read:  "+graphIn);
             return null;
         }
         
-        Graph2 inputGraph = new MatrixGeneralNpartiteGraph(graphIn,false, true); // With no header, with xml input.
+        Graph2 inputGraph = new NpartiteGraph(graphIn,false, true); // With no header, with xml input.
         // Run nforce
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
         try{
@@ -220,7 +220,7 @@ public class Main3 {
         inputGraph.writeResultInfoTo(editingOutput);
         inputGraph.writeClusterTo(clusterOut, true);
         inputGraph.writeGraphTo(graphOut, true);
-        return (MatrixGeneralNpartiteGraph)inputGraph;
+        return (NpartiteGraph)inputGraph;
     }
     
     
@@ -241,7 +241,7 @@ public class Main3 {
      * @param isMultipleThresh 
      * @return  
      */
-    public static MatrixGraph runGraphDrugReposPreClust(float thresh,
+    public static GeneralGraph runGraphDrugReposPreClust(float thresh,
             float[] threshArray,
             String graphIn,
             String clusterOut,
@@ -282,7 +282,7 @@ public class Main3 {
         try{
         fr = new FileReader(graphIn);
         }catch(IOException e){
-            System.err.println("(runGraph) The input graph cannot be read. ");
+            System.err.println("(runGraph) The input graph cannot be read: "+graphIn);
             return null;
         }
         try{
@@ -304,7 +304,7 @@ public class Main3 {
         }
         
         
-        Graph2 inputGraph = new MatrixGraph(graphIn,false, true); // With no header, with xml input.
+        Graph2 inputGraph = new GeneralGraph(graphIn,false, true); // With no header, with xml input.
         // Run nforce
         BiForceOnGraph4 algorithm = new BiForceOnGraph4();
         try{
@@ -316,7 +316,7 @@ public class Main3 {
         inputGraph.writeClusterTo(clusterOut, true);
         System.out.println("The resulted cluster is written to:  "+clusterOut);
         // Output the precluster -- index mapping.
-        MatrixGraph mg   = (MatrixGraph)inputGraph;
+        GeneralGraph mg   = (GeneralGraph)inputGraph;
         mg.writeXmlPreClusterIndexMapping(indexMappingOut);
         System.out.println("The preclusters -- index mapping is written to :  "+indexMappingOut);
         mg.writeVertexPreClusterMapping(vertexMappingOut,clusterPrefix);

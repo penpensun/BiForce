@@ -4,32 +4,29 @@
  */
 package biforce.graphs;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
- * This is the subgraph of MatrixGraph.
- * @author penpen926
+ * The matrix bipartite subgraph 
+ * @author Peng Sun
  */
-public class MatrixSubgraph extends Subgraph2
-    implements Comparable<MatrixSubgraph>{
-
-    private MatrixGraph supergraph = null;
+public class BipartiteSubgraph2 extends Subgraph2 
+        implements Comparable<BipartiteSubgraph2> {
+    /* This is the supergraph. */
+    private BipartiteGraph2 supergraph = null;
     
-    public MatrixSubgraph(ArrayList<Vertex2> subvertices,
-            MatrixGraph supergraph){
-        this.subvertices = subvertices;
-        this.supergraph = supergraph;
-    }
+    
     /**
-     * This method performs the bfs.
-     * @param Vtx
-     * @return 
+     * The constructor. 
      */
+    public BipartiteSubgraph2(ArrayList<Vertex2> subvertices,
+            BipartiteGraph2 supergraph){
+        this.subvertices = subvertices;
+        this.supergraph = supergraph;     
+    }
+    
     @Override
-    public MatrixSubgraph bfs(Vertex2 Vtx) {
+    public BipartiteSubgraph2 bfs(Vertex2 Vtx) {
         LinkedList<Vertex2> queue = new LinkedList<>();
         //create a marker
         HashMap<String, Boolean> marker = new HashMap<>();
@@ -38,8 +35,7 @@ public class MatrixSubgraph extends Subgraph2
         //create a new arrayList<Vertex> as result
         ArrayList<Vertex2> result = new ArrayList<>();
 
-        for(Vertex2 vtx: getSubvertices())
-        {
+        for(Vertex2 vtx: getSubvertices()){
             marker.put(vtx.toString(), Boolean.FALSE);
         }
 
@@ -49,21 +45,18 @@ public class MatrixSubgraph extends Subgraph2
          marker.put(Vtx.toString(),true);
 
          //while queue is not empty
-         while(!queue.isEmpty())
-         {
-             //dequeue an item from queue into currentVtx
-             Vertex2 currentVtx = queue.pollLast();
-             //get the nei of currentVtx
-             ArrayList<Vertex2> nei = neighbours(currentVtx);
+         while(!queue.isEmpty()){
+             //dequeue an item from queue into CurrentVtx
+             Vertex2 CurrentVtx = queue.pollLast();
+             //get the nei of CurrentVtx
+             ArrayList<Vertex2> nei = neighbours(CurrentVtx);
 
              /* If no neighbour is found, then we continue. */
              if(nei == null)
                  continue;
              //for each neighbour
-             for(Vertex2 vtx: nei)
-             {
-                 if(!marker.get(vtx.toString()))
-                 {
+             for(Vertex2 vtx: nei){
+                 if(!marker.get(vtx.toString())){
                      marker.put(vtx.toString(),true);
                      queue.add(vtx);
                      result.add(vtx);
@@ -71,27 +64,32 @@ public class MatrixSubgraph extends Subgraph2
              }
 
          }
-         //create a new subkpartitegraph
-         MatrixSubgraph sub = new MatrixSubgraph(result,this.supergraph);
+         //Create a new subkpartitegraph
+         BipartiteSubgraph2 sub = new BipartiteSubgraph2(result,this.supergraph);
          return sub;
     }
-
+    
+    /**
+     * This method compares two subgraphs, based on the number of vertices.
+     * @param o
+     * @return 
+     */
     @Override
-    public int compareTo(MatrixSubgraph o) {
+    public int compareTo(BipartiteSubgraph2 o) {
         if(this.vertexCount() < o.vertexCount())
             return -1;
         else if(this.vertexCount() == o.vertexCount())
             return 0;
         else return 1;
     }
-    
+
     /**
-     * This method returns the connencted component given a vertex to search.
+     * Get all connected components.
      * @return 
      */
     @Override
-    public List<? extends Subgraph2> connectedComponents() {
-        ArrayList<MatrixSubgraph> connectedComps = new ArrayList<>();
+    public List<BipartiteSubgraph2> connectedComponents() {
+        ArrayList<BipartiteSubgraph2> connectedComps = new ArrayList<>();
         //create a indicator LinkedList of vertices, when a vertex is included in one of the subgraphs, then it is 
         //removed from the indicator LinkedList
         LinkedList<Vertex2> indicatorList = new LinkedList<>();
@@ -102,19 +100,19 @@ public class MatrixSubgraph extends Subgraph2
         //While there is still unvisited vertex, we use it as the seed to search for subgraphs.
         while(!indicatorList.isEmpty()){
             Vertex2 Seed = indicatorList.pollFirst();
-            MatrixSubgraph connComps = bfs(Seed);
-            connectedComps.add(connComps);
-            //remove all the vertex in the connComps from indicatorList
-            for(Vertex2 vtx: connComps.getSubvertices()){
+            BipartiteSubgraph2 ConnectedComponent = bfs(Seed);
+            connectedComps.add(ConnectedComponent);
+            //remove all the vertex in the ConnectedComponent from indicatorList
+            for(Vertex2 vtx: ConnectedComponent.getSubvertices()){
                 indicatorList.remove(vtx);
             }
         }
         connectedComps.trimToSize();
         return connectedComps;
     }
-    
+
     /**
-     * This method returns the edge weight
+     * Return the edge weight.
      * @param vtx1
      * @param vtx2
      * @return 
@@ -123,21 +121,47 @@ public class MatrixSubgraph extends Subgraph2
     public float edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
         return supergraph.edgeWeight(vtx1, vtx2);
     }
-
+    
     /**
-     * This method returns the supergraph.
+     * This method returns if the given object is equal to the current subgraph.
+     * @param subgraph
      * @return 
      */
     @Override
-    public Graph2 getSuperGraph() {
-        return supergraph;
+    public boolean equals(Object input){
+        if(!(input instanceof BipartiteSubgraph2 ))
+            throw new IllegalArgumentException("(MatrixBipartiteSubgraphV2.equals) "
+                    + "The input object is not a MatrixBipartiteSubgraphV2.");
+        
+        BipartiteSubgraph2 subgraph = (BipartiteSubgraph2)input;
+        if(this.subvertices.size() != subgraph.subvertices.size())
+            return false;
+        else{
+            for(Vertex2 vtx: subvertices)
+                if(!subgraph.subvertices.contains(vtx))
+                    return false;
+        }
+        return true;  
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 61 * hash + Objects.hashCode(this.supergraph);
+        return hash;
     }
 
     /**
-     * This method returns the neighbours of a given vertex.
-     * @param vtx
+     * Return the supergraph.
      * @return 
      */
+    @Override
+    public BipartiteGraph2 getSuperGraph() {
+        return supergraph;
+    }
+    
+    
+
     @Override
     public ArrayList<Vertex2> neighbours(Vertex2 vtx) {
         ArrayList<Vertex2> superNbs = supergraph.neighbours(vtx);
@@ -152,9 +176,9 @@ public class MatrixSubgraph extends Subgraph2
         }
         return answer;
     }
-    
+
     /**
-     * This method sets the edge weight between two vertices.
+     * Set the edge weight between vtx1 and vtx2.
      * @param Vtx1
      * @param Vtx2
      * @param EdgeWeight 
@@ -165,12 +189,14 @@ public class MatrixSubgraph extends Subgraph2
     }
 
     /**
-     * This method returns the count of the vertices in the graph.
+     * This method returns how many vertex sets are there in the Subgraph, namely, 2.
      * @return 
      */
     @Override
-    public int vertexSetCount() {
-        return subvertices.size();
+    public final int vertexSetCount() {
+        return 2;
     }
 
+    
+    
 }

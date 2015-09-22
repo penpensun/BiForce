@@ -20,7 +20,7 @@ import biforce.constants.BiForceConstants;
  * computing distances is the main feature.
  * @author Peng
  */
-public class MatrixBipartiteGraph2 extends Graph2{
+public class BipartiteGraph2 extends Graph2{
     //This variable stores the cost of the cluster editing, with initial value of 0
     float cost=0;
     
@@ -43,7 +43,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
      * @param filePath The input file path of graph.
      * @param isHeader Is the input file with header.
      */
-    public MatrixBipartiteGraph2(String filePath, boolean isHeader) {
+    public BipartiteGraph2(String filePath, boolean isHeader) {
         if(isHeader)
             try{
                 readGraphWithHeader(filePath);
@@ -67,7 +67,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
                 distances[i][j] = -1;
     }
     
-    public MatrixBipartiteGraph2(String filePath, boolean isHeader,float thresh){
+    public BipartiteGraph2(String filePath, boolean isHeader,float thresh){
         if(isHeader)
             try{
                 readGraphWithHeader(filePath);
@@ -92,7 +92,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
     
     
     @Override
-    public MatrixBipartiteSubgraph2 bfs(Vertex2 Vtx) {
+    public BipartiteSubgraph2 bfs(Vertex2 Vtx) {
         LinkedList<Vertex2> queue = new LinkedList<>();
         //create a marker
         HashMap<String, Boolean> marker = new HashMap<>();
@@ -133,7 +133,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
 
          }
          //create a new subkpartitegraph
-         MatrixBipartiteSubgraph2 sub = new MatrixBipartiteSubgraph2(result,this);
+         BipartiteSubgraph2 sub = new BipartiteSubgraph2(result,this);
          return sub;
     }
 
@@ -144,8 +144,8 @@ public class MatrixBipartiteGraph2 extends Graph2{
      * @return 
      */
     @Override
-    public List<MatrixBipartiteSubgraph2> connectedComponents() {
-        ArrayList<MatrixBipartiteSubgraph2> connectecComps = new ArrayList<>();
+    public List<BipartiteSubgraph2> connectedComponents() {
+        ArrayList<BipartiteSubgraph2> connectecComps = new ArrayList<>();
         //create a indicator LinkedList of vertices, when a vertex is included in one of the subgraphs, then it is 
         //removed from the indicator LinkedList
         LinkedList<Vertex2> indicatorList = new LinkedList<>();
@@ -156,7 +156,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
         //While there is still unvisited vertex, we use it as the seed to search for subgraphs.
         while(!indicatorList.isEmpty()){
             Vertex2 Seed = indicatorList.pollFirst();
-            MatrixBipartiteSubgraph2 comp = bfs(Seed);
+            BipartiteSubgraph2 comp = bfs(Seed);
             connectecComps.add(comp);
             //remove all the vertex in the comp from indicatorList
             for(Vertex2 vtx: comp.getSubvertices()){
@@ -341,9 +341,9 @@ public class MatrixBipartiteGraph2 extends Graph2{
     
     @Override
     public boolean isSame(Graph2 graph){
-        if(!(graph instanceof MatrixBipartiteGraph2))
+        if(!(graph instanceof BipartiteGraph2))
             return false;
-        MatrixBipartiteGraph2 converted = (MatrixBipartiteGraph2)graph;
+        BipartiteGraph2 converted = (BipartiteGraph2)graph;
         /* Check set0Size, set1Size. */
         if(this.set0Size != converted.set0Size)
             return false;
@@ -1052,7 +1052,7 @@ public class MatrixBipartiteGraph2 extends Graph2{
         fw = new FileWriter(filePath);
         bw = new BufferedWriter(fw);
         }catch(IOException e){
-            System.err.println("(MatrixBipartiteGraph2.writeResultInfoTo) Result file opening error. ");
+            System.err.println("(MatrixBipartiteGraph2.writeResultInfoTo) Result file opening error: "+filePath);
             return;
         }
         try{

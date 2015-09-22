@@ -1,40 +1,35 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
+ * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package biforce.graphs;
 
 import biforce.constants.BiForceConstants;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
+import org.jdom2.*;
+import org.jdom2.input.*;
+import java.io.File;
 
 /**
- * This is a graph class describing the "MatrixGeneralNpartiteGraph". 
- * A "MatrixGeneralNpartiteGraph" is a "ring-like" npartite-graph with edges between neighbours sets and 
- * the between the first and the last sets. (A "ring-like" npartite graph).
- * Intra-edges are also allowed.
+ *
  * @author penpen926
  */
-public class MatrixGeneralNpartiteGraph extends Graph2{
-    protected float cost = 0; /* This stores the editing cost.*/
-    protected int[] setSizes = null;
+public final class HierGraph extends Graph2{
+    float cost = 0; /* Stores the cost for the editing. */
+    int[] setSizes = null;
     /* Here since we have different sets of edges between different vertex sets,
      * we got to have more than one edge weights matrices.*/
-    protected ArrayList<float[][]> intraEdgeWeights = null;
-    protected ArrayList<float[][]> interEdgeWeights = null;
+    ArrayList<float[][]> edgeWeights = null;
     /* This matrix stores the distances. */
     /* Distances, unlike edge weight, must be defined between two arbitrary vertices. It does not matter 
     whether the two vertices come from the same set or not, since later single-linkage and kmeans clustering
@@ -44,38 +39,25 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
     more than one distances.*/
     //ArrayList<float[][]> distances = null;
     /* 2nd version of distances, for test. */
-    protected float[][] distMatrix = null;
-    
+    float[][] distMatrix = null;
     /**
-     * The constructor.
-     * @param filePath
-     * @param isHeader
-     * @param isXmlFile 
+     * Constructor.
+     * @param filePath 
      */
-    public MatrixGeneralNpartiteGraph(String filePath, boolean isHeader, boolean isXmlFile){
+    public HierGraph(String filePath, boolean isHeader){
         /* Init the vertices arrayList. */
         vertices = new ArrayList<>();
         /* Init the distance arrayList. */
         //distances = new ArrayList<>();
         /* Init the action arrayList. */
         actions = new ArrayList<>();
-        /* If the input is in xml format. */
-        if(isXmlFile)
-            try{
-                readXmlGraph(filePath);
-            }catch(IOException e){
-                System.out.println("(MatrixGeneralNpartiteGraph.constructor) "
-                        + " MatrixGeneralNpartiteGraph readGraph in xml failed:"
-                        + " "+filePath);
-                return;
-            }
         /* If the input file is with header.*/
-        else if(isHeader)
+        if(isHeader)
             try{
                 readGraphWithHeader(filePath);
             }catch(IOException e){
-                System.out.println("(MatrixGeneralNpartiteGraph.constructor)"
-                        + " MatrixGeneralNpartiteGraph readGraphWithHeader failed:"
+                System.out.println("(MatrixHierNpartiteGraph.constructor)"
+                        + " MatrixHierNpartiteGraph readGraphWithHeader failed:"
                         + " "+filePath);
             }
         
@@ -83,11 +65,72 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
            try{
                 readGraph(filePath);
             }catch(IOException e){
-                System.out.println("(MatrixGeneralNpartiteGraph.constructor)"
-                        + " MatrixGeneralNpartiteGraph readGraph no header failed:"
+                System.out.println("(MatrixHierNpartiteGraph.constructor)"
+                        + " MatrixHierNpartiteGraph readGraphWithHeader failed:"
                         + " "+filePath);
             } 
-        /* 2nd version of the distance matrix. Now the first version of MatrixHierGeneraGraph */
+        
+        /* Init the distance matrix. */
+        /*
+        for(int i=0;i<setSizes.length;i++){
+            /* Create the dist matrix between two sets. */
+            //float[][] dist = new float [setSizes[i]][setSizes[i+1]];
+            /* Init the values in the dist matrix. */
+        /*
+            for(int j=0;j<dist.length;j++)
+                for(int k=0;k<dist[0].length;k++)
+                    dist[j][k] = Double.NaN;
+            distances.add(dist);
+        }
+        */
+        /* 2nd version of the distance matrix. */
+        distMatrix = new float[vertices.size()][vertices.size()];
+        for(int i=0;i<distMatrix.length;i++)
+            for(int j=0;j<distMatrix[0].length;j++)
+                distMatrix[i][j] = Float.NaN;
+                
+    }
+    
+    public HierGraph(String filePath, boolean isHeader,float thresh){
+        /* Init the vertices arrayList. */
+        vertices = new ArrayList<>();
+        /* Init the distance arrayList. */
+        //distances = new ArrayList<>();
+        /* Init the action arrayList. */
+        actions = new ArrayList<>();
+        /* If the input file is with header.*/
+        if(isHeader)
+            try{
+                readGraphWithHeader(filePath);
+            }catch(IOException e){
+                System.out.println("(MatrixHierNpartiteGraph.constructor)"
+                        + " MatrixHierNpartiteGraph readGraphWithHeader failed:"
+                        + " "+filePath);
+            }
+        
+        else
+           try{
+                readGraph(filePath);
+            }catch(IOException e){
+                System.out.println("(MatrixHierNpartiteGraph.constructor)"
+                        + " MatrixHierNpartiteGraph readGraphWithHeader failed:"
+                        + " "+filePath);
+            } 
+        
+        /* Init the distance matrix. */
+       // for(int i=0;i<setSizes.length-1;i++){
+            /* Create the dist matrix between two sets. */
+           // float[][] dist = new float [setSizes[i]][setSizes[i+1]];
+            /* Init the values in the dist matrix. */
+          //  for(int j=0;j<dist.length;j++)
+           //     for(int k=0;k<dist[0].length;k++)
+          //          dist[j][k] = Double.NaN;
+          //  distances.add(dist);
+       // }
+        setThreshold(thresh);
+        detractThresh();
+        
+        /* 2nd version of the distance matrix. */
         distMatrix = new float[vertices.size()][vertices.size()];
         for(int i=0;i<distMatrix.length;i++)
             for(int j=0;j<distMatrix[0].length;j++)
@@ -95,33 +138,12 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
     }
     
     /**
-     * Constructor
-     * @param vertices
-     * @param actions
-     * @param clusters
-     * @param setSizes
-     * @param intraEdgeWeights
-     * @param interEdgeWeights 
-     */
-    public MatrixGeneralNpartiteGraph(ArrayList<Vertex2> vertices, ArrayList<Action2> actions, 
-            ArrayList<Cluster2> clusters, 
-            int[] setSizes,
-            ArrayList<float[][]> intraEdgeWeights, 
-            ArrayList<float[][]> interEdgeWeights){
-        this.vertices = vertices;
-        this.actions = actions;
-        this.setSizes = setSizes;
-        this.intraEdgeWeights=  intraEdgeWeights;
-        this.interEdgeWeights = interEdgeWeights;
-    }
-    
-    /**
-     * This method performs breadth-first search.
-     * @param Vtx The start vertex.
+     * This method performs breadth-first search in MatrixHierNpartiteGraph.
+     * @param Vtx
      * @return 
      */
     @Override
-    public MatrixGeneralNpartiteSubgraph bfs(Vertex2 Vtx){
+    public HierSubgraph bfs(Vertex2 Vtx) {
         LinkedList<Vertex2> queue = new LinkedList<>();
         //create a marker
         HashMap<String, Boolean> marker = new HashMap<>();
@@ -159,17 +181,17 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
 
          }
          /* Create a new subkpartitegraph. */
-         MatrixGeneralNpartiteSubgraph sub = new MatrixGeneralNpartiteSubgraph(result,this);
+         HierSubgraph sub = new HierSubgraph(result,this);
          return sub;
     }
-    
+
     /**
      * This method returns all connected components.
      * @return 
      */
     @Override
-    public ArrayList<MatrixGeneralNpartiteSubgraph> connectedComponents() {
-        ArrayList<MatrixGeneralNpartiteSubgraph> connectecComps = new ArrayList<>();
+    public ArrayList<HierSubgraph> connectedComponents() {
+        ArrayList<HierSubgraph> connectecComps = new ArrayList<>();
         //create a indicator LinkedList of vertices, when a vertex is included in one of the subgraphs, then it is 
         //removed from the indicator LinkedList
         LinkedList<Vertex2> indicatorList = new LinkedList<>();
@@ -180,7 +202,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
         //While there is still unvisited vertex, we use it as the seed to search for subgraphs.
         while(!indicatorList.isEmpty()){
             Vertex2 Seed = indicatorList.pollFirst();
-            MatrixGeneralNpartiteSubgraph comp = bfs(Seed);
+            HierSubgraph comp = bfs(Seed);
             connectecComps.add(comp);
             //remove all the vertex in the comp from indicatorList
             for(Vertex2 vtx: comp.getSubvertices()){
@@ -190,29 +212,21 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
         connectecComps.trimToSize();
         return connectecComps;
     }
-    
+
     /**
      * This method detracts all edge weights in matrices.
      */
     @Override
     public final void detractThresh() {
-        /* Detract the threshold from inter-edgeweights. */
-        for(int i=0;i<interEdgeWeights.size();i++){
-            float[][] weights = interEdgeWeights.get(i);
+        for(int i=0;i<edgeWeights.size();i++){
+            float[][] weights = edgeWeights.get(i);
             for(int j=0;j<weights.length;j++)
                 for(int k=0;k<weights[0].length;k++)
                     weights[j][k] -=thresh;
         }
-        /* Detract the threshold from the intra-edgeweights.*/
-        for(int i=0;i<intraEdgeWeights.size();i++){
-            float[][] weights = intraEdgeWeights.get(i);
-            for(int j=0;j<weights.length;j++)
-                for(int k=0;k<weights[0].length;k++)
-                    weights[j][k] -= thresh;
-        }
         this.threshDetracted = true;
     }
-    
+
     @Override
     public final void detractThresh(float thresh) {
         /* Check if the threshold has already detracted */
@@ -226,33 +240,22 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
     
     @Override
     public final void detractThresh(float[] thresh){
+        // Check if already detracted.
         if(threshDetracted)
-            throw new IllegalArgumentException("(MatrixHierNpartiteGraph.detractThresh) The threshold is already detracted.");
-        else{
-            // Check the length.
-            if(thresh.length != interEdgeWeights.size()+intraEdgeWeights.size())
-                throw new IllegalArgumentException("(MatrixHierNpartiteGraph.detractThresh) The length of the threshold array does not fit the graph:  "+thresh.length+"  "+interEdgeWeights.size()+intraEdgeWeights.size());
-            
-            for(int i=0;i<thresh.length;i++){
-                if(i%2 == 0){
-                    // The threshold for an intra edge weight matrix.
-                    float[][] weights = intraEdgeWeights.get(i/2);
-                    for(int j=0;j<weights.length;j++)
-                        for(int k=0;k<weights[0].length;k++)
-                            weights[j][k] -=thresh[i];
-                }
-                else{
-                    //The threshold for an inter edge weight matrix.
-                    float[][] weights = interEdgeWeights.get(i/2);
-                    for(int j=0;j<weights.length;j++)
-                        for(int k=0;k<weights[0].length;k++)
-                            weights[j][k] -=thresh[i];
-                }
-            }
+            throw new IllegalArgumentException("(MatrixHierNpariteGraph.detractThresh) The threshold is already detracted.");
+
+        // Check the length
+        if(thresh.length != this.edgeWeights.size())
+            throw new IllegalArgumentException("(MatrixHierNpartiteGraph.detractThresh) The length of the threshold array does not fit the graph:  "+thresh.length+"  "+edgeWeights.size());
+        for(int i=0;i<edgeWeights.size();i++){
+            float[][] weights = edgeWeights.get(i);
+            for(int j=0;j<weights.length;j++)
+                for(int k=0;k<weights[0].length;k++)
+                    weights[j][k] -= thresh[i];
         }
-        this.threshDetracted = true;
+        
     }
-    
+
     /**
      * This method gets the distance between two vertices. 
      * @param vtx1
@@ -274,45 +277,26 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
         */
         /* 2nd version of distances. */
         return distMatrix[vtx1.getDistIdx()][vtx2.getDistIdx()];
+        
     }
-    
-    /**
-     * Get the edge weight.
-     * @param vtx1
-     * @param vtx2
-     * @return 
-     */
+
     @Override
     public float edgeWeight(Vertex2 vtx1, Vertex2 vtx2) {
-        /* Check if it is an intra-edge. */
-        if(vtx1.getVtxSet() == vtx2.getVtxSet())
-            /* First get the edge weight matrix and then get the right edge weight. */
-            return intraEdgeWeights.get(vtx1.getVtxSet())
-                    [vtx1.getVtxIdx()][vtx2.getVtxIdx()];
-        /* Check if it  is an inter-edge.  */
-        if(vtx1.getVtxSet() - vtx2.getVtxSet() == 1 ||
-                vtx1.getVtxSet() - vtx2.getVtxSet() == -1){
-            int minVtxLvl = Math.min(vtx1.getVtxSet(),vtx2.getVtxSet());
-            if(minVtxLvl == vtx1.getVtxSet())
-                return interEdgeWeights.get(minVtxLvl)[vtx1.getVtxIdx()][vtx2.getVtxIdx()];
-            else
-                return interEdgeWeights.get(minVtxLvl)[vtx2.getVtxIdx()][vtx1.getVtxIdx()];
-        }
-        else if((vtx1.getVtxSet() ==0 && vtx2.getVtxSet() == setSizes.length-1)||
-                (vtx2.getVtxSet() ==0 && vtx1.getVtxSet() == setSizes.length-1)){
-            int maxVtxLvl = Math.max(vtx1.getVtxSet(), vtx2.getVtxSet());
-            if(maxVtxLvl == vtx1.getVtxSet())
-                return interEdgeWeights.get(maxVtxLvl)[vtx2.getVtxIdx()][vtx1.getVtxIdx()];
-            else
-                return interEdgeWeights.get(maxVtxLvl)[vtx1.getVtxIdx()][vtx2.getVtxIdx()];
-        }
-        /* If it is not an intra-edge nor is it an inter-edge, then we return NaN for cross edges. */
-        return Float.NaN;
+        /* Return Double.NaN for all undefined. */
+        if(vtx1.getVtxSet() - vtx2.getVtxSet() != 1 &&
+                vtx1.getVtxSet() - vtx2.getVtxSet() != -1)
+            return Float.NaN;
+        
+        int minVtxLvl = Math.min(vtx1.getVtxSet(),vtx2.getVtxSet());
+        if(minVtxLvl == vtx1.getVtxSet())
+            return edgeWeights.get(minVtxLvl)[vtx1.getVtxIdx()][vtx2.getVtxIdx()];
+        else
+            return edgeWeights.get(minVtxLvl)[vtx2.getVtxIdx()][vtx1.getVtxIdx()];
     }
-    
+
     @Override
     public float edgeWeight(int vtxIdx1, int vtxIdx2) {
-        throw new UnsupportedOperationException("This edgeWeight(int, int) is not supported in MatrixGeneralNpartiteGraph.");
+        throw new UnsupportedOperationException("This edgeWeight(int, int) is not supported in MatrixHierNpartiteGraph.");
     }
     
     /**
@@ -322,22 +306,13 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
      * @param i
      * @return 
      */
-    public float[][] interEdgeWeightMatrix(int i){
+    public float[][] edgeWeightMatrix(int i){
         /* First check the index. */
-        if( i<0 || i>= interEdgeWeights.size()){
-            throw new IllegalArgumentException("(MatrixGeneralNpartiteGraph.interEdgeWeighMatrix) Index out of bound:  "+
+        if( i<0 || i>= edgeWeights.size()){
+            throw new IllegalArgumentException("(MatrixHierNpartiteGraph.edgeWeighMatrix) Index out of bound:  "+
                     i);
         }
-        return interEdgeWeights.get(i);   
-    }
-    
-    
-    public float[][] intraEdgeWeightMatrix(int i){
-        if( i<0 || i>= interEdgeWeights.size()){
-            throw new IllegalArgumentException("(MatrixGeneralNpartiteGraph.interEdgeWeighMatrix) Index out of bound:  "+
-                    i);
-        }
-        return interEdgeWeights.get(i);   
+        return edgeWeights.get(i);   
     }
     
     /**
@@ -367,14 +342,6 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
     public float getCost() {
         return cost;
     }
-    
-    /**
-     * Get the sizes of sets.
-     * @return 
-     */
-    public int[] getSetSizes(){
-        return setSizes;
-    }
 
     @Override
     public boolean isActionTaken(int actIdx) {
@@ -384,41 +351,33 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             return false;
         else return true;
     }
-
+    
     @Override
     public boolean isSame(Graph2 graph){
-        if(!(graph instanceof MatrixHierGeneralGraph))
+        /* Check if it is a MatrixHierNpartiteGraph. */
+        if(!(graph instanceof HierGraph))
             return false;
-        MatrixHierGeneralGraph converted = (MatrixHierGeneralGraph)(graph);
-        
+        HierGraph converted = (HierGraph)graph;
         /* Check the vertices. */
-        if(this.vertices.size() != converted.vertices.size())
+        if(this.vertices.size()!= converted.vertices.size())
             return false;
         for(int i=0;i<vertices.size();i++)
-            if(!this.vertices.get(i).equals(converted.vertices.get(i)))
+            if(!vertices.get(i).equals(converted.vertices.get(i)))
                 return false;
-        /* Check the setsizes. */
-        if(this.setSizes.length != converted.setSizes.length)
+        /* Check the setSizes. */
+        if(setSizes.length != converted.setSizes.length)
             return false;
         for(int i=0;i<setSizes.length;i++)
-            if(this.setSizes[i] != converted.setSizes[i])
+            if(setSizes[i]!= converted.setSizes[i])
                 return false;
         
-        /* Check the edge weights. */
-        /* InterEdgeWeights. */
-        if(interEdgeWeights.size() != converted.interEdgeWeights.size())
+        /* Check the edgeWeights. */
+        if(edgeWeights.size() != converted.edgeWeights.size())
             return false;
-        /* Check every matrix in interEdgeWeights. */
-        for(int i=0;i<interEdgeWeights.size();i++)
-            if( !isMatrixEqual(interEdgeWeights.get(i),converted.interEdgeWeights.get(i)))
+        for(int i=0;i<edgeWeights.size();i++)
+            if(!isMatrixEqual(edgeWeights.get(i),converted.edgeWeights.get(i)))
                 return false;
-        /* IntraEdgeWeights. */
-        if(intraEdgeWeights.size()!= converted.intraEdgeWeights.size())
-            return false;
-        /* Check very matri xin the intraEdgeWeights. */
-        for(int j=0;j<intraEdgeWeights.size();j++)
-            if(!isMatrixEqual(intraEdgeWeights.get(j),converted.intraEdgeWeights.get(j)))
-                return false;
+        
         return true;
     }
     
@@ -439,7 +398,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
                     return false;
         return true;
     }
-    
+
     @Override
     public ArrayList<Vertex2> neighbours(Vertex2 currentVtx) {
         /* Here we add a pre-condition: Check if the threshold is detracted. */
@@ -453,7 +412,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             /* If they are from the same set, then it's impossible there's an edge
              * between them.*/
             float ew  = edgeWeight(currentVtx, vtx);
-            if(!Float.isNaN(ew) && ew>0)
+            if(!Double.isNaN(ew) && ew>0)
                 neighbours.add(vtx);       
         }
         //neighbours.trimToSize();
@@ -462,7 +421,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             return null;
         return neighbours;
     }
-    
+
     @Override
     public boolean pushAction(Vertex2 vtx1, Vertex2 vtx2) {
         /* First check if thresh is already detracted, if not we have 
@@ -471,8 +430,8 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             detractThresh();
         
         float ew = edgeWeight(vtx1, vtx2);
-        //if(ew == 0)
-          //  throw new IllegalArgumentException("There is a null-edge between vtx1 and vtx2");
+        if(ew == 0)
+            throw new IllegalArgumentException("There is a null-edge between vtx1 and vtx2");
         Action2 act = null;
         act = new Action2(vtx1,vtx2,ew);
         actions.add(act);
@@ -514,7 +473,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             return ((ArrayList<Vertex2>)vertices).get(idx).getVtxIdx();
         
     }
-    
+
     /**
      * Read the graph from the input file.
      * @param filePath
@@ -603,25 +562,15 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             sizes[i] = vertexHashSets.get(i).size();
         
         /* Init thte edgeWeights matrix. */
-        interEdgeWeights = new ArrayList<>();
-        intraEdgeWeights = new ArrayList<>();
-        /* Init the values for interEdgeWeights. */
+        edgeWeights = new ArrayList<>();
         for(int i=0;i<maxSetIdx;i++){
             float[][] weights = new float[sizes[i]][sizes[i+1]];
             /* Init the values. */
             for(int j=0;j<weights.length;j++)
                 for(int k=0;k<weights[0].length;k++)
                     weights[j][k] = Float.NaN;
-            interEdgeWeights.add(weights);
-        }
-        /* Init the values for intraEdgeWeights. */
-        for(int i=0;i<=maxSetIdx;i++){
-            float[][] weights = new float[sizes[i]][sizes[i]];
-            /* Init the values. */
-            for(int j=0;j<weights.length;j++)
-                for(int k=0;k<weights[0].length;k++)
-                    weights[j][k] = Float.NaN;
-            intraEdgeWeights.add(weights);
+            
+            edgeWeights.add(weights);
         }
         br.close();
         fr.close();
@@ -629,137 +578,6 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
         /* Read the file for the third time, assign the edge weights. */
         fr = new FileReader(filePath);
         br = new BufferedReader(fr);
-        while((line = br.readLine())!= null){
-            String[] splits = line.split("\\s+");
-            /* If we have only one vertex in the line, we just push it into vertices arrayList. */
-            if(splits.length ==2){
-                String vtxName = String.copyValueOf(splits[0].toCharArray());
-                int vtxLvl = -1;
-                /* Catch the NumberFormatException. */
-                try{
-                    vtxLvl = Integer.parseInt(String.copyValueOf(splits[1].toCharArray()));
-                }catch(NumberFormatException e){
-                    System.out.println("(MatrixHierGeneralGraph.readGraph) Invalid format for vertex set index:  "+splits[1]);
-                    System.exit(0);
-                }
-                //Push vertex
-                pushVertex(vtxName,vtxLvl);
-            }
-            /* If not, then we have two vertices in the line, we push them into vertices and assign
-             * the edge weight between them.*/
-            else{
-                String vtx1Name = String.copyValueOf(splits[0].toCharArray());
-                //int Vtx1Lvl = Integer.parseInt(String.copyValueOf(splits2[1].toCharArray()));
-                int vtx1Lvl = -1;
-                /* Catch the NumberFormatException. */
-                try{
-                    vtx1Lvl = Integer.parseInt(String.copyValueOf(splits[1].toCharArray()));
-                }catch(NumberFormatException e){
-                    System.out.println("(MatrixHierGeneralGraph.readGraph) Invalid format for vertex set index:  "+splits[0]);
-                    System.exit(0);
-                }
-                
-                String vtx2Name = String.copyValueOf(splits[2].toCharArray());
-                //int Vtx2Lvl = Integer.parseInt(String.copyValueOf(splits2[3].toCharArray()));
-                int vtx2Lvl = -1;
-                /* Catch the NumberFormatException. */
-                try{
-                    vtx2Lvl = Integer.parseInt(String.copyValueOf(splits[3].toCharArray()));
-                }catch(NumberFormatException e){
-                    System.out.println("(MatrixHierGeneralGraph.readGraph) Invalid format for vertex set index:  "+splits[3]);
-                    System.exit(0);
-                }
-                /* Check if it is a inter-edge. */
-                if(vtx1Lvl - vtx2Lvl == 1 || vtx1Lvl - vtx2Lvl == -1 || 
-                        vtx1Lvl - vtx2Lvl == setSizes.length-1 ||
-                        vtx1Lvl - vtx2Lvl == -setSizes.length+1){
-                    /* The vertices are pushed into the graph and the edge weight is read. */
-                    int idx1 = pushVertex(vtx1Name,vtx1Lvl);
-                    int idx2 = pushVertex(vtx2Name,vtx2Lvl);
-                    float ew = Float.parseFloat(String.copyValueOf(splits[4].toCharArray()));
-
-                    //U. note: here we need a method to assign inter-edgeweight.
-                    int minVtxLvl = Math.min(vtx1Lvl, vtx2Lvl);
-                    if(vtx1Lvl == minVtxLvl)
-                        interEdgeWeights.get(minVtxLvl)[idx1][idx2] = ew;
-                    else
-                        interEdgeWeights.get(minVtxLvl)[idx2][idx1] = ew;
-                }
-                /* Check if it is a intra-edge. */
-                else if(vtx1Lvl== vtx2Lvl){
-                    /* The two vertices are pushed into the graph and the edge weight is read.*/
-                    int idx1 = pushVertex(vtx1Name, vtx1Lvl);
-                    int idx2 = pushVertex(vtx2Name, vtx2Lvl);
-                    float ew = Float.parseFloat(String.copyValueOf(splits[4].toCharArray()));
-                    /*Assign the intra-edgeweight. */
-                    intraEdgeWeights.get(vtx1Lvl)[idx1][idx2] = ew;
-                    intraEdgeWeights.get(vtx1Lvl)[idx2][idx1] = ew;
-                }
-                /* Else, it must be a cross-level edge, then we throw out an exception .*/
-                else
-                    throw new IllegalArgumentException("(MatrixHierGeneralGraph.readGraph) Cross level edge: "+line);
-            }
-        }
-        br.close();
-        fr.close();
-        /* Init the cluster object. */
-        clusters = new ArrayList<>();
-    }
-    
-    /**
-     * The rule for header:
-     * NumberOfSets Set1Size Set2Size ... SetNSize
-     * @param filePath
-     * @throws IOException 
-     */
-    public final void readGraphWithHeader(String filePath) throws IOException{
-        FileReader fr = new FileReader(filePath);
-        BufferedReader br =new BufferedReader(fr);
-        /* Read the header, assign setSizes */
-        String line = null;
-        line = br.readLine();
-        String[] headerSplits = line.split("\\s+");
-        /* Create the dummy set sizes just to create edgeWeights, because of method pushVertex().*/
-        int[] sizes = null;
-        try{
-        sizes = new int[Integer.parseInt(headerSplits[0])];
-        for(int i=0;i<headerSplits.length-1;i++){
-            sizes[i] = Integer.parseInt(headerSplits[i+1]);
-        }
-        }catch(NumberFormatException e){
-            System.out.println("(MatrixHierGeneralGraph.readGraphWithHeader) Header number format problem: "+line);
-            System.exit(0);
-        }
-        catch(IndexOutOfBoundsException e){
-            System.out.println("((MatrixHierGeneralGraph.readGraphWithHeader) Number of sets and the given sizes do not match: "+line);
-            System.exit(0);
-        }
-        /* However, here we must int setSizes, set all elements to 0. */
-        setSizes = new int[Integer.parseInt(headerSplits[0])];
-        for(int i=0;i<setSizes.length;i++)
-            setSizes[i] = 0;
-        /* Init the interEdgeWeight matrix. */
-        interEdgeWeights = new ArrayList<>();
-        intraEdgeWeights = new ArrayList<>(); 
-        for(int i=0;i<setSizes.length-1;i++){
-            float[][] weights = new float[sizes[i]][sizes[i+1]];
-            /* Init the values. */
-            for(int j=0;j<weights.length;j++)
-                for(int k=0;k<weights[0].length;k++)
-                    weights[j][k] = Float.NaN;
-            interEdgeWeights.add(weights);
-        }
-        /* Init the intraEdgeWegith matrix. */
-        for(int i=0;i<setSizes.length;i++){
-            float[][] weights = new float[sizes[i]][sizes[i]];
-            for(int j=0;j<weights.length;j++)
-                for(int k=0;k<weights[0].length;k++)
-                    weights[j][k] = Float.NaN;
-            
-            intraEdgeWeights.add(weights);
-        }
-        
-        /* Read the graph.*/
         while((line = br.readLine())!= null){
             String[] splits = line.split("\\s+");
             /* If we have only one vertex in the line, we just push it into vertices arrayList. */
@@ -801,35 +619,19 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
                     System.exit(0);
                 }
 
-                /* Check if it is a inter-edge. */
-                if(vtx1Lvl - vtx2Lvl == 1 || vtx1Lvl - vtx2Lvl == -1||
-                        vtx1Lvl - vtx2Lvl == setSizes.length-1 ||
-                        vtx1Lvl - vtx2Lvl == -setSizes.length+1){
-                    /* The vertices are pushed into the graph and the edge weight is read. */
-                    int idx1 = pushVertex(vtx1Name,vtx1Lvl);
-                    int idx2 = pushVertex(vtx2Name,vtx2Lvl);
-                    float ew = Float.parseFloat(String.copyValueOf(splits[4].toCharArray()));
-
-                    //U. note: here we need a method to assign inter-edgeweight.
-                    int minVtxLvl = Math.min(vtx1Lvl, vtx2Lvl);
-                    if(vtx1Lvl == minVtxLvl)
-                        interEdgeWeights.get(minVtxLvl)[idx1][idx2] = ew;
-                    else
-                        interEdgeWeights.get(minVtxLvl)[idx2][idx1] = ew;
-                }
-                /* Check if it is a intra-edge. */
-                else if(vtx1Lvl== vtx2Lvl){
-                    /* The two vertices are pushed into the graph and the edge weight is read.*/
-                    int idx1 = pushVertex(vtx1Name, vtx1Lvl);
-                    int idx2 = pushVertex(vtx2Name, vtx2Lvl);
-                    float ew = Float.parseFloat(String.copyValueOf(splits[4].toCharArray()));
-                    /*Assign the intra-edgeweight. */
-                    intraEdgeWeights.get(vtx1Lvl)[idx1][idx2] = ew;
-                    intraEdgeWeights.get(vtx1Lvl)[idx2][idx1] = ew;
-                }
-                /* Else, it must be a cross-level edge, then we throw out an exception .*/
+                //U. note: here it's not proper to use addVertex() just to search for an existing vertex.
+                //Thus, we should add a new method findVertex(). maybe a static method in Class Vertex, or a normal
+                //method in the new NpartiteGraph class
+                int idx1 = pushVertex(vtx1Name,vtx1Lvl);
+                int idx2 = pushVertex(vtx2Name,vtx2Lvl);
+                float ew = Float.parseFloat(String.copyValueOf(splits[4].toCharArray()));
+                
+                //U. note: here we need a method to assign edgeweight.
+                int minVtxLvl = Math.min(vtx1Lvl, vtx2Lvl);
+                if(vtx1Lvl == minVtxLvl)
+                    edgeWeights.get(minVtxLvl)[idx1][idx2] = ew;
                 else
-                    throw new IllegalArgumentException("(MatrixHierGeneralGraph.readGraph) Cross level edge: "+line);
+                    edgeWeights.get(minVtxLvl)[idx2][idx1] = ew;
             }
         }
         br.close();
@@ -837,12 +639,10 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
         /* Init the cluster object. */
         clusters = new ArrayList<>();
     }
-    
+
     /**
-     * This method reads graph from the "entity-matrix" style input.
-     * @throws IOException 
-     * @param filePath The input file. 
-     * untested.
+     * This method reads the graph from the xml input.
+     * @param filePath 
      */
     public final void readXmlGraph(String filePath) throws IOException{
         /* Read the input file. */
@@ -902,19 +702,9 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
         else 
             throw new IllegalStateException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) Illegal attribute of \"externalFile\": "+hasExternEntityFile);
         /* Init all matrices. */
-        /* We have setSizes.length intraEdgeWeightMatrix. */
-        intraEdgeWeights = new ArrayList<> ();
-        for(int i=0;i<setSizes.length;i++){
-            float[][] intraMatrix = new float[setSizes[i]][setSizes[i]]; 
-            /* Give matrix the init values. */
-            for(int j=0;j<setSizes[i];j++)
-                for(int k=0;k<setSizes[i];k++)
-                    intraMatrix[j][k] = Float.NaN;
-            /* Push this intraMatrix to intraEdgeWeights. */
-            intraEdgeWeights.add(intraMatrix);
-        }
+        
         /* Init the inter matrices. */
-        interEdgeWeights = new ArrayList<>();
+        edgeWeights = new ArrayList<>();
         for(int i=0;i<setSizes.length-1;i++){
             float[][] interMatrix = new float[setSizes[i]][setSizes[i+1]];
             /* Give matrix the init values. */
@@ -922,23 +712,13 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
                 for(int k=0;k<setSizes[i+1];k++)
                     interMatrix[j][k] = Float.NaN;
             /* Push this interMatrix into interEdgeWeights. */
-            interEdgeWeights.add(interMatrix);
+            edgeWeights.add(interMatrix);
         }
-        //Init the top-rear matrix.
-        float[][] interMatrix = new float[setSizes[0]][setSizes[setSizes.length-1]];
-        for(int i=0;i<interMatrix.length;i++)
-            for(int j=0;j<interMatrix[0].length;j++)
-                interMatrix[i][j] = Float.NaN;
-        interEdgeWeights.add(interMatrix);
-        
         /* Read the edge weights from the xml input file. */
         ArrayList<Element> matrixElementList = new ArrayList<>(docRoot.getChildren("matrix"));
-        /* First check the number of elements in matrixElementList, if not equal to 2*setSizes.length-1. */
-        // There are 2*setSizes.length matrix, half intra-matrices, half inter-matrices.
-        // No check of the number of the matrices anymore 2015.06.01
-        //if(matrixElementList.size() != 2*setSizes.length) 
-          //  throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The number of matrices is wrong:  "+matrixElementList.size());
-        
+        /* First check the number of elements in matrixElementList, if not equal to setSizes.length-1. */
+        if(matrixElementList.size() != setSizes.length-1)
+            throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The number of matrices is wrong:  "+matrixElementList.size());
         /* 2. Assign the edge weights. */
         for(Element matrix: matrixElementList){
             /* First check where is this matrix. */
@@ -958,23 +738,9 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
                 throw new IllegalArgumentException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) The attribute matrixLevel error:  "+matrixLevel);
             }
             /* Check if the matrix is a intra- or inter edge weight matrix. */
-            if(matrixLevel1 == matrixLevel2){ /* Intra matrix. */
-                /* Read the content. */
-                String matrixContent = matrix.getContent(0).getValue().trim();
-                /* Check if the matrix is stored in an external file.*/
-                String hasExternMatrixFile = matrix.getAttributeValue("externalFile");
-                if(hasExternMatrixFile == null || hasExternMatrixFile.equalsIgnoreCase("false")){
-                    XmlInputParser parser = new XmlInputParser();
-                    parser.parseIntraMatrixString(matrixContent, matrixLevel1, this);
-                }
-                /* If the node names are stored in an external file.*/
-                else if(hasExternMatrixFile.equalsIgnoreCase("true")){
-                    XmlInputParser parser = new XmlInputParser();
-                    parser.parseIntraMatrixFile(matrixContent,matrixLevel1,this);
-                }
-                else
-                    throw new IllegalStateException("(biforce.graphs.MatrixHierGeneralGraph.readGraphInXml) Illegal attribute of \"externalFile\": "+hasExternMatrixFile);
-            }
+            if(matrixLevel1 == matrixLevel2) /* Intra matrix. */
+                throw new IllegalArgumentException("(biforce.graphs.MatrixHierNpartiteGraph.readGraphInXml) There is no intra-matrix in a MatrixHierNpartiteGraph.");
+            
             else{ 
                 /* For inter-matrix. */
                 String matrixContent = matrix.getContent(0).getValue().trim();
@@ -995,6 +761,111 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
         }
         clusters = new ArrayList<>();
     }
+    /**
+     * The rule for header:
+     * NumberOfSets Set1Size Set2Size ... SetNSize
+     * @param filePath
+     * @throws IOException 
+     */
+    public final void readGraphWithHeader(String filePath) throws IOException{
+        FileReader fr = new FileReader(filePath);
+        BufferedReader br =new BufferedReader(fr);
+        /* Read the header, assign setSizes */
+        String line = null;
+        line = br.readLine();
+        String[] headerSplits = line.split("\\s+");
+        /* Create the dummy set sizes just to create edgeWeights */
+        int[] sizes = null;
+        try{
+        sizes = new int[Integer.parseInt(headerSplits[0])];
+        for(int i=0;i<headerSplits.length-1;i++){
+            sizes[i] = Integer.parseInt(headerSplits[i+1]);
+        }
+        }catch(NumberFormatException e){
+            System.out.println("(MatrixHierNpartiteGraph.readGraphWithHeader) Header number format problem: "+line);
+            System.exit(0);
+        }
+        catch(IndexOutOfBoundsException e){
+            System.out.println("((MatrixHierNpartiteGraph.readGraphWithHeader) Number of sets and the given sizes do not match: "+line);
+            System.exit(0);
+        }
+        /* However, here we must int setSizes, set all elements to 0. */
+        setSizes = new int[Integer.parseInt(headerSplits[0])];
+        for(int i=0;i<setSizes.length;i++)
+            setSizes[i] = 0;
+        /* Init the edgeWeight matrix. */
+        edgeWeights = new ArrayList<>();
+        for(int i=0;i<setSizes.length-1;i++){
+            float[][] weights = new float[sizes[i]][sizes[i+1]];
+            /* Init the values. */
+            for(int j=0;j<weights.length;j++)
+                for(int k=0;k<weights[0].length;k++)
+                    weights[j][k] = Float.NaN;
+            edgeWeights.add(weights);
+        }
+        
+        /* Read the graph.*/
+        while((line = br.readLine())!= null){
+            String[] splits = line.split("\\s+");
+            /* If we have only one vertex in the line, we just push it into vertices arrayList. */
+            if(splits.length ==2){
+                String vtxName = String.copyValueOf(splits[0].toCharArray());
+                int vtxLvl = -1;
+                /* Catch the NumberFormatException. */
+                try{
+                    vtxLvl = Integer.parseInt(String.copyValueOf(splits[1].toCharArray()));
+                }catch(NumberFormatException e){
+                    System.out.println("(readGraph) Invalid format for vertex set index:  "+splits[1]);
+                    System.exit(0);
+                }
+                //Push vertex
+                pushVertex(vtxName,vtxLvl);
+            }
+            /* If not, then we have two vertices in the line, we push them into vertices and assign
+             * the edge weight between them.*/
+            else{
+                String vtx1Name = String.copyValueOf(splits[0].toCharArray());
+                //int Vtx1Lvl = Integer.parseInt(String.copyValueOf(splits2[1].toCharArray()));
+                int vtx1Lvl = -1;
+                /* Catch the NumberFormatException. */
+                try{
+                    vtx1Lvl = Integer.parseInt(String.copyValueOf(splits[1].toCharArray()));
+                }catch(NumberFormatException e){
+                    System.out.println("(readGraph) Invalid format for vertex set index:  "+splits[0]);
+                    System.exit(0);
+                }
+                
+                String vtx2Name = String.copyValueOf(splits[2].toCharArray());
+                //int Vtx2Lvl = Integer.parseInt(String.copyValueOf(splits2[3].toCharArray()));
+                int vtx2Lvl = -1;
+                /* Catch the NumberFormatException. */
+                try{
+                    vtx2Lvl = Integer.parseInt(String.copyValueOf(splits[3].toCharArray()));
+                }catch(NumberFormatException e){
+                    System.out.println("(readGraph) Invalid format for vertex set index:  "+splits[3]);
+                    System.exit(0);
+                }
+
+                //U. note: here it's not proper to use addVertex() just to search for an existing vertex.
+                //Thus, we should add a new method findVertex(). maybe a static method in Class Vertex, or a normal
+                //method in the new NpartiteGraph class
+                int idx1 = pushVertex(vtx1Name,vtx1Lvl);
+                int idx2 = pushVertex(vtx2Name,vtx2Lvl);
+                float ew = Float.parseFloat(String.copyValueOf(splits[4].toCharArray()));
+                
+                //U. note: here we need a method to assign edgeweight.
+                int minVtxLvl = Math.min(vtx1Lvl, vtx2Lvl);
+                if(vtx1Lvl == minVtxLvl)
+                    edgeWeights.get(minVtxLvl)[idx1][idx2] = ew;
+                else
+                    edgeWeights.get(minVtxLvl)[idx2][idx1] = ew;
+            }
+        }
+        br.close();
+        fr.close();
+        /* Init the cluster object. */
+        clusters = new ArrayList<>();
+    }
     
     /**
      * This method re-add the threshold to edge weights, provided the threshold has been
@@ -1010,24 +881,17 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
         if(thresh == Double.MAX_VALUE)
             throw new IllegalArgumentException("(MatrixBipartiteGraph2.detractThresh)"
                     + "  The threshold must be set at first.");
-        /* Restore the edge weights. */
         else{
-            for(int i=0;i<interEdgeWeights.size();i++){
-                float[][] weights = interEdgeWeights.get(i);
-                for(int j=0;j<weights.length;j++)
-                    for(int k=0;k<weights[0].length;k++)
-                        weights[j][k] +=thresh;
-            }
-            for(int i=0;i<intraEdgeWeights.size();i++){
-                float[][] weights = intraEdgeWeights.get(i);
-                for(int j=0;j<weights.length;j++)
-                    for(int k=0;k<weights[0].length;k++)
-                        weights[j][k] += thresh;
+            for(int i=0;i<edgeWeights.size();i++){
+            float[][] weights = edgeWeights.get(i);
+            for(int j=0;j<weights.length;j++)
+                for(int k=0;k<weights[0].length;k++)
+                    weights[j][k] +=thresh;
             }
         }
         threshDetracted = false;
     }
-    
+
     /**
      * This method removes the action with the given index from the arraylist actions.
      * @param Index
@@ -1053,59 +917,47 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
      * @param dist 
      */
     public void setDist(Vertex2 vtx1, Vertex2 vtx2){
-        /* For the 2nd version of distance, the first version of MatixHierGeneralGraph. */
-        float dist = euclidDist(vtx1,vtx2);
-        distMatrix[vtx1.getDistIdx()][vtx2.getDistIdx()] = dist;
-        distMatrix[vtx2.getDistIdx()][vtx1.getDistIdx()] = dist;
+        /* Check the vertex sets first. */
+        /*
+        if(vtx1.getVtxSet() - vtx2.getVtxSet() != 1 &&
+                vtx1.getVtxSet() - vtx2.getVtxSet() != -1)
+            return;
+        int minVtxSet = Math.min(vtx1.getVtxSet(),vtx2.getVtxSet());
+        if(minVtxSet == vtx1.getVtxSet())
+            distances.get(minVtxSet)[vtx1.getVtxIdx()][vtx2.getVtxIdx()]= euclidDist(vtx1,vtx2);
+        else
+            distances.get(minVtxSet)[vtx2.getVtxIdx()][vtx1.getVtxIdx()]= euclidDist(vtx1,vtx2);
+        */
+        /* For the 2nd version of distance. */
+        distMatrix[vtx1.getDistIdx()][vtx2.getDistIdx()] = euclidDist(vtx1,vtx2);
+        distMatrix[vtx2.getDistIdx()][vtx2.getDistIdx()] = euclidDist(vtx2,vtx1);
     }
 
     @Override
     public void setEdgeWeight(Vertex2 vtx1, Vertex2 vtx2, float edgeWeight) {
-        /* Check if it is an inter-edgeweight. */
-        if(vtx1.getVtxSet() - vtx2.getVtxSet() == 1 || 
-                vtx1.getVtxSet() - vtx2.getVtxSet() == -1){
-            int minVtxSet = Math.min(vtx1.getVtxSet(),vtx2.getVtxSet());
-            if(minVtxSet == vtx1.getVtxSet())
-                interEdgeWeights.get(minVtxSet)
-                        [vtx1.getVtxIdx()][vtx2.getVtxIdx()]= edgeWeight;
-            else
-                interEdgeWeights.get(minVtxSet)
-                        [vtx2.getVtxIdx()][vtx1.getVtxIdx()]= edgeWeight;
-        }
-        // Check if it is an edge between top set and rear set.
-        if(vtx1.getVtxSet() - vtx2.getVtxSet() == setSizes.length-1 ||
-                vtx1.getVtxSet() - vtx2.getVtxSet() == 1- setSizes.length){
-            int minVtxSet = Math.min(vtx1.getVtxSet(),vtx2.getVtxSet());
-            if(minVtxSet == vtx1.getVtxSet())
-                interEdgeWeights.get(vtx2.getVtxSet())
-                        [vtx1.getVtxIdx()][vtx2.getVtxIdx()]= edgeWeight;
-            else
-                interEdgeWeights.get(vtx2.getVtxSet())
-                        [vtx2.getVtxIdx()][vtx1.getVtxIdx()]= edgeWeight;
-        }
-            
-        /* Check if it is an intra-edgeweight. */
-        else if(vtx1.getVtxSet() == vtx2.getVtxSet())
-            intraEdgeWeights.get(vtx1.getVtxSet())[vtx1.getVtxIdx()][vtx2.getVtxIdx()]= edgeWeight;
+        /* Check the vertex sets first. */
+        if(vtx1.getVtxSet() - vtx2.getVtxSet() != 1 &&
+                vtx1.getVtxSet() - vtx2.getVtxSet() != -1)
+            throw new IllegalArgumentException("(MatrixHierNpartiteGraph.setEdgeWeight) The two vertices must be in the "
+                    + "neighbouring vertex sets:  "+vtx1.getVtxSet()+"  "+vtx2.getVtxSet());
+        int minVtxSet = Math.min(vtx1.getVtxSet(),vtx2.getVtxSet());
+        if(minVtxSet == vtx1.getVtxSet())
+            edgeWeights.get(minVtxSet)[vtx1.getVtxIdx()][vtx2.getVtxIdx()]= edgeWeight;
+        else
+            edgeWeights.get(minVtxSet)[vtx2.getVtxIdx()][vtx1.getVtxIdx()]= edgeWeight;
     }
 
-    
-     @Override
+    @Override
     public boolean takeAction(int idx) {
         /* First the check the index. */
         if(idx <0 || idx >= actions.size())
             throw new IllegalArgumentException("(MatrixBipartitGraph2.takeAction) Wrong action index: "+
                     idx);
         Action2 act = actions.get(idx);
-        
-        if(act.getOriginalWeight()>0){
+        if(act.getOriginalWeight()>0)
             setEdgeWeight(act.getVtx1(),act.getVtx2(),BiForceConstants.FORBIDDEN);
-            //System.out.println("Forbidden");
-        }
-        else{
+        else
             setEdgeWeight(act.getVtx1(),act.getVtx2(),BiForceConstants.PERMENANT);
-            //System.out.println("Permenant");
-        }
         return true;
     }
 
@@ -1125,7 +977,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
     @Override
     public void updateDist() {
         for(int i=0;i<vertices.size();i++)
-            for(int j=i+1;j<vertices.size();j++)
+            for(int j=0;j<vertices.size();j++)
                 setDist(vertices.get(i),vertices.get(j));
                 
     }
@@ -1157,77 +1009,100 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
     public int vertexSetCount() {
         return setSizes.length;
     }
-    
-    
+
     /**
-     * This method writes the distance matrix into the given file. 
-     * This method is used to output the running information of bi-force
-     * @param file 
+     * This method writes to the given filePath, according to the different format.
+     * @param filePath
+     * @param outFmt 
      */
-    public void writeDistanceMatrix(String file){
-        try{
-        FileWriter fw = new FileWriter(file);
-        BufferedWriter bw = new BufferedWriter(fw);
-        for(int i=0;i<distMatrix.length;i++){
-            for(int j=0;j<distMatrix[i].length-1;j++)
-                bw.write(distMatrix[i][j]+"\t");
-            bw.write(distMatrix[i][distMatrix[i].length-1]+"\n");
-        }
-        bw.flush();
-        bw.close();
-        fw.close();
-        }catch(IOException e){
-            System.err.println("(MatrixHierGeneralGraph.writeDistanceMatrix) File writer init error.");
-        }
+    @Override
+    public void writeGraphTo(String filePath,boolean outFmt) {
+        if(filePath == null)
+            throw new IllegalArgumentException("(MatrixHierNpartiteGraph.writeGraphTo) The given file path is null. ");
+        if(!outFmt) /* The plain format. */
+            writePlainGraphTo(filePath);
+        else
+            writeXmlGraphTo(filePath);
     }
     
     /**
-     * This method outputs the intra matrix with index idx to the given file.
-     * @param outFile
-     * @param idx 
+     * This method writes to the given filepath the xml graph format. 
+     * @param filePath 
      */
-    public void writeIntraEwMatrix(String outFile, int idx){
-        if(idx>= intraEdgeWeights.size() || idx <0)
-            throw new IllegalArgumentException("(MatrixHierGeneralGraph.writeIntraEwMatrix) The given index is out of the bound or illegal: "+idx);
-        float[][] matrix = intraEdgeWeights.get(idx);
+    public void writeXmlGraphTo(String filePath){
+        FileWriter fw = null;
+        BufferedWriter bw = null;
         try{
-        FileWriter fw = new FileWriter(outFile);
-        BufferedWriter bw = new BufferedWriter(fw);
-        for(int i=0;i<matrix.length;i++){
-            for(int j=0;j<matrix[i].length-1;j++)
-                bw.write(matrix[i][j]+"\t");
-            bw.write(matrix[i][matrix[i].length-1]+"\n");
-        }
-        bw.flush();
-        bw.close();
-        fw.close();
+            fw = new FileWriter(filePath);
+            bw = new BufferedWriter(fw);
         }catch(IOException e){
-            System.err.println("(MatrixHierGeneralGraph.writeInatrEwMatrix) File writer init error.");
+            System.err.println("(MatrixBipartiteGraph2.writeXmlGraphTo) Xml output error.");
+            return;
+        }
+        try{
+            bw.write("<document>\n");
+            /* Output the entity element. */
+            bw.write("<entity levels=\""+setSizes.length+"\">\n");
+            /* Output the vertices. */
+            for(int k=0;k<setSizes.length;k++){
+                for(int i=0;i<vertices.size();i++){
+                    if(vertices.get(i).getVtxSet() == k)
+                        bw.write(vertices.get(i).getValue()+"\t");
+                }
+                bw.write("\n");
+            }
+            bw.write("</entity>\n");
+            /* Output the matrix. */
+            for(int l=0;l<setSizes.length-1;l++){
+                bw.write("<matrix matrixLevel=\""+l+"  "+(l+1)+"\">\n");
+                float[][] matrix = edgeWeights.get(l);
+                for(int j=0;j<matrix.length;j++){
+                    for(int k=0;k<matrix[0].length-1;k++)
+                        bw.write(matrix[j][k]+"\t");
+                    bw.write(matrix[j][matrix[0].length-1]+"\n");
+                }
+                bw.write("</matrix>\n");
+            }
+            bw.write("</document>\n");
+            bw.flush();
+            bw.close();
+            fw.close();
+        }catch(IOException e){
+            System.err.println("(MatrixBipartiteGraph2.writeXmlGraphTo) Xml writing error.");
+            return;
         }
     }
+   
     
     /**
-     * This method outputs the inter edge weight matrix into the given out file.
-     * @param outFile
-     * @param idx 
+     * This method writes to the given filepath the plain graph format. 
+     * @param filePath 
      */
-    public void writerInterEwMatrix(String outFile, int idx){
-        if(idx>= interEdgeWeights.size() || idx <0)
-            throw new IllegalArgumentException("(MatrixHierGeneralGraph.writeIntraEwMatrix) The given index is out of the bound or illegal: "+idx);
-        float[][] matrix = interEdgeWeights.get(idx);
+    public void writePlainGraphTo(String filePath){
+        FileWriter fw = null;
+        BufferedWriter bw = null;
         try{
-        FileWriter fw = new FileWriter(outFile);
-        BufferedWriter bw = new BufferedWriter(fw);
-        for(int i=0;i<matrix.length;i++){
-            for(int j=0;j<matrix[i].length-1;j++)
-                bw.write(matrix[i][j]+"\t");
-            bw.write(matrix[i][matrix[i].length-1]+"\n");
-        }
+        fw = new FileWriter(filePath);
+        bw = new BufferedWriter(fw);
+        bw.write(setSizes.length+"\t");
+        for(int i=0;i<setSizes.length-1;i++)
+            bw.write(setSizes[i]+"\t");
+        bw.write(setSizes[setSizes.length-1]+"\n");
+        for(int i=0;i<vertices.size();i++)
+            for(int j=i+1;j<vertices.size();j++){
+                float ew = edgeWeight(vertices.get(i), vertices.get(j));
+                if(Double.isNaN(ew))
+                    continue;
+                bw.write(vertices.get(i).getValue()+"\t"+vertices.get(i).getVtxSet()+"\t"+
+                        vertices.get(j).getValue()+"\t"+vertices.get(j).getVtxSet()+"\t"+
+                        ew+"\n");
+            }
         bw.flush();
         bw.close();
         fw.close();
         }catch(IOException e){
-            System.err.println("(MatrixHierGeneralGraph.writeInatrEwMatrix) File writer init error.");
+            System.err.println("(MatrixHierNpartiteGraph.writePlainGraphTo) Write error.");
+            return;
         }
     }
 
@@ -1244,86 +1119,8 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             writePlainClusterTo(filePath);
     }
     
-    /**
-     * This method writes the graph in the given format into the given filePath.
-     * @param filePath
-     * @param isXmlFile 
-     */
-    @Override
-    public void writeGraphTo(String filePath, boolean isXmlFile) {
-        if(!isXmlFile) /* If plain graph is to be outputted. */
-            writePlainGraphTo(filePath);
-        else
-            writeXmlGraphTo(filePath);
-    }
     
     /**
-     * This method outputs the resulted graph in xml format into the given filePath.
-     * @param filePath 
-     */
-    public void writeXmlGraphTo(String filePath){
-        /* Write the xml. */
-        FileWriter fw = null;
-        BufferedWriter bw = null;
-        try{
-            fw = new FileWriter(filePath);
-            bw = new BufferedWriter(fw);
-        }catch(IOException e){
-            System.err.println("(MatrixHierGeneralGraph.writeXmlGraphTo) Xml output error.");
-            return;
-        }
-        try{
-            bw.write("<document>\n");
-            /* Output the entity element. */
-            bw.write("<entity levels=\""+setSizes.length+"\">\n");
-            /* Output the vertices. */
-            for(int k=0;k<setSizes.length;k++){
-                for(int i=0;i<vertices.size();i++){
-                    if(vertices.get(i).getVtxSet() == k)
-                        bw.write(vertices.get(i).getValue()+"\t");
-                }
-                bw.write("\n");
-            }
-           
-            bw.write("</entity>\n");
-            /* Output the interEdgeWeight matrix. */
-            for(int l=0;l<setSizes.length;l++){
-                bw.write("<matrix matrixLevel=\""+l+"  "+(l+1)+"\">\n");
-                float[][] matrix = interEdgeWeights.get(l);
-                for(int j=0;j<matrix.length;j++){
-                    for(int k=0;k<matrix[0].length-1;k++)
-                        bw.write(matrix[j][k]+"\t");
-                    bw.write(matrix[j][matrix[0].length-1]+"\n");
-                }
-                bw.write("</matrix>\n");
-            }
-            /* Output the intraEdgeWeight matrix. */
-            for(int l=0;l<intraEdgeWeights.size();l++){
-                bw.write("<matrix matrixLevel=\""+l+"  "+l+"\">\n");
-                float[][] matrix = intraEdgeWeights.get(l);
-                for(int j=0;j<matrix.length;j++){
-                    for(int k=0;k<matrix[0].length-1;k++)
-                        bw.write(matrix[j][k]+"\t");
-                    bw.write(matrix[j][matrix[0].length-1]+"\n");
-                }
-                bw.write("</matrix>\n");
-            }
-            bw.write("</document>\n");
-            bw.flush();
-            bw.close();
-            fw.close();
-        }catch(IOException e){
-            System.err.println("(MatrixHierGeneralGraph.writeXmlGraphTo) Xml writing error.");
-            return;
-        }
-    }
-    
-    public void writePlainGraphTo(String filePath){
-        
-    }
-    
-    
-     /**
      * This method writes the cluster in plain format into filePath.
      * @param filePath 
      */
@@ -1334,7 +1131,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             fw = new FileWriter(filePath);
             bw = new BufferedWriter(fw);
         }catch(IOException e){
-            System.err.println("(MatrixHierGeneralGraph.writeClusterTo) Clusters writing error.");
+            System.err.println("(MatrixBipartiteGraph2.writeClusterTo) Clusters writing error.");
             return;
         }
         try{
@@ -1349,7 +1146,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
         bw.close();
         fw.close();
         }catch(IOException e){
-            System.err.println("(MatrixHierGeneralGraph.writeClusterTo) Clusters writing error.");
+            System.err.println("(MatrixBipartiteGraph2.writeClusterTo) Clusters writing error.");
             return;
         }
     }
@@ -1371,7 +1168,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             fw.close();
             
         }catch(IOException e){
-            System.err.println("(MatrixHierGeneralGraph.writeXmlClusterTo) Cluster writing error.");
+            System.err.println("(MatrixHierNpartiteGraph.writeXmlClusterTo) Cluster writing error.");
             e.printStackTrace();
             return;
         }
@@ -1384,13 +1181,7 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
      */
     public void writeSingleCluster(BufferedWriter bw, Cluster2 cluster){
         ArrayList<Vertex2> clusterVertices = cluster.getVertices();
-        // For test
-        if(clusterVertices.isEmpty()){
-            System.out.println("Empty cluster");
-            return;
-        }
         try{
-        bw.write("<cluster  "+clusterVertices.get(0).getClustNum()+">\n");
         /* We output the cluster in separated sets. */
         for(int i=0;i<setSizes.length;i++){
             for(int j=0;j<clusterVertices.size();j++)
@@ -1399,20 +1190,18 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
             bw.write("\n");
         }
         bw.flush();
-        bw.write("</cluster>\n");
         }catch(IOException e){
-            System.err.println("(MatrixHierGeneralGraph.writeSingleCluster) Single cluster output error.");
+            System.err.println("(MatrixHierNpartiteGraph.writeSingleCluster) Single cluster output error.");
             e.printStackTrace();
             return;
         }
     }
-
     /**
-     * This method writes the information of the result into the given filePath.
+     * 
      * @param filePath 
      */
     @Override
-    public void writeResultInfoTo(String filePath){
+    public void writeResultInfoTo(String filePath) {
         FileWriter fw = null;
         BufferedWriter bw = null;
         try{
@@ -1429,12 +1218,19 @@ public class MatrixGeneralNpartiteGraph extends Graph2{
                     actions.get(i).getOriginalWeight()+"\n");
         }
         }catch(IOException e){
-            System.err.println("(MatrixHierGeneralGraph.writeResultInfoTo) Writing error.");
+            System.err.println("(MatrixBiPartiteGraph2.writeResultInfoTo) Writing error.");
             return;
         }
     }
     
-
-    
+    public void writerInterEwMatrix(String outFile, int idx){
+        
+    }
+    public void writeIntraEwMatrix(String outFile, int idx){
+        
+    }
+    public void writeDistanceMatrix(String file){
+        
+    }
     
 }

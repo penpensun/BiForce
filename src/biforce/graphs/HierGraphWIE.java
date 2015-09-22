@@ -24,7 +24,7 @@ import java.io.FileWriter;
  * same vertex subset.
  * @author penpen926
  */
-public class MatrixHierGeneralGraph extends Graph2{
+public class HierGraphWIE extends Graph2{
     protected float cost = 0; /* This stores the editing cost.*/
     protected int[] setSizes = null;
     /* Here since we have different sets of edges between different vertex sets,
@@ -48,7 +48,7 @@ public class MatrixHierGeneralGraph extends Graph2{
      * @param isHeader 
      * @param isXmlFile 
      */
-    public MatrixHierGeneralGraph(String filePath, boolean isHeader, boolean isXmlFile){
+    public HierGraphWIE(String filePath, boolean isHeader, boolean isXmlFile){
         /* Init the vertices arrayList. */
         vertices = new ArrayList<>();
         /* Init the distance arrayList. */
@@ -98,7 +98,7 @@ public class MatrixHierGeneralGraph extends Graph2{
      * @param isXmlFile
      * @param thresh 
      */
-    public MatrixHierGeneralGraph(String filePath, boolean isHeader, boolean isXmlFile,float thresh){
+    public HierGraphWIE(String filePath, boolean isHeader, boolean isXmlFile,float thresh){
         /* Init the vertices arrayList. */
         vertices = new ArrayList<>();
         /* Init the distance arrayList. */
@@ -152,7 +152,7 @@ public class MatrixHierGeneralGraph extends Graph2{
      * @param intraEdgeWeights
      * @param interEdgeWeights 
      */
-    public MatrixHierGeneralGraph(ArrayList<Vertex2> vertices, ArrayList<Action2> actions, 
+    public HierGraphWIE(ArrayList<Vertex2> vertices, ArrayList<Action2> actions, 
             ArrayList<Cluster2> clusters, 
             int[] setSizes,
             ArrayList<float[][]> intraEdgeWeights, 
@@ -170,7 +170,7 @@ public class MatrixHierGeneralGraph extends Graph2{
      * @return 
      */
     @Override
-    public MatrixHierGeneralSubgraph bfs(Vertex2 Vtx) {
+    public HierSubgraphWIE bfs(Vertex2 Vtx) {
         LinkedList<Vertex2> queue = new LinkedList<>();
         //create a marker
         HashMap<String, Boolean> marker = new HashMap<>();
@@ -208,7 +208,7 @@ public class MatrixHierGeneralGraph extends Graph2{
 
          }
          /* Create a new subkpartitegraph. */
-         MatrixHierGeneralSubgraph sub = new MatrixHierGeneralSubgraph(result,this);
+         HierSubgraphWIE sub = new HierSubgraphWIE(result,this);
          return sub;
     }
     
@@ -217,8 +217,8 @@ public class MatrixHierGeneralGraph extends Graph2{
      * @return 
      */
     @Override
-    public ArrayList<MatrixHierGeneralSubgraph> connectedComponents() {
-        ArrayList<MatrixHierGeneralSubgraph> connectecComps = new ArrayList<>();
+    public ArrayList<HierSubgraphWIE> connectedComponents() {
+        ArrayList<HierSubgraphWIE> connectecComps = new ArrayList<>();
         //create a indicator LinkedList of vertices, when a vertex is included in one of the subgraphs, then it is 
         //removed from the indicator LinkedList
         LinkedList<Vertex2> indicatorList = new LinkedList<>();
@@ -229,7 +229,7 @@ public class MatrixHierGeneralGraph extends Graph2{
         //While there is still unvisited vertex, we use it as the seed to search for subgraphs.
         while(!indicatorList.isEmpty()){
             Vertex2 Seed = indicatorList.pollFirst();
-            MatrixHierGeneralSubgraph comp = bfs(Seed);
+            HierSubgraphWIE comp = bfs(Seed);
             connectecComps.add(comp);
             //remove all the vertex in the comp from indicatorList
             for(Vertex2 vtx: comp.getSubvertices()){
@@ -426,9 +426,9 @@ public class MatrixHierGeneralGraph extends Graph2{
 
     @Override
     public boolean isSame(Graph2 graph){
-        if(!(graph instanceof MatrixHierGeneralGraph))
+        if(!(graph instanceof HierGraphWIE))
             return false;
-        MatrixHierGeneralGraph converted = (MatrixHierGeneralGraph)(graph);
+        HierGraphWIE converted = (HierGraphWIE)(graph);
         
         /* Check the vertices. */
         if(this.vertices.size() != converted.vertices.size())

@@ -5,7 +5,7 @@
  */
 
 package biforce.matrices;
-import biforce.graphs.BipartiteGraph;
+import biforce.graphs.BipartiteGraph_deprecated;
 import biforce.graphs.Cluster;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
  * @author Peng Sun
  */
 public class BipartiteGraphMatrix{
-    BipartiteGraph Graph =null;
+    BipartiteGraph_deprecated Graph =null;
     
     /**
      * Inits matrix on input.
@@ -113,16 +113,16 @@ public class BipartiteGraphMatrix{
         }
         
         if(hasHeader)
-            Graph =  new BipartiteGraph(edgweight, RowNames, ColNames);
+            Graph =  new BipartiteGraph_deprecated(edgweight, RowNames, ColNames);
         else
-            Graph = new BipartiteGraph(edgweight);
+            Graph = new BipartiteGraph_deprecated(edgweight);
     }
     
     /**
      * This method returns the bipartitegraph.
      * @return 
      */
-    public BipartiteGraph getGraph ()
+    public BipartiteGraph_deprecated getGraph ()
     {
         return Graph;
     }

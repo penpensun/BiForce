@@ -12,7 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import biforce.graphs.BipartiteGraph;
+import biforce.graphs.BipartiteGraph_deprecated;
 import biforce.graphs.SubBipartiteGraph;
 import biforce.graphs.Vertex;
 
@@ -21,7 +21,7 @@ import biforce.graphs.Vertex;
  * @author mac-97-41
  */
 public class ResultWriter {
-    static void writeMatrixResult(BipartiteGraph graph, Param p,
+    static void writeMatrixResult(BipartiteGraph_deprecated graph, Param p,
             String outputfile, int sizerank) throws IOException
     {
         BufferedWriter bw = new BufferedWriter(new FileWriter(outputfile,true));
